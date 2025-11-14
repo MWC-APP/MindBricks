@@ -112,7 +112,7 @@
 
           <!-- showcase forest - our main inspiration to create the app -->
           <section>
-            <div class="h-stack">
+            <div class="h-stack" style="text-align:center; justify-content:center; gap:0.6rem;">
               <img class="fragment phone-shot" src="./assets/forest_homepage_short.png" />
               <img class="fragment phone-shot" src="./assets/forest_shop.png" />
               <img class="fragment phone-shot" src="./assets/forest_stats.png" />
@@ -126,46 +126,18 @@
 
           <!-- The difference with existing apps and what we want to build (split in 2 for better animations) -->
           <!-- part 1 -->
-          <section data-background-gradient="linear-gradient(145deg,#0e172f,#1f114a)" data-auto-animate>
+          <section data-auto-animate>
             <h2>Gap in Existing Apps</h2>
 
             <div class="grid smallgap">
               <!-- Left: existing apps -->
               <div class="card compact">
                 <h3>Forest / Focus To-Do</h3>
-                <ul class="compact-list">
-                  <li class="fragment blur-in" data-fragment-index="1">Timers only</li>
-                  <li class="fragment blur-in" data-fragment-index="2">Generic rewards</li>
-                  <li class="fragment blur-in" data-fragment-index="3">No environment sensing</li>
-                  <li class="fragment blur-in" data-fragment-index="4">No next-day guidance</li>
-                </ul>
-              </div>
-
-              <!-- Right: MindBricks -->
-              <div class="card compact">
-                <h3>MindBricks</h3>
-                <ul class="compact-list">
-                  <li class="fragment blur-in" data-fragment-index="1">Context-aware (noise, light, pickups)</li>
-                  <li class="fragment blur-in" data-fragment-index="2">Adaptive, progress-linked motivation</li>
-                  <li class="fragment blur-in" data-fragment-index="3">On-device sensing & personalization</li>
-                  <li class="fragment blur-in" data-fragment-index="4">Next-day focus timeline & tips</li>
-                </ul>
-              </div>
-            </div>
-          </section>
-          <!-- part 2 -->
-          <section data-background-gradient="linear-gradient(145deg,#0e172f,#1f114a)" data-auto-animate>
-            <h2>Gap in Existing Apps</h2>
-
-            <div class="grid smallgap">
-              <!-- Left: existing apps -->
-              <div class="card compact">
-                <h3>Forest / Focus To-Do</h3>
-                <ul class="compact-list">
+                <ul class="compact-list fragment blur-in" data-fragment-index="0">
                   <li>Timers only</li>
                   <li>Generic rewards</li>
                   <li>No environment sensing</li>
-                  <li>No next-day guidance</li>
+                  <li>No guidance</li>
                 </ul>
               </div>
 
@@ -173,26 +145,27 @@
               <div class="card compact">
                 <h3>MindBricks</h3>
                 <ul class="compact-list">
-                  <li>Context-aware (noise, light, pickups)</li>
-                  <li>Adaptive, progress-linked motivation</li>
-                  <li>On-device sensing & personalization</li>
-                  <li>Next-day focus timeline & tips</li>
+                  <li class="fragment blur-in">Context-aware</li>
+                  <li class="fragment blur-in">Adaptive</li>
+                  <li class="fragment blur-in">On-device sensing</li>
+                  <li class="fragment blur-in">Next-day focus timeline</li>
                 </ul>
               </div>
             </div>
 
+
             <!-- Our strengths -->
             <div style="display:flex; align-items:center; justify-content:center; gap:0.8rem; margin-top:1.2rem; flex-wrap:nowrap;">
-              <p class="lead small" style="font-weight:600; margin:0;">
+              <p class="lead small fragment blur-in" style="font-weight:600; margin:0;" data-auto-next="100">
                 Our strengths:
               </p>
-              <span class="badge small fragment blur-in" data-fragment-index="5" style="white-space:nowrap;" data-auto-next="500">
+              <span class="badge small fragment blur-in" style="white-space:nowrap;" data-auto-next="100">
                 Privacy: fully on-device
               </span>
-              <span class="badge small fragment blur-in" data-fragment-index="6" style="white-space:nowrap;" data-auto-next="500">
+              <span class="badge small fragment blur-in" style="white-space:nowrap;" data-auto-next="100" >
                 Generative: next-day plan
               </span>
-              <span class="badge small fragment blur-in" data-fragment-index="7" style="white-space:nowrap;">
+              <span class="badge small fragment blur-in" style="white-space:nowrap;">
                 Personalized: learns your habits
               </span>
             </div>
@@ -212,7 +185,7 @@
               .steps.compact .step p { margin: 0; font-size: 0.9rem; color: #cbd5f5; }
             </style>
 
-            <div class="steps compact" style="display:grid; grid-template-columns:repeat(3, minmax(200px, 1fr)); gap:1rem; margin-top:1rem; justify-content:center; width:fit-content; margin-left:auto; margin-right:auto;">
+            <div class="steps compact" style="display:grid; grid-template-columns:repeat(3, minmax(200px, 1fr)); gap:1rem; margin-top:1rem; justify-content:center; width:fit-content; max-width:90%;">
               <div class="step fragment blur-in" data-fragment-index="1">
                 <strong>1) Start a focus block</strong>
                 <p>Pomodoro runs and records <span class="highlight">light</span>, <span class="highlight">noise</span>, <span class="highlight">phone pickups</span>.</p>
@@ -246,22 +219,24 @@
           </section>
           <!-- Work structure - who does what and when -->
           <section data-transition="slide" data-auto-animate>
-            <h2>Indicative schedule · <span class="highlight">Parallel Tracks</span></h2>
+            <h2>Indicative schedule</h2>
 
             <div class="grid" style="gap:1rem;">
               <div class="card compact">
-                <h3>Sensing</h3>
+                <h3>Sensing & Data Storage</h3>
                 <ul class="compact-list">
-                  <li>Noise & light pipeline</li>
-                  <li>Phone-pickup detection</li>
+                  <li>Sensor data processing</li>
+                  <li>On-device data storage</li>
+                  <li>User metrics</li>
                 </ul>
               </div>
 
               <div class="card compact">
-                <h3>Modeling</h3>
+                <h3>Modeling & AI</h3>
                 <ul class="compact-list">
-                  <li>Focus scoring</li>
-                  <li>Tomorrow’s timeline</li>
+                  <li>Focus score from questionnaires</li>
+                  <li>Estimate score from context</li>
+                  <li>Generate optimal schedule</li>
                 </ul>
               </div>
 
@@ -270,12 +245,13 @@
                 <ul class="compact-list">
                   <li>Pomodoro UI</li>
                   <li>House-building system</li>
+                  <li>Data visualization</li>
                 </ul>
               </div>
             </div>
 
-            <p class="mini-note" style="text-align:center;">
-              All three tracks developed concurrently and integrated weekly
+            <p class="mini-note">
+              All three tracks developed concurrently!
             </p>
           </section>
         </section>
@@ -298,9 +274,9 @@
           </section>
         </section>
 
-        <section class="thanks" data-background-gradient="linear-gradient(160deg,#0f172a,#1d2451,#3b0764)">
+        <section class="thanks" data-background-gradient="linear-gradient(135deg,#020617 0%, #0f172a 45%, #1e1b4b 100%)">
           <h2 class="highlight">Thanks!</h2>
-          <p><span class="highlight">MindBricks</span> blends sensing, behavioral modeling, and playful design to keep students <span class="highlight">laser-focused anywhere</span>.</p>
+          <p><span class="highlight">MindBricks</span> blends sensing, behavioral modeling, and playful design to keep students <span class="highlight">laser-focused</span>.</p>
 
           <div class="badges" style="display:flex; flex-direction:row; gap:0.6rem; margin-top:1.2rem; justify-content:center; flex-wrap:wrap;">
             <span class="badge"><span class="highlight">Questions?</span> We’re ready.</span>
