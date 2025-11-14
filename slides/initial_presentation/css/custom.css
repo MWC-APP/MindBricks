@@ -285,6 +285,7 @@ body {
 
 .grid {
   display: grid;
+  max-width: 90%;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.2rem;
   margin-top: 1rem;
