@@ -3,10 +3,11 @@ package ch.inf.usi.mindbricks.ui.onboarding;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.button.MaterialButton;
 
 import ch.inf.usi.mindbricks.MainActivity;
 import ch.inf.usi.mindbricks.R;
@@ -15,9 +16,10 @@ import ch.inf.usi.mindbricks.util.PreferencesManager;
 public class OnboardingActivity extends AppCompatActivity {
 
     private ViewPager2 viewPager;
-    private Button buttonSkip;
-    private Button buttonNext;
+    private MaterialButton buttonSkip;
+    private MaterialButton buttonNext;
     private PreferencesManager prefs;
+    private OnboardingPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,13 +32,14 @@ public class OnboardingActivity extends AppCompatActivity {
         buttonSkip = findViewById(R.id.buttonSkip);
         buttonNext = findViewById(R.id.buttonNext);
 
-        viewPager.setAdapter(new OnboardingPagerAdapter(this));
+        pagerAdapter = new OnboardingPagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
 
         buttonSkip.setOnClickListener(v -> finishOnboarding());
 
         buttonNext.setOnClickListener(v -> {
             int pos = viewPager.getCurrentItem();
-            if (pos < 2) {
+            if (pos < pagerAdapter.getItemCount() - 1) {
                 viewPager.setCurrentItem(pos + 1);
             } else {
                 finishOnboarding();
@@ -47,15 +50,17 @@ public class OnboardingActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                if (position == 2) {
-                    buttonNext.setText("Start");
-                    buttonSkip.setVisibility(View.GONE);
-                } else {
-                    buttonNext.setText("Next");
-                    buttonSkip.setVisibility(View.VISIBLE);
-                }
+                updateBottomButtons(position);
             }
         });
+
+        updateBottomButtons(viewPager.getCurrentItem());
+    }
+
+    private void updateBottomButtons(int position) {
+        boolean isLastPage = position == pagerAdapter.getItemCount() - 1;
+        buttonNext.setText(isLastPage ? R.string.onboarding_start : R.string.onboarding_next);
+        buttonSkip.setVisibility(isLastPage ? View.GONE : View.VISIBLE);
     }
 
     private void finishOnboarding() {
