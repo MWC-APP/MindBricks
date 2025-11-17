@@ -13,7 +13,9 @@ public class PreferencesManager {
         NOTIFICATION_ENABLED("notification_enabled"),
         USER_NAME("user_name"),
         USER_SURNAME("user_surname"),
-        USER_EMAIL("user_email");
+        USER_EMAIL("user_email"),
+        USER_FOCUS_GOAL("user_focus_goal"),
+        USER_SPRINT_LENGTH_MINUTES("user_sprint_length_minutes");
 
 
 
@@ -79,5 +81,21 @@ public class PreferencesManager {
     }
     public String getUserEmail() {
         return preferences.getString(PreferencesKey.USER_EMAIL.getName(), "");
+    }
+
+    // -- Focus goal --
+    public void setUserFocusGoal(String goal) {
+        preferences.edit().putString(PreferencesKey.USER_FOCUS_GOAL.getName(), goal).apply();
+    }
+    public String getUserFocusGoal() {
+        return preferences.getString(PreferencesKey.USER_FOCUS_GOAL.getName(), "");
+    }
+
+    // -- Sprint length (minutes) --
+    public void setUserSprintLengthMinutes(String minutes) {
+        preferences.edit().putString(PreferencesKey.USER_SPRINT_LENGTH_MINUTES.getName(), minutes).apply();
+    }
+    public String getUserSprintLengthMinutes() {
+        return preferences.getString(PreferencesKey.USER_SPRINT_LENGTH_MINUTES.getName(), "");
     }
 }
