@@ -9,15 +9,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import ch.inf.usi.mindbricks.databinding.FragmentMetricsBinding;
+import ch.inf.usi.mindbricks.databinding.FragmentProfileBinding;
 
 public class MetricsFragment extends Fragment implements View.OnClickListener {
 
-    private FragmentMetricsBinding binding;
+    private FragmentProfileBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // inflate to get binding
-        binding = FragmentMetricsBinding.inflate(inflater, container, false);
+        binding = FragmentProfileBinding.inflate(inflater, container, false);
 
         // add click listener to handle local events
 
