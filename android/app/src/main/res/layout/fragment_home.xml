@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="180dp"
-            android:text="Start"
+            android:text="@string/start_session"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -67,8 +67,8 @@
     <!-- RIGHT SIDE DRAWER -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
-        android:layout_width="260dp"
-        android:layout_height="match_parent"
+        android:layout_width="120dp"
+        android:layout_height="200dp"
         android:layout_gravity="end"
         app:menu="@menu/drawer_menu" />
 

@@ -51,6 +51,7 @@ public class HomeFragment extends Fragment {
         menuIcon = view.findViewById(R.id.drawer_menu);            // Top-right icon
         navigationView = view.findViewById(R.id.navigation_view);  // Drawer menu
 
+
         // Open the drawer when the menu icon is clicked
         menuIcon.setOnClickListener(v -> drawer.openDrawer(GravityCompat.END));
 
@@ -65,6 +66,17 @@ public class HomeFragment extends Fragment {
 
         // Timer start/stop button
         startStopButton.setOnClickListener(v -> handleStartStop());
+
+
+        // Setup the drawer
+        navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.nav_settings) {
+                // Open Settings fragment or activity
+            }
+            drawer.closeDrawer(GravityCompat.END);
+            return true;
+        });
+
     }
 
     private void handleStartStop() {
@@ -77,7 +89,7 @@ public class HomeFragment extends Fragment {
 
     private void startTimer() {
         isRunning = true;
-        startStopButton.setText("Stop");
+        startStopButton.setText("Stop Session");
 
         timerRunnable = new Runnable() {
             @Override
@@ -91,10 +103,20 @@ public class HomeFragment extends Fragment {
     }
 
     private void stopTimer() {
-        isRunning = false;
-        startStopButton.setText("Start");
+        if (!isRunning) return; // safety check
+
+        // Stop the timer Runnable
         timerHandler.removeCallbacks(timerRunnable);
+
+        // Reset counter
+        seconds = 0;
+        isRunning = false;
+
+        // Update UI
+        startStopButton.setText("Start Session"); // or use string resource
+        timerTextView.setText(String.format(Locale.getDefault(), "%02d:%02d:%02d", 0, 0, 0));
     }
+
 
     private void updateTimerUI() {
         int hours = seconds / 3600;

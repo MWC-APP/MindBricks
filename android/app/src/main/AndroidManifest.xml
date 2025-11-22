@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Notifications: needed to inform the user when timer ends -->
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MindBricks">
 
-        <!-- router activity -->
+        <!-- Launcher activity -->
         <activity
             android:name=".LauncherActivity"
             android:exported="true"
@@ -27,13 +27,16 @@
             </intent-filter>
         </activity>
 
-        <!-- main activity -->
-        <activity android:name=".MainActivity" />
-        <!-- onboarding activity -->
+        <!-- Remove ActionBar -->
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/Theme.MindBricks.NoActionBar" />
+
+        <!-- Onboarding activity without ActionBar -->
         <activity
             android:name=".ui.onboarding.OnboardingActivity"
             android:theme="@style/Theme.MindBricks.NoActionBar" />
-        />
+
     </application>
 
 </manifest>
