@@ -15,7 +15,8 @@ public class PreferencesManager {
         USER_SURNAME("user_surname"),
         USER_EMAIL("user_email"),
         USER_FOCUS_GOAL("user_focus_goal"),
-        USER_SPRINT_LENGTH_MINUTES("user_sprint_length_minutes");
+        USER_SPRINT_LENGTH_MINUTES("user_sprint_length_minutes"),
+        USER_TAGS_JSON("user_tags_json");
 
 
 
@@ -97,5 +98,13 @@ public class PreferencesManager {
     }
     public String getUserSprintLengthMinutes() {
         return preferences.getString(PreferencesKey.USER_SPRINT_LENGTH_MINUTES.getName(), "");
+    }
+
+    // -- User tags --
+    public void setUserTagsJson(String tagsJson) {
+        preferences.edit().putString(PreferencesKey.USER_TAGS_JSON.getName(), tagsJson).apply();
+    }
+    public String getUserTagsJson() {
+        return preferences.getString(PreferencesKey.USER_TAGS_JSON.getName(), "[]");
     }
 }
