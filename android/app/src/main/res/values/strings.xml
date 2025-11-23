@@ -25,6 +25,19 @@
     <string name="onboarding_profile_goal_label">What project or habits do you want to focus on?</string>
     <string name="onboarding_profile_session_label">Preferred sprint length (minutes)</string>
     <string name="onboarding_profile_session_helper">Start with 25 minutes to follow the classic Pomodoro technique.</string>
+    <string name="onboarding_tags_empty_state">Add tags to label each study session (e.g. Algorithms, UX Research, Physics).</string>
+    <string name="onboarding_tags_add_button">Add a tag</string>
+    <string name="onboarding_error_name_required">Add your name so we can personalize your coaching.</string>
+    <string name="onboarding_error_goal_required">Tell us what you want to focus on.</string>
+    <string name="onboarding_error_sprint_required">Enter your preferred sprint length.</string>
+    <string name="onboarding_error_sprint_invalid">Use a positive number of minutes.</string>
+    <string name="onboarding_error_tags_required">Create at least one tag to track your sessions.</string>
+    <string name="onboarding_error_profile_required">Complete your profile to continue.</string>
+    <string name="onboarding_tags_dialog_title">Create a tag</string>
+    <string name="onboarding_tags_dialog_add">Add tag</string>
+    <string name="onboarding_tags_dialog_name_label">Tag name</string>
+    <string name="onboarding_tags_dialog_color_label">Pick a color</string>
+    <string name="onboarding_error_tag_name_required">Give your tag a name.</string>
 
     <string name="onboarding_sensors_title">Sense your environment</string>
     <string name="onboarding_sensors_description">MindBricks learns based on ambient noise and light environment during study sessions.</string>
@@ -34,6 +47,8 @@
     <string name="onboarding_sensors_light_body">Ambient light data helps us understand if you are more productive in the dark, or in the bright.</string>
     <string name="onboarding_enable_microphone">Allow microphone</string>
     <string name="onboarding_enable_light">Allow luminance sensor</string>
+    <string name="onboarding_error_microphone_required">Enable microphone access to continue.</string>
+    <string name="onboarding_sensors_light_unavailable">Light sensor unavailable on this device</string>
 
     <string name="onboarding_notifications_title">Stay on track</string>
     <string name="onboarding_notifications_body">Enable reminders so MindBricks can nudge you to start, pause, and celebrate after each focus session.</string>
