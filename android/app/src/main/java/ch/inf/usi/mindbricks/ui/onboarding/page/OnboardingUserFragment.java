@@ -86,6 +86,14 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
         loadTagsFromPrefs();
         renderTags();
 
+        // input validation callback -> when user focus changes = trigger field validation
+        editName.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) validateNameField();
+        });
+        editSprintLength.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) validateSprintLengthField();
+        });
+
         return view;
     }
 
@@ -108,30 +116,12 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
         // 1. ensure that all fields are filed
 
-        if (TextUtils.isEmpty(name)) {
-            nameLayout.setError(getString(R.string.onboarding_error_name_required));
-            isValid = false;
-        }
+        if (!validateNameField()) isValid = false;
         if (tags.isEmpty()) {
             showTagValidationError();
             isValid = false;
         }
-        if (TextUtils.isEmpty(sprintLength)) {
-            sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_required));
-            isValid = false;
-        } else {
-            // 2. ensure that the sprint length is a valid number (integer + non-negative)
-            try {
-                int sprintMinutes = Integer.parseInt(sprintLength);
-                if (sprintMinutes <= 0) {
-                    sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_invalid));
-                    isValid = false;
-                }
-            } catch (NumberFormatException e) {
-                sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_invalid));
-                isValid = false;
-            }
-        }
+        if (!validateSprintLengthField()) isValid = false;
 
         // if all valid: store the result in app preferences
         if (isValid) {
@@ -171,6 +161,45 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     private void clearErrors() {
         nameLayout.setError(null);
         sprintLengthLayout.setError(null);
+    }
+
+    /**
+     * Validates the name field ensuring that user input is not empty
+     * @return true if the name is valid, false otherwise
+     */
+    private boolean validateNameField() {
+        String name = readText(editName);
+        if (TextUtils.isEmpty(name)) {
+            nameLayout.setError(getString(R.string.onboarding_error_name_required));
+            return false;
+        }
+        nameLayout.setError(null);
+        return true;
+    }
+
+    /**
+     * Validates the sprint length field ensuring that user input is not empty and is a valid number
+     * @return true if the sprint length is valid, false otherwise
+     */
+    private boolean validateSprintLengthField() {
+        String sprintLength = readText(editSprintLength);
+        if (TextUtils.isEmpty(sprintLength)) {
+            sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_required));
+            return false;
+        }
+        try {
+            int sprintMinutes = Integer.parseInt(sprintLength);
+            if (sprintMinutes <= 0) {
+                sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_invalid));
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_invalid));
+            return false;
+        }
+
+        sprintLengthLayout.setError(null);
+        return true;
     }
 
     /**
