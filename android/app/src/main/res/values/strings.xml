@@ -120,4 +120,9 @@
     <string name="title_home">Home</string>
     <string name="title_metrics">Metrics</string>
     <string name="title_profile">Profile</string>
+
+    <!-- Timer  -->
+    <string name="start_session">Start Session</string>
+    <string name="stop_session">Stop Session</string>
+
 </resources>

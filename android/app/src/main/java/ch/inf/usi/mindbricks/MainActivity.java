@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
         // this setups how the fragments are displayed in the activity
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 }
