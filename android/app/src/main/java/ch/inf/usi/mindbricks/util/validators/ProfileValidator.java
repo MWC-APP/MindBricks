@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.Tag;
@@ -14,6 +15,13 @@ import ch.inf.usi.mindbricks.util.ValidationResult;
  * data (name, sprint length, tags) for reusability across the application
  */
 public final class ProfileValidator {
+
+    /**
+     * The validation pattern for names.
+     * (Source: <a href="https://stackoverflow.com/questions/888838/regular-expression-for-validating-names-and-surnames">stackoverflow</a>)
+     */
+    private static final Pattern NAME_PATTERN =
+            Pattern.compile("^[\\p{L} .'-]+$");
 
     private ProfileValidator() {
         // not instantiable
@@ -27,6 +35,11 @@ public final class ProfileValidator {
     public static ValidationResult validateName(String name) {
         if (TextUtils.isEmpty(name == null ? "" : name.trim())) {
             return ValidationResult.error(R.string.validation_error_name_required);
+        }
+        assert name != null; // after the previous check -> this is enforced!
+        String normalized = name.trim();
+        if (!NAME_PATTERN.matcher(normalized).matches()) {
+            return ValidationResult.error(R.string.validation_error_name_format);
         }
         return ValidationResult.ok();
     }
@@ -49,15 +62,6 @@ public final class ProfileValidator {
         } catch (NumberFormatException e) {
             return ValidationResult.error(R.string.validation_error_sprint_invalid);
         }
-        return ValidationResult.ok();
-    }
-
-    /**
-     * Validates tags; current rule allows empty/null (tags are optional).
-     * @param tags The list of tags to validate
-     * @return A ValidationResult indicating the validation result
-     */
-    public static ValidationResult validateTags(List<Tag> tags) {
         return ValidationResult.ok();
     }
 }

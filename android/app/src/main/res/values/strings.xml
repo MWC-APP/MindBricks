@@ -27,7 +27,6 @@
     <string name="onboarding_profile_session_helper">Start with 25 minutes to follow the classic Pomodoro technique.</string>
     <string name="onboarding_tags_empty_state">Add tags to label each study session (e.g. Algorithms, UX Research, Physics).</string>
     <string name="onboarding_tags_add_button">Add a tag</string>
-    <string name="validation_error_name_required">Add your name so we can personalize your coaching.</string>
     <string name="onboarding_error_goal_required">Tell us what you want to focus on.</string>
     <string name="validation_error_sprint_required">Enter your preferred sprint length.</string>
     <string name="validation_error_sprint_invalid">Use a positive number of minutes.</string>
@@ -58,6 +57,10 @@
 
     <string name="onboarding_done_title">Ready to focus</string>
     <string name="onboarding_done_body">You have everything set. When you tap Start we\'ll open your focus dashboard.</string>
+
+    <string name="validation_error_name_required">Add your name so we can personalize your coaching.</string>
+    <string name="validation_error_name_format">Use a real name (letters, accents, spaces, &amp; allowed).</string>
+    <string name="validation_error_tag_name_format">Use letters/numbers with simple punctuation for tag names.</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

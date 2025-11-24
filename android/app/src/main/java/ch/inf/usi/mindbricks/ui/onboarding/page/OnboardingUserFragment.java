@@ -2,7 +2,6 @@ package ch.inf.usi.mindbricks.ui.onboarding.page;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +27,7 @@ import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.Tags;
 import ch.inf.usi.mindbricks.util.ValidationResult;
 import ch.inf.usi.mindbricks.util.validators.ProfileValidator;
+import ch.inf.usi.mindbricks.util.validators.TagValidator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -218,15 +218,14 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(d -> dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
                 .setOnClickListener(v -> {
-                    // validate tag name -> ensure it is not empty
+                    // validate tag name using validator utility
                     String title = readText(editTagName);
-                    if (TextUtils.isEmpty(title)) {
-                        // show error if not valid
-                        tagNameLayout.setError(getString(R.string.onboarding_error_tag_name_required));
+                    ValidationResult titleResult = TagValidator.validateTitle(title);
+                    if (!titleResult.isValid()) {
+                        tagNameLayout.setError(getString(titleResult.errorResId()));
                         return;
-                    } else {
-                        tagNameLayout.setError(null);
                     }
+                    tagNameLayout.setError(null);
 
                     // get the selected color from the list
                     int checkedChipId = colorGroup.getCheckedChipId();
