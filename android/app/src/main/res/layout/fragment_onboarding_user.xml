@@ -43,17 +43,31 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/imageProfile"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:contentDescription="@string/onboarding_profile_upload_photo"
-                    android:scaleType="centerCrop"
-                    android:src="@mipmap/ic_launcher_round"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                    app:strokeColor="?attr/colorPrimary"
-                    app:strokeWidth="2dp" />
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageProfile"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:contentDescription="@string/onboarding_profile_upload_photo"
+                        android:src="@mipmap/ic_launcher_round"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                        app:strokeColor="?attr/colorPrimary"
+                        app:strokeWidth="2dp" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/buttonReloadAvatar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:contentDescription="@string/onboarding_profile_upload_photo"
+                        app:backgroundTint="?attr/colorSurfaceDim"
+                        app:fabCustomSize="36dp"
+                        app:maxImageSize="20dp"
+                        app:srcCompat="@drawable/ic_avatar_reload" />
+                </FrameLayout>
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonChoosePhoto"
                     style="@style/Widget.Material3.Button.TextButton"

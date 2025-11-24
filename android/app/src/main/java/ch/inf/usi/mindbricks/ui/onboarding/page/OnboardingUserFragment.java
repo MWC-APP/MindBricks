@@ -18,6 +18,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -51,6 +52,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     private ChipGroup tagChipGroup;
     private MaterialButton addTagButton;
     private MaterialTextView tagEmptyState;
+    private FloatingActionButton reloadAvatarButton;
 
     private final List<Tag> tags = new ArrayList<>();
     private PreferencesManager prefs;
@@ -82,6 +84,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
         tagChipGroup = view.findViewById(R.id.chipGroupTags);
         addTagButton = view.findViewById(R.id.buttonAddTag);
         tagEmptyState = view.findViewById(R.id.textTagsEmptyState);
+        reloadAvatarButton = view.findViewById(R.id.buttonReloadAvatar);
 
         // set handler to pick photo
         MaterialButton choosePhoto = view.findViewById(R.id.buttonChoosePhoto);
@@ -89,6 +92,12 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
         // show dialog on "add a tag"
         addTagButton.setOnClickListener(v -> showAddTagDialog());
+
+        // generate a new avatar on "refresh" click
+        reloadAvatarButton.setOnClickListener(v -> {
+            String seed = generateUniqueSeed();
+            loadRandomizedProfilePicture(seed);
+        });
 
         // preload if already stored
         editName.setText(prefs.getUserName());
@@ -105,7 +114,11 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadProfilePicture();
+        String seed = prefs.getUserName();
+        if (seed == null || seed.isEmpty()) {
+            seed = generateUniqueSeed();
+        }
+        loadRandomizedProfilePicture(seed);
     }
 
     @Override
@@ -155,12 +168,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     /**
      * Loads the default user avatar from DiceBear.
      */
-    private void loadProfilePicture() {
-        String seed = prefs.getUserName();
-        if (seed == null || seed.isEmpty()) {
-            seed = generateUniqueSeed();
-        }
-
+    private void loadRandomizedProfilePicture(String seed) {
         // build URL with unique seed
         Uri avatarUri = Uri.parse(DICEBEAR_BASE_URL)
                 .buildUpon()
