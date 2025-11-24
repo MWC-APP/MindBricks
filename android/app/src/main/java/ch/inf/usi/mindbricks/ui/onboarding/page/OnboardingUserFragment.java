@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,12 +19,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.textview.MaterialTextView;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.ui.onboarding.OnboardingStepValidator;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.Tags;
+import ch.inf.usi.mindbricks.util.ValidationResult;
+import ch.inf.usi.mindbricks.util.validators.ProfileValidator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,7 +46,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     private TextInputEditText editSprintLength;
     private ChipGroup tagChipGroup;
     private MaterialButton addTagButton;
-    private View tagEmptyState;
+    private MaterialTextView tagEmptyState;
 
     private final List<Tag> tags = new ArrayList<>();
     private PreferencesManager prefs;
@@ -87,14 +89,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
         // load + render the list of tags stored inside preferences
         loadTagsFromPrefs();
         renderTags();
-
-        // input validation callback -> when user focus changes = trigger field validation
-        editName.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) validateNameField();
-        });
-        editSprintLength.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) validateSprintLengthField();
-        });
+        setupFieldValidation();
 
         return view;
     }
@@ -108,26 +103,14 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
 
     @Override
     public boolean validateStep() {
-        clearErrors();
-
-        // get data from fields
-        String name = readText(editName);
-        String sprintLength = readText(editSprintLength);
-
         boolean isValid = true;
 
-        // 1. ensure that all fields are filed
-
         if (!validateNameField()) isValid = false;
-        if (tags.isEmpty()) {
-            showTagValidationError();
-            isValid = false;
-        }
         if (!validateSprintLengthField()) isValid = false;
 
         // if all valid: store the result in app preferences
         if (isValid) {
-            persistUserData(name, sprintLength);
+            persistUserData(readText(editName), readText(editSprintLength));
         }
 
         return isValid;
@@ -157,12 +140,13 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
         return editText.getText() != null ? editText.getText().toString().trim() : "";
     }
 
-    /**
-     * Clears errors from fields in this fragment
-     */
-    private void clearErrors() {
-        nameLayout.setError(null);
-        sprintLengthLayout.setError(null);
+    private void setupFieldValidation() {
+        editName.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) validateNameField();
+        });
+        editSprintLength.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) validateSprintLengthField();
+        });
     }
 
     /**
@@ -170,9 +154,9 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
      * @return true if the name is valid, false otherwise
      */
     private boolean validateNameField() {
-        String name = readText(editName);
-        if (TextUtils.isEmpty(name)) {
-            nameLayout.setError(getString(R.string.onboarding_error_name_required));
+        ValidationResult result = ProfileValidator.validateName(readText(editName));
+        if (!result.isValid()) {
+            nameLayout.setError(getString(result.errorResId()));
             return false;
         }
         nameLayout.setError(null);
@@ -184,22 +168,11 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
      * @return true if the sprint length is valid, false otherwise
      */
     private boolean validateSprintLengthField() {
-        String sprintLength = readText(editSprintLength);
-        if (TextUtils.isEmpty(sprintLength)) {
-            sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_required));
+        ValidationResult result = ProfileValidator.validateSprintLength(readText(editSprintLength));
+        if (!result.isValid()) {
+            sprintLengthLayout.setError(getString(result.errorResId()));
             return false;
         }
-        try {
-            int sprintMinutes = Integer.parseInt(sprintLength);
-            if (sprintMinutes <= 0) {
-                sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_invalid));
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            sprintLengthLayout.setError(getString(R.string.onboarding_error_sprint_invalid));
-            return false;
-        }
-
         sprintLengthLayout.setError(null);
         return true;
     }
@@ -208,7 +181,9 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
      * Shows a dialog to add a new tag to the list
      *
      * NOTE: this solution is inspired from this tutorial:
-     * <https://www.geeksforgeeks.org/android/how-to-create-a-custom-alertdialog-in-android/>
+     * <a href="https://www.geeksforgeeks.org/android/how-to-create-a-custom-alertdialog-in-android/">
+     *     geeksforgeeks.org
+     * </a>
      */
     private void showAddTagDialog() {
         // loads the dialog view from the layout
@@ -284,12 +259,15 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
      */
     private void renderTags() {
         tagChipGroup.removeAllViews();
+        // if no tags -> show a message instead
         if (tags.isEmpty()) {
+            tagEmptyState.setText(getString(R.string.onboarding_tags_empty_state));
             tagEmptyState.setVisibility(View.VISIBLE);
             return;
         }
         tagEmptyState.setVisibility(View.GONE);
 
+        // render each tag view as individual chips + add chips to the group
         for (Tag tag : tags) {
             Chip chip = (Chip) LayoutInflater.from(requireContext())
                     .inflate(R.layout.view_tag_chip, tagChipGroup, false);
@@ -302,15 +280,6 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
                 prefs.setUserTagsJson(serializeTags());
             });
             tagChipGroup.addView(chip);
-        }
-    }
-
-    /**
-     * Shows the error message for missing tags
-     */
-    private void showTagValidationError() {
-        if (tagEmptyState instanceof android.widget.TextView) {
-            ((android.widget.TextView) tagEmptyState).setText(getString(R.string.onboarding_error_tags_required));
         }
     }
 

@@ -16,8 +16,8 @@ import ch.inf.usi.mindbricks.MainActivity;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.PermissionManager;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
-import org.json.JSONArray;
-import org.json.JSONException;
+import ch.inf.usi.mindbricks.util.ValidationResult;
+import ch.inf.usi.mindbricks.util.validators.ProfileValidator;
 
 public class OnboardingActivity extends AppCompatActivity {
 
@@ -148,17 +148,11 @@ public class OnboardingActivity extends AppCompatActivity {
      */
     private boolean canCompleteOnboarding() {
         // ensure user has a valid name + sprint length
-        if (prefs.getUserName().isEmpty() ||
-                prefs.getUserSprintLengthMinutes().isEmpty()) {
+        ValidationResult nameResult = ProfileValidator.validateName(prefs.getUserName());
+        ValidationResult sprintLengthResult = ProfileValidator.validateSprintLength(prefs.getUserSprintLengthMinutes());
+        if (!nameResult.isValid() || !sprintLengthResult.isValid()) {
             viewPager.setCurrentItem(PAGE_USER, true);
             Snackbar.make(viewPager, R.string.onboarding_error_profile_required, Snackbar.LENGTH_SHORT).show();
-            return false;
-        }
-
-        // ensure user has some tags
-        if (!hasStoredTags()) {
-            viewPager.setCurrentItem(PAGE_USER, true);
-            Snackbar.make(viewPager, R.string.onboarding_error_tags_required, Snackbar.LENGTH_SHORT).show();
             return false;
         }
 
@@ -174,18 +168,8 @@ public class OnboardingActivity extends AppCompatActivity {
     }
 
     /**
-     * Utility method to check if user has stored tags
-     * @return true if there is at least one stored tag, false otherwise
+     * Finishes the onboarding process and goes to the main activity
      */
-    private boolean hasStoredTags() {
-        try {
-            JSONArray arr = new JSONArray(prefs.getUserTagsJson());
-            return arr.length() > 0;
-        } catch (JSONException e) {
-            return false;
-        }
-    }
-
     private void finishOnboarding() {
         // toggle flag + go to main activity
         prefs.setOnboardingComplete();
