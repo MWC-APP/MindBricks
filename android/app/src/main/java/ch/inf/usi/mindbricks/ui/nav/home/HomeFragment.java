@@ -159,7 +159,7 @@ public class HomeFragment extends Fragment {
     private void confirmEndSessionDialog() {
         new AlertDialog.Builder(requireContext())
                 .setTitle("End Session?")
-                .setMessage("Are you sure you want to end the current session? No coins will be awarded.")
+                .setMessage("Are you sure you want to end the current session?")
                 .setPositiveButton("Confirm", (dialog, which) -> {
                     stopTimerAndReset();
                     Toast.makeText(getContext(), "Session ended.", Toast.LENGTH_SHORT).show();
