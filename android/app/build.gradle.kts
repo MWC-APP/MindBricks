@@ -42,7 +42,10 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        dataBinding = true
+        compose = true
     }
+
 }
 
 dependencies {
@@ -65,4 +68,9 @@ dependencies {
     implementation(libs.glide.runtime)
     annotationProcessor(libs.glide.compiler)
     implementation("com.google.android.material:material:1.10.0")
+
+    // visualistion
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.1")
 }

@@ -40,6 +40,16 @@
         <activity
             android:name=".ui.onboarding.OnboardingActivity"
             android:theme="@style/Theme.MindBricks.NoActionBar" />
+            
+        <!-- Visualisation -->
+        <activity
+            android:name=".ui.analytics.AnalyticsActivity"
+            android:label="Analytics"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
 
     </application>
 
