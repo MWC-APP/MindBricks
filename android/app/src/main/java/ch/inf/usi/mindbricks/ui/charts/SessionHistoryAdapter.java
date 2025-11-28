@@ -1,16 +1,20 @@
 package ch.inf.usi.mindbricks.ui.charts;
 
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.chip.Chip;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -18,13 +22,12 @@ import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.StudySession;
 
 /**
- * Adapter for displaying session history in a RecyclerView
+ * Adapter for displaying study session history in a RecyclerView
  */
 public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAdapter.SessionViewHolder> {
 
     private List<StudySession> sessions;
-    private final OnSessionClickListener listener;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault());
+    private OnSessionClickListener clickListener;
 
     public interface OnSessionClickListener {
         void onSessionClick(StudySession session);
@@ -32,14 +35,19 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
 
     public SessionHistoryAdapter(OnSessionClickListener listener) {
         this.sessions = new ArrayList<>();
-        this.listener = listener;
+        this.clickListener = listener;
+    }
+
+    public void setData(List<StudySession> sessions) {
+        this.sessions = sessions != null ? sessions : new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public SessionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_sessions_history, parent, false);
+                .inflate(R.layout.item_session_history, parent, false);
         return new SessionViewHolder(view);
     }
 
@@ -54,113 +62,43 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
         return sessions.size();
     }
 
-    public void setData(List<StudySession> sessions) {
-        this.sessions = sessions != null ? sessions : new ArrayList<>();
-        notifyDataSetChanged();
-    }
-
-    public void addSession(StudySession session) {
-        sessions.add(0, session);
-        notifyItemInserted(0);
-    }
-
-    public class SessionViewHolder extends RecyclerView.ViewHolder {
+    class SessionViewHolder extends RecyclerView.ViewHolder {
+        private final MaterialCardView cardView;
         private final TextView dateText;
         private final TextView durationText;
-        private final TextView productivityText;
-        private final TextView noiseText;
-        private final TextView lightText;
-        private final TextView pickupText;
-        private final TextView locationText;
-        private final View completionIndicator;
+        private final TextView focusScoreText;
 
         SessionViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardView = itemView.findViewById(R.id.sessionCard);
             dateText = itemView.findViewById(R.id.sessionDate);
             durationText = itemView.findViewById(R.id.sessionDuration);
-            productivityText = itemView.findViewById(R.id.sessionProductivity);
-            noiseText = itemView.findViewById(R.id.noiseLevel);
-            lightText = itemView.findViewById(R.id.lightLevel);
-            pickupText = itemView.findViewById(R.id.pickupCount);
-            locationText = itemView.findViewById(R.id.sessionLocation);
-            completionIndicator = itemView.findViewById(R.id.completionIndicator);
-
-            itemView.setOnClickListener(v -> {
-                int pos = getBindingAdapterPosition();
-                if (pos != RecyclerView.NO_POSITION && listener != null) {
-                    listener.onSessionClick(sessions.get(pos));
-                }
-            });
+            focusScoreText = itemView.findViewById(R.id.sessionFocusScore);
         }
 
         void bind(StudySession session) {
-            dateText.setText(dateFormat.format(session.getStartTime()));
-            durationText.setText(String.format(Locale.getDefault(), "%d min", session.getDurationMinutes()));
+            // Format date
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault());
+            dateText.setText(sdf.format(new Date(session.getTimestamp())));
 
-            // Productivity score with color coding
-            int productivity = session.getProductivityScore();
-            productivityText.setText(String.format(Locale.getDefault(), "%d%%", productivity));
-            int productivityColor = getProductivityColor(productivity);
-            productivityText.setTextColor(productivityColor);
-
-            // Noise level
-            String noiseLevel = categorizeNoise(session.getNoiseAvgDb());
-            noiseText.setText(noiseLevel);
-
-            // Light level
-            String lightLevel = categorizeLight(session.getLightLuxAvg());
-            lightText.setText(lightLevel);
-
-            // Phone pickups
-            pickupText.setText(String.valueOf(session.getPhonePickups()));
-
-            // Location
-            String location = session.getUserLocation();
-            locationText.setText(capitalizeFirst(location));
-
-            // Completion indicator
-            if (session.isSessionCompleted()) {
-                completionIndicator.setBackgroundColor(itemView.getContext().getColor(R.color.tag_color_green));
+            // Format duration
+            int hours = session.getDurationMinutes() / 60;
+            int minutes = session.getDurationMinutes() % 60;
+            if (hours > 0) {
+                durationText.setText(String.format(Locale.getDefault(), "%dh %dm", hours, minutes));
             } else {
-                completionIndicator.setBackgroundColor(itemView.getContext().getColor(R.color.tag_color_orange));
+                durationText.setText(String.format(Locale.getDefault(), "%dm", minutes));
             }
-        }
 
-        private int getProductivityColor(int productivity) {
-            if (productivity < 40) {
-                return itemView.getContext().getColor(R.color.tag_color_red);
-            } else if (productivity < 70) {
-                return itemView.getContext().getColor(R.color.tag_color_orange);
-            } else {
-                return itemView.getContext().getColor(R.color.tag_color_green);
-            }
-        }
+            // Format focus score
+            focusScoreText.setText(String.format(Locale.getDefault(), "%.0f%% focus", session.getFocusScore()));
 
-        private String categorizeNoise(float noiseDb) {
-            if (noiseDb < 30)
-                return "Quiet";
-            if (noiseDb < 45)
-                return "Moderate";
-            if (noiseDb < 60)
-                return "Loud";
-
-            return "Very Loud";
-        }
-
-        private String categorizeLight(float lightLux) {
-            if (lightLux < 50)
-                return "Dark";
-            if (lightLux < 200)
-                return "Dim";
-            if (lightLux < 400)
-                return "Bright";
-
-            return "Very Bright";
-        }
-
-        private String capitalizeFirst(String str) {
-            if (str == null || str.isEmpty()) return str;
-            return str.substring(0, 1).toUpperCase() + str.substring(1);
+            // Click listener
+            cardView.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onSessionClick(session);
+                }
+            });
         }
     }
 }

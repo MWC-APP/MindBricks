@@ -2,147 +2,165 @@ package ch.inf.usi.mindbricks.util;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 import ch.inf.usi.mindbricks.model.StudySession;
 
 /**
- * Utility class for generating mock study session data for testing
- * In production, this would be replaced with actual database queries
+ * Generates mock study session data for testing and demonstration
  */
 public class MockDataGenerator {
 
     private static final Random random = new Random();
-    private static final String[] LOCATIONS = {"home", "library", "cafe", "outside"};
-    private static final String[] NOTES = {
-            "Great flow", "Too noisy", "Distracted", "Energy peak",
-            "Felt tired", "Good session", "Hard to focus", "Mediocre",
-            "Stable productivity", "Sun was annoying"
+
+    private static final String[] TAG_TITLES = {
+            "Mathematics", "Physics", "Programming", "History", "Literature",
+            "Biology", "Chemistry", "Art", "Music", "Languages"
+    };
+
+    private static final int[] TAG_COLORS = {
+            0xFFF44336, // Red
+            0xFFFB8C00, // Orange
+            0xFFFBC02D, // Yellow
+            0xFF4CAF50, // Green
+            0xFF2196F3, // Blue
+            0xFF9C27B0  // Purple
     };
 
     /**
-     * Generates mock study sessions for testing
+     * Generate mock study sessions
      * @param count Number of sessions to generate
-     * @return List of mock StudySession objects
+     * @return List of mock study sessions
      */
     public static List<StudySession> generateMockSessions(int count) {
         List<StudySession> sessions = new ArrayList<>();
+
         Calendar cal = Calendar.getInstance();
 
         for (int i = 0; i < count; i++) {
-            // Generate session in the past 30 days
-            cal.setTime(new Date());
-            cal.add(Calendar.DAY_OF_YEAR, -(random.nextInt(30)));
-            cal.set(Calendar.HOUR_OF_DAY, 8 + random.nextInt(14)); // 8 AM to 10 PM
+            // Random session within last 60 days
+            long daysAgo = random.nextInt(60);
+            cal.setTimeInMillis(System.currentTimeMillis());
+            cal.add(Calendar.DAY_OF_MONTH, -(int)daysAgo);
+
+            // Random hour between 6 AM and 11 PM
+            int hour = 6 + random.nextInt(17);
+            cal.set(Calendar.HOUR_OF_DAY, hour);
             cal.set(Calendar.MINUTE, random.nextInt(60));
 
-            Date startTime = cal.getTime();
+            long timestamp = cal.getTimeInMillis();
 
-            int duration = 20 + random.nextInt(41); // 20-60 minutes
-            cal.add(Calendar.MINUTE, duration);
-            Date endTime = cal.getTime();
+            // Random duration between 15-120 minutes
+            int duration = 15 + random.nextInt(106);
 
-            StudySession session = new StudySession(
-                    i + 1,
-                    startTime,
-                    endTime,
-                    duration,
-                    20f + random.nextFloat() * 50f, // noise: 20-70 dB
-                    random.nextFloat() * 15f, // noise variance
-                    random.nextFloat() * 700f, // light: 0-700 lux
-                    random.nextFloat() * 40f, // light variance
-                    random.nextInt(5), // phone pickups: 0-4
-                    LOCATIONS[random.nextInt(LOCATIONS.length)],
-                    random.nextBoolean() || random.nextBoolean(), // 75% completed
-                    1 + random.nextInt(10), // self-rated focus: 1-10
-                    1 + random.nextInt(5), // difficulty: 1-5
-                    1 + random.nextInt(5), // mood: 1-5
-                    generateProductivityScore(cal.get(Calendar.HOUR_OF_DAY)), // productivity based on hour
-                    random.nextInt(8), // distractions: 0-7
-                    generateProductivityScore(cal.get(Calendar.HOUR_OF_DAY)), // AI score
-                    NOTES[random.nextInt(NOTES.length)]
-            );
+            // Random tag
+            String tagTitle = TAG_TITLES[random.nextInt(TAG_TITLES.length)];
+            int tagColor = TAG_COLORS[random.nextInt(TAG_COLORS.length)];
+
+            StudySession session = new StudySession(timestamp, duration, tagTitle, tagColor);
+
+            // Generate realistic metrics based on time of day
+            session.setAvgNoiseLevel(generateNoiseLevel(hour));
+            session.setAvgLightLevel(generateLightLevel(hour));
+            session.setPhonePickupCount(random.nextInt(8));
+            session.setFocusScore(generateFocusScore(hour, session.getPhonePickupCount()));
+            session.setCoinsEarned(duration / 60); // 1 coin per minute
+
+            // Occasional notes
+            if (random.nextFloat() < 0.3) { // 30% chance of having notes
+                session.setNotes(generateRandomNote());
+            }
 
             sessions.add(session);
         }
 
-        // Sort by date descending (newest first)
-        sessions.sort((a, b) -> b.getStartTime().compareTo(a.getStartTime()));
+        // Sort by timestamp (newest first)
+        sessions.sort((a, b) -> Long.compare(b.getTimestamp(), a.getTimestamp()));
 
         return sessions;
     }
 
     /**
-     * Generates realistic productivity scores based on time of day
-     * Higher productivity during typical work hours
+     * Generate realistic noise level based on time of day
      */
-    private static int generateProductivityScore(int hour) {
-        int baseScore;
+    private static float generateNoiseLevel(int hour) {
+        float baseNoise;
 
-        if (hour >= 9 && hour <= 11) {
-            baseScore = 70 + random.nextInt(25); // Morning peak: 70-95
-        } else if (hour >= 14 && hour <= 17) {
-            baseScore = 65 + random.nextInt(25); // Afternoon: 65-90
-        } else if (hour >= 19 && hour <= 21) {
-            baseScore = 60 + random.nextInt(30); // Evening: 60-90
-        } else if (hour >= 6 && hour <= 8) {
-            baseScore = 50 + random.nextInt(30); // Early morning: 50-80
+        if (hour >= 6 && hour < 9) {
+            baseNoise = 40 + random.nextFloat() * 30; // Morning: moderate
+        } else if (hour >= 9 && hour < 17) {
+            baseNoise = 50 + random.nextFloat() * 30; // Day: higher
+        } else if (hour >= 17 && hour < 22) {
+            baseNoise = 45 + random.nextFloat() * 25; // Evening: moderate-high
         } else {
-            baseScore = 20 + random.nextInt(40); // Night/very early: 20-60
+            baseNoise = 20 + random.nextFloat() * 20; // Night: low
         }
 
-        return Math.min(100, Math.max(0, baseScore));
+        return Math.min(100, Math.max(0, baseNoise));
     }
 
     /**
-     * Generates a realistic daily recommendation based on persona data
-     * Uses patterns from the provided CSV data
+     * Generate realistic light level based on time of day
      */
-    public static int[] generateRealisticDailyRecommendation() {
-        int[] hourly = new int[24];
+    private static float generateLightLevel(int hour) {
+        float baseLight;
 
-        // Low productivity during sleep/early hours
-        hourly[0] = 35 + random.nextInt(10);
-        hourly[1] = 30 + random.nextInt(10);
-        hourly[2] = 30 + random.nextInt(10);
-        hourly[3] = 35 + random.nextInt(10);
-        hourly[4] = 30 + random.nextInt(10);
-        hourly[5] = 35 + random.nextInt(10);
+        if (hour >= 6 && hour < 8) {
+            baseLight = 40 + random.nextFloat() * 30; // Dawn: moderate
+        } else if (hour >= 8 && hour < 18) {
+            baseLight = 70 + random.nextFloat() * 30; // Day: bright
+        } else if (hour >= 18 && hour < 21) {
+            baseLight = 50 + random.nextFloat() * 30; // Dusk: moderate
+        } else {
+            baseLight = 20 + random.nextFloat() * 30; // Night: low
+        }
 
-        // Morning rise (6-8 AM)
-        hourly[6] = 50 + random.nextInt(15);
-        hourly[7] = 55 + random.nextInt(15);
+        return Math.min(100, Math.max(0, baseLight));
+    }
 
-        // School hours blocked or low (8-13)
-        hourly[8] = 5 + random.nextInt(10);
-        hourly[9] = 5 + random.nextInt(10);
-        hourly[10] = 5 + random.nextInt(10);
-        hourly[11] = 5 + random.nextInt(10);
-        hourly[12] = 5 + random.nextInt(10);
+    /**
+     * Generate realistic focus score
+     */
+    private static float generateFocusScore(int hour, int pickupCount) {
+        float baseScore;
 
-        // Post-school recovery (13-14)
-        hourly[13] = 45 + random.nextInt(15);
+        // Morning and evening tend to have better focus
+        if (hour >= 7 && hour < 10) {
+            baseScore = 75 + random.nextFloat() * 20; // Morning: high
+        } else if (hour >= 10 && hour < 14) {
+            baseScore = 60 + random.nextFloat() * 25; // Midday: moderate
+        } else if (hour >= 14 && hour < 17) {
+            baseScore = 55 + random.nextFloat() * 25; // Afternoon: moderate-low
+        } else if (hour >= 17 && hour < 21) {
+            baseScore = 70 + random.nextFloat() * 20; // Evening: high
+        } else {
+            baseScore = 65 + random.nextFloat() * 25; // Other: moderate
+        }
 
-        // Peak study hours (14-17)
-        hourly[14] = 70 + random.nextInt(20);
-        hourly[15] = 70 + random.nextInt(20);
-        hourly[16] = 75 + random.nextInt(20);
-        hourly[17] = 70 + random.nextInt(15);
+        // Reduce score based on phone pickups
+        baseScore -= pickupCount * 5;
 
-        // Gym/dinner blocked (18-19)
-        hourly[18] = 0;
-        hourly[19] = 25 + random.nextInt(15);
+        return Math.min(100, Math.max(20, baseScore));
+    }
 
-        // Evening study possibility (20-22)
-        hourly[20] = 50 + random.nextInt(15);
-        hourly[21] = 50 + random.nextInt(15);
-        hourly[22] = 50 + random.nextInt(15);
+    /**
+     * Generate random study notes
+     */
+    private static String generateRandomNote() {
+        String[] notes = {
+                "Very productive session! Made good progress.",
+                "Struggled with focus in the beginning but got better.",
+                "Great session, minimal distractions.",
+                "Had to deal with some noise but managed well.",
+                "Feeling accomplished!",
+                "Need to review this material again tomorrow.",
+                "Completed all planned tasks for today.",
+                "Coffee helped a lot during this session.",
+                "Found this topic really interesting.",
+                "A bit tired but pushed through."
+        };
 
-        // Late night decline
-        hourly[23] = 35 + random.nextInt(10);
-
-        return hourly;
+        return notes[random.nextInt(notes.length)];
     }
 }

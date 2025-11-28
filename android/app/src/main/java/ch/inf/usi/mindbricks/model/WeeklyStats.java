@@ -1,31 +1,78 @@
 package ch.inf.usi.mindbricks.model;
 
 /**
- * Represents weekly aggregated statistics
+ * Model representing statistics for a single day in weekly view
  */
 public class WeeklyStats {
-    private final int dayOfWeek; // 0=Sunday, 1=Monday...
-    private final float avgFocusDuration;
-    private final int totalSessions;
-    private final float avgProductivity;
 
-    public WeeklyStats(int dayOfWeek, float avgFocusDuration, int totalSessions, float avgProductivity) {
+    private String dayLabel; // "Mon", "Tue", etc.
+    private int dayOfWeek; // 1-7 (Sunday = 1)
+    private int totalMinutes; // Total study time for this day
+    private float avgFocusScore; // Average focus score (0-100)
+    private int sessionCount; // Number of sessions
+    private long date; // Timestamp for this day (midnight)
+
+    public WeeklyStats(String dayLabel, int dayOfWeek, long date) {
+        this.dayLabel = dayLabel;
         this.dayOfWeek = dayOfWeek;
-        this.avgFocusDuration = avgFocusDuration;
-        this.totalSessions = totalSessions;
-        this.avgProductivity = avgProductivity;
+        this.date = date;
+        this.totalMinutes = 0;
+        this.avgFocusScore = 0;
+        this.sessionCount = 0;
+    }
+
+    public String getDayLabel() {
+        return dayLabel;
+    }
+
+    public void setDayLabel(String dayLabel) {
+        this.dayLabel = dayLabel;
     }
 
     public int getDayOfWeek() {
         return dayOfWeek;
     }
-    public float getAvgFocusDuration() {
-        return avgFocusDuration;
+
+    public void setDayOfWeek(int dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
     }
-    public int getTotalSessions() {
-        return totalSessions;
+
+    public int getTotalMinutes() {
+        return totalMinutes;
     }
-    public float getAvgProductivity() {
-        return avgProductivity;
+
+    public void setTotalMinutes(int totalMinutes) {
+        this.totalMinutes = totalMinutes;
+    }
+
+    public float getAvgFocusScore() {
+        return avgFocusScore;
+    }
+
+    public void setAvgFocusScore(float avgFocusScore) {
+        this.avgFocusScore = avgFocusScore;
+    }
+
+    public int getSessionCount() {
+        return sessionCount;
+    }
+
+    public void setSessionCount(int sessionCount) {
+        this.sessionCount = sessionCount;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    /**
+     * Get total study time in hours (formatted)
+     */
+    public float getTotalHours() {
+        return totalMinutes / 60f;
     }
 }

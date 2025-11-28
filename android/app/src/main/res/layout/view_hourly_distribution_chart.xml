@@ -6,16 +6,17 @@
     android:padding="16dp">
 
     <TextView
+        android:id="@+id/hourlyDistributionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hourly Productivity Distribution"
-        android:textSize="18sp"
+        android:text="Hourly Study Distribution"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="12dp" />
 
-    <com.github.mikephil.charting.charts.RadarChart
-        android:id="@+id/hourlyDistributionChart"
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/hourlyDistributionLineChart"
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_height="250dp" />
 
 </LinearLayout>

@@ -1,115 +1,139 @@
 package ch.inf.usi.mindbricks.model;
 
-import java.util.Date;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 
 /**
- * Represents a single study session with all relevant metrics
+ * Model representing a completed study session with metrics
  */
+@Entity(tableName = "study_sessions")
 public class StudySession {
-    private final long sessionId;
-    private final Date startTime;
-    private final Date endTime;
-    private final int durationMinutes;
-    private final float noiseAvgDb;
-    private final float noiseVariance;
-    private final float lightLuxAvg;
-    private final float lightVariance;
-    private final int phonePickups;
-    private final String userLocation;
-    private final boolean sessionCompleted;
-    private final int selfRatedFocus;
-    private final int perceivedDifficulty;
-    private final int mood;
-    private final int productivityScore;
-    private final int distractionsDetected;
-    private final int aiEstimatedProdScore;
-    private final String notes;
 
-    public StudySession(long sessionId, Date startTime, Date endTime, int durationMinutes,
-                        float noiseAvgDb, float noiseVariance, float lightLuxAvg,
-                        float lightVariance, int phonePickups, String userLocation,
-                        boolean sessionCompleted, int selfRatedFocus, int perceivedDifficulty,
-                        int mood, int productivityScore, int distractionsDetected,
-                        int aiEstimatedProdScore, String notes) {
+    @PrimaryKey(autoGenerate = true)
+    private long id;
 
-        this.sessionId = sessionId;
-        this.startTime = startTime;
-        this.endTime = endTime;
+    private long timestamp; // When session started
+    private int durationMinutes; // How long the session lasted
+    private String tagTitle; // Which tag/subject was studied
+    private int tagColor; // Color of the tag
+
+    // Environmental metrics
+    private float avgNoiseLevel; // Average noise during session (0-100)
+    private float avgLightLevel; // Average light level (0-100)
+    private int phonePickupCount; // How many times phone was picked up
+
+    // Focus metrics
+    private float focusScore; // Calculated focus score (0-100)
+    private int coinsEarned; // Coins earned during session
+
+    // Optional notes
+    private String notes;
+
+    @Ignore
+    public StudySession() {
+    }
+
+    public StudySession(long timestamp, int durationMinutes, String tagTitle, int tagColor) {
+        this.timestamp = timestamp;
         this.durationMinutes = durationMinutes;
-        this.noiseAvgDb = noiseAvgDb;
-        this.noiseVariance = noiseVariance;
-        this.lightLuxAvg = lightLuxAvg;
-        this.lightVariance = lightVariance;
-        this.phonePickups = phonePickups;
-        this.userLocation = userLocation;
-        this.sessionCompleted = sessionCompleted;
-        this.selfRatedFocus = selfRatedFocus;
-        this.perceivedDifficulty = perceivedDifficulty;
-        this.mood = mood;
-        this.productivityScore = productivityScore;
-        this.distractionsDetected = distractionsDetected;
-        this.aiEstimatedProdScore = aiEstimatedProdScore;
-        this.notes = notes;
+        this.tagTitle = tagTitle;
+        this.tagColor = tagColor;
+        this.avgNoiseLevel = 0;
+        this.avgLightLevel = 0;
+        this.phonePickupCount = 0;
+        this.focusScore = 0;
+        this.coinsEarned = 0;
+        this.notes = "";
     }
 
-    // getters
-    public long getSessionId() {
-        return sessionId;
+    // Getters and Setters
+    public long getId() {
+        return id;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public int getDurationMinutes() {
         return durationMinutes;
     }
 
-    public float getNoiseAvgDb() {
-        return noiseAvgDb;
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 
-    public float getNoiseVariance() {
-        return noiseVariance;
+    public String getTagTitle() {
+        return tagTitle;
     }
-    public float getLightLuxAvg() {
-        return lightLuxAvg;
+
+    public void setTagTitle(String tagTitle) {
+        this.tagTitle = tagTitle;
     }
-    public float getLightVariance() {
-        return lightVariance;
+
+    public int getTagColor() {
+        return tagColor;
     }
-    public int getPhonePickups() {
-        return phonePickups;
+
+    public void setTagColor(int tagColor) {
+        this.tagColor = tagColor;
     }
-    public String getUserLocation() {
-        return userLocation;
+
+    public float getAvgNoiseLevel() {
+        return avgNoiseLevel;
     }
-    public boolean isSessionCompleted() {
-        return sessionCompleted;
+
+    public void setAvgNoiseLevel(float avgNoiseLevel) {
+        this.avgNoiseLevel = avgNoiseLevel;
     }
-    public int getSelfRatedFocus() {
-        return selfRatedFocus;
+
+    public float getAvgLightLevel() {
+        return avgLightLevel;
     }
-    public int getPerceivedDifficulty() {
-        return perceivedDifficulty;
+
+    public void setAvgLightLevel(float avgLightLevel) {
+        this.avgLightLevel = avgLightLevel;
     }
-    public int getMood() {
-        return mood;
+
+    public int getPhonePickupCount() {
+        return phonePickupCount;
     }
-    public int getProductivityScore() {
-        return productivityScore;
+
+    public void setPhonePickupCount(int phonePickupCount) {
+        this.phonePickupCount = phonePickupCount;
     }
-    public int getDistractions() {
-        return distractionsDetected;
+
+    public float getFocusScore() {
+        return focusScore;
     }
-    public int getAiEstimatedProdScore() {
-        return aiEstimatedProdScore;
+
+    public void setFocusScore(float focusScore) {
+        this.focusScore = focusScore;
     }
+
+    public int getCoinsEarned() {
+        return coinsEarned;
+    }
+
+    public void setCoinsEarned(int coinsEarned) {
+        this.coinsEarned = coinsEarned;
+    }
+
     public String getNotes() {
         return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

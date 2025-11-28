@@ -5,14 +5,17 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.LineChart;
+import androidx.annotation.Nullable;
+
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,119 +24,91 @@ import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.WeeklyStats;
 
 /**
- * Displays weekly focus trends showing average focus duration per weekday
+ * Custom view that displays weekly study statistics as a bar chart
  */
 public class WeeklyFocusChartView extends LinearLayout {
 
-    private LineChart chart;
-    private List<WeeklyStats> weeklyStats;
-
-    private static final int PRIMARY_COLOR = Color.rgb(33, 150, 243); // Blue
+    private TextView titleText;
+    private BarChart barChart;
 
     public WeeklyFocusChartView(Context context) {
         super(context);
         init(context);
     }
 
-    public WeeklyFocusChartView(Context context, AttributeSet attrs) {
+    public WeeklyFocusChartView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context);
+    }
+
+    public WeeklyFocusChartView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         init(context);
     }
 
     private void init(Context context) {
         setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.view_weekly_focus_chart, this, true);
-        chart = findViewById(R.id.weeklyFocusChart);
+
+        titleText = findViewById(R.id.weeklyFocusTitle);
+        barChart = findViewById(R.id.weeklyFocusBarChart);
+
         setupChart();
     }
 
     private void setupChart() {
-        chart.getDescription().setEnabled(false);
-        chart.setDrawGridBackground(false);
-        chart.setTouchEnabled(true);
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(false);
-        chart.setPinchZoom(false);
-        chart.getLegend().setEnabled(false);
+        barChart.getDescription().setEnabled(false);
+        barChart.setDrawGridBackground(false);
+        barChart.setDrawBarShadow(false);
+        barChart.setHighlightFullBarEnabled(false);
+        barChart.setPinchZoom(false);
+        barChart.setScaleEnabled(false);
+        barChart.getLegend().setEnabled(false);
 
-        // X-axis setup -> days of week
-        XAxis xAxis = chart.getXAxis();
+        // Configure X axis
+        XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f);
-        xAxis.setLabelCount(7);
-        xAxis.setValueFormatter(new ValueFormatter() {
-            private final String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+        xAxis.setTextSize(12f);
 
-            @Override
-            public String getFormattedValue(float value) {
-                int index = (int) value;
-                if (index >= 0 && index < days.length) {
-                    return days[index];
-                }
-                return "";
-            }
-        });
-
-        // Y-axis setup -> average duration in minutes
-        YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setAxisMinimum(0f);
+        // Configure Y axes
+        YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
-        leftAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return String.format("%dm", (int) value);
-            }
-        });
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setTextSize(12f);
 
-        YAxis rightAxis = chart.getAxisRight();
+        YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setEnabled(false);
     }
 
-    public void setData(List<WeeklyStats> stats) {
-        this.weeklyStats = stats;
-        updateChart();
-    }
-
-    private void updateChart() {
+    public void setData(List<WeeklyStats> weeklyStats) {
         if (weeklyStats == null || weeklyStats.isEmpty()) {
-            chart.clear();
+            barChart.clear();
             return;
         }
 
-        List<Entry> entries = new ArrayList<>();
+        List<BarEntry> entries = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
 
-        for (WeeklyStats stat : weeklyStats) {
-            entries.add(new Entry(stat.getDayOfWeek(), stat.getAvgFocusDuration()));
+        for (int i = 0; i < weeklyStats.size(); i++) {
+            WeeklyStats stats = weeklyStats.get(i);
+            float hours = stats.getTotalHours();
+            entries.add(new BarEntry(i, hours));
+            labels.add(stats.getDayLabel());
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Avg Focus Time");
-
-        dataSet.setColor(PRIMARY_COLOR);
-        dataSet.setCircleColor(PRIMARY_COLOR);
-        dataSet.setLineWidth(2.5f);
-        dataSet.setCircleRadius(5f);
-        dataSet.setDrawCircleHole(false);
+        BarDataSet dataSet = new BarDataSet(entries, "Study Hours");
+        dataSet.setColor(Color.parseColor("#2196F3")); // Blue
         dataSet.setValueTextSize(10f);
-        dataSet.setDrawFilled(true);
-        dataSet.setFillColor(PRIMARY_COLOR);
-        dataSet.setFillAlpha(50);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setValueTextColor(Color.BLACK);
 
-        dataSet.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return String.format("%dm", (int) value);
-            }
-        });
+        BarData barData = new BarData(dataSet);
+        barData.setBarWidth(0.8f);
 
-        LineData data = new LineData(dataSet);
-
-        chart.setData(data);
-        chart.invalidate();
-    }
-
-    public void refresh() {
-        updateChart();
+        barChart.setData(barData);
+        barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+        barChart.getXAxis().setLabelCount(labels.size());
+        barChart.invalidate(); // Refresh
     }
 }
