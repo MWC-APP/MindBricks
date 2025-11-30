@@ -74,9 +74,9 @@ public class MicrophoneRecorder {
 
     /**
      * Calculates the Root Mean Square over the audio buffer.
-     *
+     * <p>
      * RMS allows to estimate loudness over short time windows.
-     *
+     * <p>
      * SOURCES:
      * - <a href="https://en.wikipedia.org/wiki/DBFS">...</a>
      *      - states that RMS is used for loudness measurement

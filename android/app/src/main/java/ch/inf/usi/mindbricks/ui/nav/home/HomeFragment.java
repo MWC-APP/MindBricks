@@ -3,7 +3,6 @@ package ch.inf.usi.mindbricks.ui.nav.home;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -20,7 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -63,8 +61,7 @@ public class HomeFragment extends Fragment {
         if (context instanceof NavigationLocker) {
             navigationLocker = (NavigationLocker) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement NavigationLocker");
+            throw new RuntimeException(context + " must implement NavigationLocker");
         }
     }
 
@@ -124,9 +121,8 @@ public class HomeFragment extends Fragment {
         final TextView durationText = dialogView.findViewById(R.id.duration_text);
 
         durationText.setText(String.format(Locale.getDefault(), "%d minutes", (int) durationSlider.getValue()));
-        durationSlider.addOnChangeListener((slider, value, fromUser) -> {
-            durationText.setText(String.format(Locale.getDefault(), "%d minutes", (int) value));
-        });
+        durationSlider.addOnChangeListener((slider, value, fromUser) ->
+                durationText.setText(String.format(Locale.getDefault(), "%d minutes", (int) value)));
 
         new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
