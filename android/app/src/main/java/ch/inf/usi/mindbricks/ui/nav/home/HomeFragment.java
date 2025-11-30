@@ -1,11 +1,14 @@
 package ch.inf.usi.mindbricks.ui.nav.home;
 
-// ADDED: Import the Context class for onAttach
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +18,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -25,8 +30,11 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.drivers.MicrophoneRecorder;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
+import ch.inf.usi.mindbricks.util.PermissionManager;
+import ch.inf.usi.mindbricks.util.PermissionManager.PermissionRequest;
 
 public class HomeFragment extends Fragment {
 
@@ -37,7 +45,10 @@ public class HomeFragment extends Fragment {
     private ProfileViewModel profileViewModel;
 
     private CountDownTimer countDownTimer;
+    private MicrophoneRecorder microphoneRecorder;
     private boolean isTimerRunning = false;
+    private PermissionRequest micPermissionRequest;
+    private Integer pendingDurationMinutes = null;
 
     // ADDED: A reference to the navigation locker interface
     private NavigationLocker navigationLocker;
@@ -64,6 +75,7 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -71,6 +83,21 @@ public class HomeFragment extends Fragment {
         timerTextView = view.findViewById(R.id.timer_text_view);
         startSessionButton = view.findViewById(R.id.start_stop_button);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
+
+        micPermissionRequest = PermissionManager.registerSinglePermission(
+                this,
+                Manifest.permission.RECORD_AUDIO,
+                () -> {
+                    if (pendingDurationMinutes != null) {
+                        startTimerInternal(pendingDurationMinutes);
+                        pendingDurationMinutes = null;
+                    }
+                },
+                () -> {
+                    pendingDurationMinutes = null;
+                    Toast.makeText(getContext(), "Microphone permission is required to record ambient noise.", Toast.LENGTH_SHORT).show();
+                }
+        );
 
         profileViewModel.coins.observe(getViewLifecycleOwner(), balance -> {
             if (balance != null) {
@@ -117,7 +144,22 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
+    @SuppressLint("MissingPermission")
     private void startTimer(int minutes) {
+        if (!PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO)) {
+            pendingDurationMinutes = minutes;
+            if (micPermissionRequest != null) {
+                micPermissionRequest.launch();
+            } else {
+                Toast.makeText(getContext(), "Microphone permission required to record ambient noise.", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+        startTimerInternal(minutes);
+    }
+
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+    private void startTimerInternal(int minutes) {
         // Disable navigation when the timer starts
         if (navigationLocker != null) {
             navigationLocker.setNavigationEnabled(false);
@@ -129,6 +171,8 @@ public class HomeFragment extends Fragment {
 
         long durationInMillis = TimeUnit.MINUTES.toMillis(minutes);
         final int[] minutesCompleted = {0};
+        microphoneRecorder = new MicrophoneRecorder();
+        microphoneRecorder.startRecording();
 
         countDownTimer = new CountDownTimer(durationInMillis, 1000) {
             @Override
@@ -137,10 +181,15 @@ public class HomeFragment extends Fragment {
 
                 long elapsedMillis = durationInMillis - millisUntilFinished;
                 int elapsedMinutes = (int) TimeUnit.MILLISECONDS.toMinutes(elapsedMillis);
-
                 if (elapsedMinutes > minutesCompleted[0]) {
                     minutesCompleted[0] = elapsedMinutes;
                     earnCoin(1);
+                }
+
+                // record amplitude from recording
+                if (microphoneRecorder != null) {
+                    double amplitude = microphoneRecorder.getCurrentAmplitude();
+                    Log.d("RMS Amplitude", String.valueOf(amplitude));
                 }
             }
 
@@ -149,6 +198,7 @@ public class HomeFragment extends Fragment {
                 if (minutes > minutesCompleted[0]) {
                     earnCoin(1);
                 }
+                stopRecording();
                 showSessionCompleteDialog();
             }
         }.start();
@@ -189,6 +239,7 @@ public class HomeFragment extends Fragment {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
+        stopRecording();
         resetTimerState();
     }
 
@@ -214,8 +265,6 @@ public class HomeFragment extends Fragment {
         timerTextView.setText(timeString);
     }
 
-
-
     private void earnCoin(int amount) {
         profileViewModel.addCoins(amount);
         String message = (amount == 1) ? "+1 Coin!" : String.format(Locale.getDefault(), "+%d Coins!", amount);
@@ -228,6 +277,7 @@ public class HomeFragment extends Fragment {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
+        stopRecording();
     }
 
     /**
@@ -237,5 +287,12 @@ public class HomeFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         navigationLocker = null;
+    }
+
+    private void stopRecording() {
+        if (microphoneRecorder != null) {
+            microphoneRecorder.stopRecording();
+            microphoneRecorder = null;
+        }
     }
 }
