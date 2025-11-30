@@ -37,7 +37,6 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
     private MaterialButton micButton;
     private MaterialButton lightInfoButton;
     private MaterialButton pickupButton;
-    private MaterialButton micInfoButton;
 
 
     @Nullable
@@ -69,9 +68,7 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
                     } else {
                         showMicSettingsDialog();
                     }
-                },
-                // on rationale callback
-                this::showMicRationaleAndRequest
+                }
         );
 
         rootView = inflater.inflate(R.layout.fragment_onboarding_sensors, container, false);
@@ -79,7 +76,7 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
         micButton = rootView.findViewById(R.id.buttonEnableMicrophone);
         lightInfoButton = rootView.findViewById(R.id.buttonLightInfo);
         pickupButton = rootView.findViewById(R.id.buttonEnablePickup);
-        micInfoButton = rootView.findViewById(R.id.buttonMicBackgroundInfo);
+        MaterialButton micInfoButton = rootView.findViewById(R.id.buttonMicBackgroundInfo);
 
         // setup on click listeners
         micButton.setOnClickListener(v -> requestMicrophoneAccess());
@@ -184,10 +181,6 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
         }
 
         micPermissionRequest.launch();
-    }
-
-    private void showMicRationaleAndRequest() {
-        showMicRationaleDialog();
     }
 
     private void requestPickupAccess() {
@@ -327,7 +320,7 @@ public class OnboardingSensorsFragment extends Fragment implements OnboardingSte
 
     /**
      * Shows a dialog that asks the user to open the app settings to grant the microphone permission.
-     *
+     * <p>
      * NOTE: happens when the user denied access to mic (initial request + rationale)
      */
     private void showMicSettingsDialog() {
