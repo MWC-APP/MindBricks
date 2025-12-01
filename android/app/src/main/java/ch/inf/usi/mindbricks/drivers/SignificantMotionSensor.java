@@ -3,8 +3,8 @@ package ch.inf.usi.mindbricks.drivers;
 import android.content.Context;
 import android.util.Log;
 
-import ch.inf.usi.mindbricks.drivers.motion.AccelerometerStrategy;
 import ch.inf.usi.mindbricks.drivers.base.MotionListener;
+import ch.inf.usi.mindbricks.drivers.motion.AccelerometerStrategy;
 import ch.inf.usi.mindbricks.drivers.motion.MotionSensorStrategy;
 import ch.inf.usi.mindbricks.drivers.motion.SignificantMotionStrategy;
 

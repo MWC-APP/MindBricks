@@ -9,19 +9,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import ch.inf.usi.mindbricks.databinding.ItemPurchasedAssetBinding;
+import ch.inf.usi.mindbricks.ui.nav.shop.ItemViewHolder;
 
 /**
  * An adapter for the RecyclerView in the ProfileFragment.
- * It takes a list of PurchasedItem objects and binds them to the
- * item_purchased_asset.xml layout for display.
+ * It takes a list of PurchasedItem objects and binds them to their layout for display.
  */
-public class PurchasedItemsAdapter extends RecyclerView.Adapter<PurchasedItemsAdapter.ItemViewHolder> {
+public class PurchasedItemsAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
-    // The list of items that the adapter will display.
+    /**
+     * The list of items that the adapter will display.
+     */
     private final List<PurchasedItem> items;
 
     /**
      * Constructor for the adapter.
+     *
      * @param items The list of PurchasedItem objects to be displayed.
      */
     public PurchasedItemsAdapter(List<PurchasedItem> items) {
@@ -35,9 +38,9 @@ public class PurchasedItemsAdapter extends RecyclerView.Adapter<PurchasedItemsAd
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the item layout using ViewBinding for type-safety and convenience.
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ItemPurchasedAssetBinding binding = ItemPurchasedAssetBinding.inflate(inflater, parent, false);
+        // pass binding to the ViewHolder
         return new ItemViewHolder(binding);
     }
 
@@ -47,9 +50,9 @@ public class PurchasedItemsAdapter extends RecyclerView.Adapter<PurchasedItemsAd
      */
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
-        // Get the data model for the current row.
+        // Get the data model for the current row
         PurchasedItem currentItem = items.get(position);
-        // Bind the data to the ViewHolder.
+        // Bind the data to the ViewHolder
         holder.bind(currentItem);
     }
 
@@ -59,29 +62,5 @@ public class PurchasedItemsAdapter extends RecyclerView.Adapter<PurchasedItemsAd
     @Override
     public int getItemCount() {
         return items.size();
-    }
-
-    /**
-     * The ViewHolder class. It describes an item view and metadata about its place within the RecyclerView.
-     * This is a static inner class for better performance and encapsulation.
-     */
-    static class ItemViewHolder extends RecyclerView.ViewHolder {
-
-        // Using ViewBinding provides direct and null-safe access to the views
-        private final ItemPurchasedAssetBinding binding;
-
-        public ItemViewHolder(ItemPurchasedAssetBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-
-        /**
-         * A helper method to populate the views in the ViewHolder with data from a PurchasedItem object.
-         * @param item The PurchasedItem object containing the data for this view.
-         */
-        public void bind(PurchasedItem item) {
-            binding.purchasedItemName.setText(item.getName());
-            binding.purchasedItemImage.setImageResource(item.getImageResId());
-        }
     }
 }

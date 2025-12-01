@@ -17,9 +17,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
 
-    public abstract StudySessionDao studySessionDao();
-    public abstract SessionSensorLogDao sessionSensorLogDao();
-
     public static synchronized AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(
@@ -27,9 +24,13 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class,
                             "mindbricks_database"
                     )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigrationOnDowngrade(false)
                     .build();
         }
         return INSTANCE;
     }
+
+    public abstract StudySessionDao studySessionDao();
+
+    public abstract SessionSensorLogDao sessionSensorLogDao();
 }

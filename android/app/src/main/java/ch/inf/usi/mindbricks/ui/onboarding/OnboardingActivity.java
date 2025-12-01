@@ -110,6 +110,7 @@ public class OnboardingActivity extends AppCompatActivity {
      * Updates the bottom buttons based on the current page:
      * - the skip button is hidden if it's the last page
      * - the next button is set to "Start" if it's the last page otherwise to "Next"
+     *
      * @param position index of the current page
      */
     private void updateBottomButtons(int position) {
@@ -120,6 +121,7 @@ public class OnboardingActivity extends AppCompatActivity {
 
     /**
      * Triggers validation routine for the current onboarding step
+     *
      * @return true if step is valid, false otherwise
      */
     private boolean validateCurrentStep() {
@@ -128,6 +130,7 @@ public class OnboardingActivity extends AppCompatActivity {
 
     /**
      * Validates a given onboarding step
+     *
      * @param position index of the onboarding step
      * @return true if step is valid or doesn't need validation, false otherwise
      */
@@ -144,6 +147,7 @@ public class OnboardingActivity extends AppCompatActivity {
 
     /**
      * Checks if user has completed the onboarding
+     *
      * @return true if user has completed the onboarding, false otherwise
      */
     private boolean canCompleteOnboarding() {

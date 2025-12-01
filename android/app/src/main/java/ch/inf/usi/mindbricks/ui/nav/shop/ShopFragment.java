@@ -26,7 +26,6 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
     private FragmentShopBinding binding;
     private ProfileViewModel profileViewModel;
     private PreferencesManager prefs;
-    private List<ShopItem> items;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,12 +52,12 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         RecyclerView shopRecyclerView1 = binding.itemsRecyclerView1;
         RecyclerView shopRecyclerView2 = binding.itemsRecyclerView2;
 
-        items = new ArrayList<>();
-        items.add(new ShopItem("avatar_cool_1","name1",  1, R.drawable.ic_avatar_placeholder));
-        items.add(new ShopItem("avatar_pro_2",  "name2", 2, R.drawable.ic_avatar_placeholder));
+        List<ShopItem> items = new ArrayList<>();
+        items.add(new ShopItem("avatar_cool_1", "name1", 1, R.drawable.ic_avatar_placeholder));
+        items.add(new ShopItem("avatar_pro_2", "name2", 2, R.drawable.ic_avatar_placeholder));
         items.add(new ShopItem("theme_dark_3", "name3", 3, R.drawable.ic_avatar_placeholder));
-        items.add(new ShopItem("golden_brick",  "name4", 10, R.drawable.ic_coin_icon));
-        items.add(new ShopItem("another_brick",  "name5", 5, R.drawable.ic_home_black_24dp));
+        items.add(new ShopItem("golden_brick", "name4", 10, R.drawable.ic_coin_icon));
+        items.add(new ShopItem("another_brick", "name5", 5, R.drawable.ic_home_black_24dp));
 
         ShopItemAdapter adapter1 = new ShopItemAdapter(items, this);
         ShopItemAdapter adapter2 = new ShopItemAdapter(items, this);
@@ -69,7 +68,7 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
 
     @Override
     public void onItemBuyClick(ShopItem item) {
-        if (prefs.getPurchasedItemIds().contains(item.getId())) {
+        if (prefs.getPurchasedItemIds().contains(item.id())) {
             Toast.makeText(getContext(), "You already own this item!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -78,14 +77,14 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         // Access the public coins LiveData field
         Integer currentCoins = profileViewModel.coins.getValue();
 
-        if (currentCoins == null || currentCoins < item.getPrice()) {
-            Toast.makeText(getContext(), "Not enough coins to buy " + item.getName(), Toast.LENGTH_SHORT).show();
+        if (currentCoins == null || currentCoins < item.price()) {
+            Toast.makeText(getContext(), "Not enough coins to buy " + item.name(), Toast.LENGTH_SHORT).show();
             return;
         }
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Confirm Purchase")
-                .setMessage("Buy \"" + item.getName() + "\" for " + item.getPrice() + " coins?")
+                .setMessage("Buy \"" + item.name() + "\" for " + item.price() + " coins?")
                 .setPositiveButton("Buy", (dialog, which) -> {
                     completePurchase(item);
                 })
@@ -94,11 +93,11 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
     }
 
     private void completePurchase(ShopItem item) {
-        boolean purchaseSuccessful = profileViewModel.spendCoins(item.getPrice());
+        boolean purchaseSuccessful = profileViewModel.spendCoins(item.price());
 
         if (purchaseSuccessful) {
-            prefs.purchaseItem(item.getId());
-            Toast.makeText(getContext(), "You purchased " + item.getName() + "!", Toast.LENGTH_LONG).show();
+            prefs.purchaseItem(item.id());
+            Toast.makeText(getContext(), "You purchased " + item.name() + "!", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getContext(), "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
         }

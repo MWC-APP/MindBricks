@@ -102,6 +102,7 @@ public class SessionRecordingManager {
     /**
      * Stops a running study session, stopping all sensors and recording. Furthermore, all generated
      * study session logs are saved to the database for further analysis.
+     *
      * @param session Study session to update with statistics about the environment of the session.
      */
     public void stopSession(StudySession session) {
@@ -186,7 +187,7 @@ public class SessionRecordingManager {
         // Log everything for debugging
         Log.v(TAG, String.format("Sampled - Noise: %.2f, Light: %.2f, Motion: %b, FaceUp: %b",
                 noise, currentLightLevel, motionDetectedInInterval, isFaceUp));
-        
+
         // Reset interval flags to force recalculation during next step
         motionDetectedInInterval = false;
     }

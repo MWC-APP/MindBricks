@@ -8,8 +8,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingDoneFragment;
 import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingIntroFragment;
 import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingNotificationsFragment;
-import ch.inf.usi.mindbricks.ui.onboarding.page.sensors.OnboardingSensorsFragment;
 import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingUserFragment;
+import ch.inf.usi.mindbricks.ui.onboarding.page.sensors.OnboardingSensorsFragment;
 
 public class OnboardingPagerAdapter extends FragmentStateAdapter {
 
@@ -20,19 +20,13 @@ public class OnboardingPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        switch (position) {
-            case 0:
-                return new OnboardingIntroFragment();
-            case 1:
-                return new OnboardingUserFragment();
-            case 2:
-                return new OnboardingSensorsFragment();
-            case 3:
-                return new OnboardingNotificationsFragment();
-            case 4:
-            default:
-                return new OnboardingDoneFragment();
-        }
+        return switch (position) {
+            case 0 -> new OnboardingIntroFragment();
+            case 1 -> new OnboardingUserFragment();
+            case 2 -> new OnboardingSensorsFragment();
+            case 3 -> new OnboardingNotificationsFragment();
+            default -> new OnboardingDoneFragment();
+        };
     }
 
     @Override

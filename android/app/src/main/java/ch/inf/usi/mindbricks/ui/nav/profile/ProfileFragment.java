@@ -12,9 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
@@ -29,19 +26,16 @@ import java.util.Set;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.databinding.FragmentProfileBinding;
 import ch.inf.usi.mindbricks.model.Tag;
-import ch.inf.usi.mindbricks.ui.nav.profile.PurchasedItem;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
 public class ProfileFragment extends Fragment {
 
+    private static final String DICEBEAR_BASE_URL = "https://api.dicebear.com/9.x/pixel-art/png";
+    private final List<PurchasedItem> allShopItems = new ArrayList<>();
     private FragmentProfileBinding binding;
     private ProfileViewModel profileViewModel;
     private PreferencesManager prefs;
-
-    private static final String DICEBEAR_BASE_URL = "https://api.dicebear.com/9.x/pixel-art/png";
-
-    private final List<PurchasedItem> allShopItems = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -99,7 +93,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadAndRenderTags() {
-        // ... (this method is unchanged)
         binding.profileTagsChipGroup.removeAllViews();
         List<Tag> tags = new ArrayList<>();
         try {
@@ -108,7 +101,10 @@ public class ProfileFragment extends Fragment {
                 Tag t = Tag.fromJson(array.getJSONObject(i));
                 if (t != null) tags.add(t);
             }
-        } catch (JSONException e) {  }
+        } catch (JSONException e) {
+            // this should never happen
+            throw new RuntimeException(e);
+        }
 
         if (tags.isEmpty()) {
             binding.profileTagsEmptyState.setVisibility(View.VISIBLE);
@@ -125,9 +121,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * ⭐️ ADDED: Sets up the RecyclerView to display the items the user has purchased. ⭐️
-     */
     private void setupPurchasedItemsList() {
         // Get the set of IDs for items the user has purchased.
         Set<String> purchasedIds = prefs.getPurchasedItemIds();
@@ -135,7 +128,7 @@ public class ProfileFragment extends Fragment {
         //  Filter the master list of all shop items to get only the ones the user owns.
         List<PurchasedItem> userOwnedItems = new ArrayList<>();
         for (PurchasedItem shopItem : allShopItems) {
-            if (purchasedIds.contains(shopItem.getId())) {
+            if (purchasedIds.contains(shopItem.id())) {
                 userOwnedItems.add(shopItem);
             }
         }

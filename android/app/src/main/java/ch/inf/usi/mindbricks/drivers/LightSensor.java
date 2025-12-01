@@ -18,12 +18,8 @@ public class LightSensor extends BaseSensor implements SensorEventListener {
     private final AccelerometerSensor accelerometerSensor;
     private boolean isFaceUp = false;
     private float currentLightLevel = 0;
-    
-    private LightSensorListener listener;
 
-    public interface LightSensorListener {
-        void onLightLevelChanged(float lightLevel, boolean isFaceUp);
-    }
+    private LightSensorListener listener;
 
     private LightSensor(Context ctx) {
         super(ctx, Sensor.TYPE_LIGHT);
@@ -77,7 +73,7 @@ public class LightSensor extends BaseSensor implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         // Read raw light level from sensor
         float rawLightLevel = event.values[0];
-        
+
         // Logic: record light state only when screen is facing upwards.
         if (isFaceUp) {
             currentLightLevel = rawLightLevel;
@@ -104,12 +100,8 @@ public class LightSensor extends BaseSensor implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
-    
-    public float getCurrentLightLevel() {
-        return currentLightLevel;
-    }
-    
-    public boolean isFaceUp() {
-        return isFaceUp;
+
+    public interface LightSensorListener {
+        void onLightLevelChanged(float lightLevel, boolean isFaceUp);
     }
 }

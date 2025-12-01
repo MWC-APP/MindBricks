@@ -30,9 +30,9 @@ import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.StudySession;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
-import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.PermissionManager;
 import ch.inf.usi.mindbricks.util.PermissionManager.PermissionRequest;
+import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.SessionRecordingManager;
 
 public class HomeFragment extends Fragment {
