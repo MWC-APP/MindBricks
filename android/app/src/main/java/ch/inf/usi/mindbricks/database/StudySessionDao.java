@@ -1,5 +1,6 @@
 package ch.inf.usi.mindbricks.database;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -19,8 +20,14 @@ public interface StudySessionDao {
     @Query("SELECT * FROM study_sessions ORDER BY timestamp DESC LIMIT :limit")
     List<StudySession> getRecentSessions(int limit);
 
+    @Query("SELECT * FROM study_sessions ORDER BY timestamp DESC LIMIT :limit")
+    LiveData<List<StudySession>> observeRecentSessions(int limit);
+
     @Query("SELECT * FROM study_sessions WHERE timestamp >= :startTime ORDER BY timestamp DESC")
     List<StudySession> getSessionsSince(long startTime);
+
+    @Query("SELECT * FROM study_sessions WHERE timestamp >= :startTime ORDER BY timestamp DESC")
+    LiveData<List<StudySession>> observeSessionsSince(long startTime);
 
     @Query("SELECT * FROM study_sessions ORDER BY timestamp DESC")
     List<StudySession> getAllSessions();

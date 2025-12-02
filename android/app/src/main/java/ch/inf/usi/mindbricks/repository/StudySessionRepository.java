@@ -5,8 +5,10 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -36,25 +38,11 @@ public class StudySessionRepository {
     }
 
     public LiveData<List<StudySession>> getAllSessions(int limit) {
-        MutableLiveData<List<StudySession>> liveData = new MutableLiveData<>();
-
-        dbExecutor.execute(() -> {
-            List<StudySession> sessions = studySessionDao.getRecentSessions(limit);
-            liveData.postValue(sessions);
-        });
-
-        return liveData;
+        return studySessionDao.observeRecentSessions(limit);
     }
 
     public LiveData<List<StudySession>> getRecentSessions(int limit) {
-        MutableLiveData<List<StudySession>> liveData = new MutableLiveData<>();
-
-        dbExecutor.execute(() -> {
-            List<StudySession> sessions = studySessionDao.getRecentSessions(limit);
-            liveData.postValue(sessions);
-        });
-
-        return liveData;
+        return studySessionDao.observeRecentSessions(limit);
     }
 
     // Add this method to StudySessionRepository
@@ -68,32 +56,24 @@ public class StudySessionRepository {
     }
 
     public LiveData<List<StudySession>> getSessionsSince(long startTime) {
-        MutableLiveData<List<StudySession>> liveData = new MutableLiveData<>();
-
-        dbExecutor.execute(() -> {
-            Log.d("Repository", "Querying sessions since: " + startTime);  // ADD THIS
-            List<StudySession> sessions = studySessionDao.getSessionsSince(startTime);
-            Log.d("Repository", "Found " + (sessions != null ? sessions.size() : 0) + " sessions");  // ADD THIS
-            liveData.postValue(sessions);
-        });
-
-        return liveData;
+        Log.d("Repository", "Querying sessions since: " + startTime);
+        return studySessionDao.observeSessionsSince(startTime);
     }
     public LiveData<List<StudySession>> getSessionsInRange(long startTime, long endTime){
-        MutableLiveData<List<StudySession>> liveData = new MutableLiveData<>();
-
-        dbExecutor.execute(() -> {
-            List<StudySession> allSesions = studySessionDao.getSessionsSince(startTime);
-            List<StudySession> filteredSessions = new java.util.ArrayList<>();
-
-            for(StudySession session : allSesions){
-                if(session.getTimestamp() >= startTime && session.getTimestamp() <= endTime)
-                    filteredSessions.add(session);
+        return Transformations.map(studySessionDao.observeSessionsSince(startTime), allSessions -> {
+            if (allSessions == null) {
+                return Collections.emptyList();
             }
 
-            liveData.postValue(filteredSessions);
+            List<StudySession> filteredSessions = new ArrayList<>();
+            for (StudySession session : allSessions) {
+                if (session.getTimestamp() >= startTime && session.getTimestamp() <= endTime) {
+                    filteredSessions.add(session);
+                }
+            }
+
+            return filteredSessions;
         });
-        return liveData;
     }
 
     public LiveData<List<SessionSensorLog>> getSensorLogsForSession(long sessionId) {
