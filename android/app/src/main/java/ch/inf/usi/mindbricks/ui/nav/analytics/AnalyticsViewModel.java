@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import ch.inf.usi.mindbricks.model.DailyRecommendation;
-import ch.inf.usi.mindbricks.model.StudySession;
-import ch.inf.usi.mindbricks.model.TimeSlotStats;
-import ch.inf.usi.mindbricks.model.WeeklyStats;
+import ch.inf.usi.mindbricks.model.visual.DailyRecommendation;
+import ch.inf.usi.mindbricks.model.visual.StudySession;
+import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
+import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
 import ch.inf.usi.mindbricks.repository.StudySessionRepository;
-import ch.inf.usi.mindbricks.util.DataProcessor;
+import ch.inf.usi.mindbricks.util.database.DataProcessor;
 
 /**
  * ViewModel for Analytics screen.
