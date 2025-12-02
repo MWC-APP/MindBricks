@@ -27,7 +27,6 @@ import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.databinding.FragmentProfileBinding;
 import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
-import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
 public class ProfileFragment extends Fragment {
 

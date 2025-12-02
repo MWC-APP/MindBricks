@@ -1,4 +1,4 @@
-package ch.inf.usi.mindbricks.util;
+package ch.inf.usi.mindbricks.ui.nav.profile;
 
 import android.app.Application;
 

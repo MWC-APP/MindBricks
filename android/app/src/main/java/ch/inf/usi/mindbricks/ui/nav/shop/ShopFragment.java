@@ -19,7 +19,7 @@ import java.util.List;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.databinding.FragmentShopBinding;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
-import ch.inf.usi.mindbricks.util.ProfileViewModel;
+import ch.inf.usi.mindbricks.ui.nav.profile.ProfileViewModel;
 
 public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyClickListener {
 
