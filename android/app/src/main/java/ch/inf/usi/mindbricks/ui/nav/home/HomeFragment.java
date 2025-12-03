@@ -8,12 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -30,6 +33,7 @@ public class HomeFragment extends Fragment {
     private Button startSessionButton;
     private TextView coinBalanceTextView;
     private TextView sessionTitleTextView;
+    private ImageView settingsIcon;
 
     private HomeViewModel homeViewModel;
     private ProfileViewModel profileViewModel;
@@ -65,6 +69,14 @@ public class HomeFragment extends Fragment {
         timerTextView = view.findViewById(R.id.timer_text_view);
         startSessionButton = view.findViewById(R.id.start_stop_button);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
+        settingsIcon = view.findViewById(R.id.settings_icon);
+
+        settingsIcon.setOnClickListener(v -> {
+            DrawerLayout drawerLayout = requireActivity().findViewById(R.id.drawer_layout);
+            if (drawerLayout != null) {
+                drawerLayout.openDrawer(GravityCompat.END);
+            }
+        });
 
         setupObservers();
 

@@ -78,4 +78,7 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.recyclerview:recyclerview:1.3.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+
+    //drawer
+    implementation("com.google.android.material:material:1.11.0")
 }

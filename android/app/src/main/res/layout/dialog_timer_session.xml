@@ -25,7 +25,7 @@
         android:textColor="@color/black"
         android:textSize="28sp"
         android:textStyle="bold" />
-
+    
     <com.google.android.material.slider.Slider
         android:id="@+id/duration_slider"
         android:layout_width="match_parent"
