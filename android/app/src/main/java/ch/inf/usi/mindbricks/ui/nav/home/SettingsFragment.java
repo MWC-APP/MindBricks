@@ -26,7 +26,6 @@ public class SettingsFragment extends DialogFragment {
     private TextView studyDurationText, pauseDurationText, longPauseDurationText;
     private Slider studyDurationSlider, pauseDurationSlider, longPauseDurationSlider;
     private Button saveButton;
-    private ImageButton closeButton;
 
     private SharedPreferences sharedPreferences;
 
@@ -66,7 +65,6 @@ public class SettingsFragment extends DialogFragment {
         longPauseDurationText = view.findViewById(R.id.long_pause_duration_text);
         longPauseDurationSlider = view.findViewById(R.id.long_pause_duration_slider);
         saveButton = view.findViewById(R.id.save_settings_button);
-        closeButton = view.findViewById(R.id.close_button);
 
         // Load saved settings into the UI
         loadSettings();
@@ -87,8 +85,6 @@ public class SettingsFragment extends DialogFragment {
             dismiss(); // Close the dialog.\
         });
 
-        // Set a click listener for the close button to dismiss the dialog without saving
-        closeButton.setOnClickListener(v -> dismiss());
     }
 
     // Loads the timer values from SharedPreferences and updates the sliders
