@@ -13,6 +13,9 @@ public class MicrophoneRecorder {
     private static final int SAMPLE_RATE = 44100;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+
+    private static final int MAX_AMPLITUDE_16BIT = 32768; 
+
     private final int bufferSize;
     private AudioRecord audioRecord;
     private Thread recordingThread = null;
@@ -97,7 +100,24 @@ public class MicrophoneRecorder {
         if (readSize > 0) {
             // compute RMS:
             // A_rms = sqrt(sum_i x_i^2 / N)
-            currentAmplitude = Math.sqrt(sum / readSize);
+            double rms = Math.sqrt(sum / readSize);
+
+
+            // Convert to Decibels (dB)
+            // Source:  https://en.wikipedia.org/wiki/Sound_pressure#Sound_pressure_level
+            // NOTE: PCM is signed, so 16 bits have range [-32768, 32767]
+            // 20 * log10(32767) approx 90.3 dB.
+            // 20 * log10(1) = 0 dB.
+      
+            // FIXME: this formula don't take in consideration the
+            // reference sound pressure level (20 µPa for air)
+
+            // check to to avoid log(0)
+            if (rms > 1) {
+                currentAmplitude = 20 * Math.log10(rms);
+            } else {
+                currentAmplitude = 0;
+            }
         }
     }
 
@@ -109,6 +129,14 @@ public class MicrophoneRecorder {
         isRecording = false;
 
         if (audioRecord != null) {
+            if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
+                try {
+                    audioRecord.stop();
+                } catch (IllegalStateException e) {
+                    Log.e(LOG_TAG, "Error stopping AudioRecord", e);
+                }
+            }
+
             try {
                 // wait for the recording thread to finish before releasing resources
                 if (recordingThread != null) {
@@ -118,9 +146,6 @@ public class MicrophoneRecorder {
                 Log.e(LOG_TAG, "Interrupted while waiting for thread to finish");
             }
 
-            if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
-                audioRecord.stop();
-            }
             audioRecord.release();
             audioRecord = null;
         }
