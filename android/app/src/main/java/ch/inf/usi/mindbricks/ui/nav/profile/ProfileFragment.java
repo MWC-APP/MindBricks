@@ -16,9 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -61,8 +58,18 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        loadAndDisplayUserData();
+        binding.buttonSettings.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(requireContext(), ch.inf.usi.mindbricks.ui.settings.SettingsActivity.class);
+            startActivity(intent);
+        });
+
         setupPurchasedItemsList();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadAndDisplayUserData();
     }
 
     private void loadAndDisplayUserData() {

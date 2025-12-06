@@ -1,0 +1,5 @@
+<resources>
+    <string name="settings_title">Settings</string>
+    <string name="settings_tab_profile">Profile</string>
+    <string name="settings_tab_study_plan">Study Plan</string>
+</resources>

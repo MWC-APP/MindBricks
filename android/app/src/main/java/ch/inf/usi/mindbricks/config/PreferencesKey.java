@@ -13,7 +13,8 @@ public enum PreferencesKey {
     USER_AVATAR_SEED("user_avatar_seed"),
     USER_PURCHASED_ITEMS("user_purchased_items"),
     STUDY_OBJECTIVE("study_objective"),
-    STUDY_PLAN_JSON("study_plan_json");
+    STUDY_PLAN_JSON("study_plan_json"),
+    STUDY_GOAL_SET("study_goal_set");
 
 
     private final String name;
