@@ -24,10 +24,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -151,7 +147,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
     private void persistUserData(String name, String sprintLength) {
         prefs.setUserName(name);
         prefs.setUserSprintLengthMinutes(sprintLength);
-        prefs.setUserTagsJson(serializeTags());
+        prefs.setUserTags(tags);
     }
 
     private String generateUniqueSeed() {
@@ -306,7 +302,7 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
                     renderTags();
 
                     // store the new tags in preferences
-                    prefs.setUserTagsJson(serializeTags());
+                    prefs.setUserTags(tags);
                     dialog.dismiss();
                 }));
 
@@ -336,39 +332,17 @@ public class OnboardingUserFragment extends Fragment implements OnboardingStepVa
             chip.setOnCloseIconClickListener(v -> {
                 tags.remove(tag);
                 renderTags();
-                prefs.setUserTagsJson(serializeTags());
+                prefs.setUserTags(tags);
             });
             tagChipGroup.addView(chip);
         }
     }
 
     /**
-     * Loads the list of tags from the preferences as JSON entries
+     * Loads the list of tags from the preferences
      */
     private void loadTagsFromPrefs() {
         tags.clear();
-        try {
-            JSONArray array = new JSONArray(prefs.getUserTagsJson());
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject obj = array.getJSONObject(i);
-                Tag t = Tag.fromJson(obj);
-                if (t != null) tags.add(t);
-            }
-        } catch (JSONException e) {
-            // ignore and start empty
-        }
-    }
-
-    /**
-     * Serializes the list of tags into a JSON array
-     *
-     * @return JSON array of tags as raw String
-     */
-    private String serializeTags() {
-        JSONArray array = new JSONArray();
-        for (Tag tag : tags) {
-            array.put(tag.toJson());
-        }
-        return array.toString();
+        tags.addAll(prefs.getUserTags());
     }
 }

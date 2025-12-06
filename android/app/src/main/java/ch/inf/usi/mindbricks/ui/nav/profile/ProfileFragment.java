@@ -94,17 +94,7 @@ public class ProfileFragment extends Fragment {
 
     private void loadAndRenderTags() {
         binding.profileTagsChipGroup.removeAllViews();
-        List<Tag> tags = new ArrayList<>();
-        try {
-            JSONArray array = new JSONArray(prefs.getUserTagsJson());
-            for (int i = 0; i < array.length(); i++) {
-                Tag t = Tag.fromJson(array.getJSONObject(i));
-                if (t != null) tags.add(t);
-            }
-        } catch (JSONException e) {
-            // this should never happen
-            throw new RuntimeException(e);
-        }
+        List<Tag> tags = prefs.getUserTags();
 
         if (tags.isEmpty()) {
             binding.profileTagsEmptyState.setVisibility(View.VISIBLE);
