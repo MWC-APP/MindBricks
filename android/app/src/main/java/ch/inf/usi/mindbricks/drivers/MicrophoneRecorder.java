@@ -95,8 +95,7 @@ public class MicrophoneRecorder {
         if (readSize > 0) {
             // compute RMS:
             // A_rms = sqrt(sum_i x_i^2 / N)
-            double rms = Math.sqrt(sum / readSize);
-            currentAmplitude = rms;
+            currentAmplitude = Math.sqrt(sum / readSize);
         }
     }
 

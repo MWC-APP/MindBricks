@@ -1,12 +1,17 @@
 package ch.inf.usi.mindbricks.model.visual;
 
+import androidx.annotation.NonNull;
+
+import java.util.Locale;
+
 /**
  * Model representing statistics for a specific time slot (hour of day).
  * Used for hourly distribution analysis.
  */
+@SuppressWarnings("unused")
 public class TimeSlotStats {
 
-    private int hourOfDay; // 0-23
+    private final int hourOfDay; // 0-23
     private int totalMinutes;
     private int sessionCount;
     private float averageFocusScore;
@@ -37,10 +42,6 @@ public class TimeSlotStats {
 
     public int getHourOfDay() {
         return hourOfDay;
-    }
-
-    public void setHourOfDay(int hourOfDay) {
-        this.hourOfDay = hourOfDay;
     }
 
     public int getTotalMinutes() {
@@ -151,9 +152,10 @@ public class TimeSlotStats {
         }
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return String.format("TimeSlot[hour=%d, minutes=%d, sessions=%d, focus=%.1f]",
+        return String.format(Locale.US, "TimeSlot[hour=%d, minutes=%d, sessions=%d, focus=%.1f]",
                 hourOfDay, totalMinutes, sessionCount, averageFocusScore);
     }
 }

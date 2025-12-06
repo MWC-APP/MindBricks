@@ -23,8 +23,6 @@ public class SessionRecordingManager {
     private static final int SAMPLE_RATE = 1; // in seconds (1 sample per second)
     private static final int EMPTY_SESSION_ID = -1;
 
-    // References to utility instances
-    private final Context context;
     private final MicrophoneRecorder microphoneRecorder;
     private final LightSensor lightSensor;
     private final SignificantMotionSensor motionSensor;
@@ -33,7 +31,6 @@ public class SessionRecordingManager {
 
     // information about current study session
     private long currentSessionId = EMPTY_SESSION_ID;
-    private long sessionStartTime;
 
     // sensor data for current iteration
     private float currentLightLevel = 0;
@@ -48,7 +45,7 @@ public class SessionRecordingManager {
 
     public SessionRecordingManager(Context context) {
         // store context
-        this.context = context.getApplicationContext();
+        // References to utility instances
         this.db = AppDatabase.getInstance(context);
         this.microphoneRecorder = new MicrophoneRecorder();
 
@@ -66,7 +63,6 @@ public class SessionRecordingManager {
 
         // store basic information about current study session
         this.currentSessionId = sessionId;
-        this.sessionStartTime = System.currentTimeMillis();
         this.logBuffer = new ArrayList<>();
 
         // clear counters / state flags
