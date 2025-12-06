@@ -460,13 +460,12 @@ public class AnalyticsFragment extends Fragment {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Select Time Range")
                 .setItems(options, (dialog, which) -> {
-                    int days;
-                    switch (which) {
-                        case 0: days = 7; break;
-                        case 1: days = 30; break;
-                        case 2: days = 90; break;
-                        default: days = 365 * 10; break;
-                    }
+                    int days = switch (which) {
+                        case 0 -> 7;
+                        case 1 -> 30;
+                        case 2 -> 90;
+                        default -> 365 * 10;
+                    };
                     viewModel.loadAnalyticsData(days);
                 })
                 .show();

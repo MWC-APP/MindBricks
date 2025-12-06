@@ -41,6 +41,11 @@
             android:name=".ui.onboarding.OnboardingActivity"
             android:theme="@style/Theme.MindBricks.NoActionBar" />
 
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:label="@string/settings_title"
+            android:theme="@style/Theme.MindBricks.NoActionBar" />
+
     </application>
 
 </manifest>
