@@ -30,6 +30,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     // The main entry point to start a new Pomodoro cycle
+    //help source: https://stackoverflow.com/questions/39215947/stuck-on-trying-to-resume-paused-stopped-function-pomodoro-timer
     public void pomodoroTechnique(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes) {
         // Prevent starting a new timer if one is already running.
         if (currentState.getValue() != PomodoroState.IDLE) {
@@ -78,6 +79,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     // Starts a pause session
+    // help source: https://www.reddit.com/r/developersIndia/comments/v5b06t/i_built_a_pomodoro_timer_to_demonstrate_how_a/
     private void startPauseSession(boolean isLongPause, int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes) {
         long pauseDurationMillis;
         if (isLongPause) {

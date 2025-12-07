@@ -82,6 +82,8 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
             return;
         }
 
+        // help source: https://stackoverflow.com/questions/14398392/ok-button-for-alert-dialog-on-android?
+
         new AlertDialog.Builder(requireContext())
                 .setTitle("Confirm Purchase")
                 .setMessage("Buy \"" + item.name() + "\" for " + item.price() + " coins?")

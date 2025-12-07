@@ -93,7 +93,7 @@ public class HomeFragment extends Fragment {
 
         // Notify the ViewModel that the UI is ready
         homeViewModel.activityRecreated();
-
+        // help source: https://stackoverflow.com/questions/25640598/android-dialog-with-countdown-timer?
         startSessionButton.setOnClickListener(v -> {
             // If the timer is running, show a confirmation dialog to stop it
             if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {

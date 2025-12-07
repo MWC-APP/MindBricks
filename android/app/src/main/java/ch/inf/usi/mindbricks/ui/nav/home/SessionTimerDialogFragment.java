@@ -57,9 +57,9 @@ public class SessionTimerDialogFragment extends DialogFragment {
             if (studyMinutes > 0) {
                 // Define the default pause durations
                 int pauseMinutes = 5;
-                int longPauseMinutes = 15; // Define the default long pause
+                int longPauseMinutes = 15;
 
-                // *** THIS IS THE CORRECTED LINE ***
+
                 // Call the ViewModel method with all three required arguments
                 homeViewModel.pomodoroTechnique(studyMinutes, pauseMinutes, longPauseMinutes);
 

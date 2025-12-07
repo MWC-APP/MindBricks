@@ -92,6 +92,7 @@ public class ProfileFragment extends Fragment {
                 .into(binding.profileImageView);
     }
 
+    // help source: https://stackoverflow.com/questions/3876680/is-it-possible-to-add-an-array-or-object-to-sharedpreferences-on-android?
     private void loadAndRenderTags() {
         binding.profileTagsChipGroup.removeAllViews();
         List<Tag> tags = new ArrayList<>();
@@ -102,7 +103,6 @@ public class ProfileFragment extends Fragment {
                 if (t != null) tags.add(t);
             }
         } catch (JSONException e) {
-            // this should never happen
             throw new RuntimeException(e);
         }
 
@@ -122,10 +122,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupPurchasedItemsList() {
-        // Get the set of IDs for items the user has purchased.
+        // Get the set of IDs for items the user has purchased
         Set<String> purchasedIds = prefs.getPurchasedItemIds();
 
-        //  Filter the master list of all shop items to get only the ones the user owns.
+        //  Filter the list of all shop items to get only the ones the user owns
         List<PurchasedItem> userOwnedItems = new ArrayList<>();
         for (PurchasedItem shopItem : allShopItems) {
             if (purchasedIds.contains(shopItem.id())) {
@@ -133,13 +133,13 @@ public class ProfileFragment extends Fragment {
             }
         }
 
-        //  Check if the user's inventory is empty and update the UI visibility.
+        //  Check if the user's inventory is empty and update the UI visibility
         if (userOwnedItems.isEmpty()) {
             // If empty, hide the list and show the "empty" text
             binding.purchasedItemsRecyclerView.setVisibility(View.GONE);
             binding.purchasedItemsEmptyState.setVisibility(View.VISIBLE);
         } else {
-            // If not empty, show the list and hide the "empty" text.
+            // If not empty, show the list and hide the "empty" text
             binding.purchasedItemsRecyclerView.setVisibility(View.VISIBLE);
             binding.purchasedItemsEmptyState.setVisibility(View.GONE);
 
