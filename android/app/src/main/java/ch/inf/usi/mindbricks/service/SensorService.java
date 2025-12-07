@@ -47,7 +47,6 @@ public class SensorService extends Service {
     // Sensors
     private MicrophoneRecorder microphoneRecorder;
     private LightSensor lightSensor;
-    private AccelerometerSensor accelerometerSensor;
     private SignificantMotionSensor significantMotionSensor;
 
     // Current sensor values
@@ -73,7 +72,6 @@ public class SensorService extends Service {
 
         // Get reference to singletons
         lightSensor = LightSensor.getInstance();
-        accelerometerSensor = AccelerometerSensor.getInstance(ctx);
         significantMotionSensor = SignificantMotionSensor.getInstance();
         microphoneRecorder = new MicrophoneRecorder();
 
