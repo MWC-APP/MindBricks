@@ -10,7 +10,10 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.NotificationHelper;
+import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
@@ -59,6 +62,8 @@ public class HomeViewModel extends AndroidViewModel {
         this.sessionCounter++;
         currentState.setValue(PomodoroState.STUDY); // Set the state to STUDY
         long studyDurationMillis = TimeUnit.MINUTES.toMillis(studyDurationMinutes);
+
+        SoundPlayer.playSound(getApplication(), R.raw.start_session);
 
         // Save new session (to get its id) + start foreground service
         long startTime = System.currentTimeMillis();
