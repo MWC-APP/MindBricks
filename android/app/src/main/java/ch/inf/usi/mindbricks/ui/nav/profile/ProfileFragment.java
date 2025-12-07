@@ -16,9 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +23,7 @@ import java.util.Set;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.databinding.FragmentProfileBinding;
 import ch.inf.usi.mindbricks.model.Tag;
+import ch.inf.usi.mindbricks.ui.settings.SettingsActivity;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
@@ -61,8 +59,18 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        loadAndDisplayUserData();
+        binding.buttonSettings.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(requireContext(), SettingsActivity.class);
+            startActivity(intent);
+        });
+
         setupPurchasedItemsList();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadAndDisplayUserData();
     }
 
     private void loadAndDisplayUserData() {
@@ -92,19 +100,9 @@ public class ProfileFragment extends Fragment {
                 .into(binding.profileImageView);
     }
 
-    // help source: https://stackoverflow.com/questions/3876680/is-it-possible-to-add-an-array-or-object-to-sharedpreferences-on-android?
     private void loadAndRenderTags() {
         binding.profileTagsChipGroup.removeAllViews();
-        List<Tag> tags = new ArrayList<>();
-        try {
-            JSONArray array = new JSONArray(prefs.getUserTagsJson());
-            for (int i = 0; i < array.length(); i++) {
-                Tag t = Tag.fromJson(array.getJSONObject(i));
-                if (t != null) tags.add(t);
-            }
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+        List<Tag> tags = prefs.getUserTags();
 
         if (tags.isEmpty()) {
             binding.profileTagsEmptyState.setVisibility(View.VISIBLE);
@@ -125,7 +123,7 @@ public class ProfileFragment extends Fragment {
         // Get the set of IDs for items the user has purchased
         Set<String> purchasedIds = prefs.getPurchasedItemIds();
 
-        //  Filter the list of all shop items to get only the ones the user owns
+        // Filter the list of all shop items to get only the ones the user owns
         List<PurchasedItem> userOwnedItems = new ArrayList<>();
         for (PurchasedItem shopItem : allShopItems) {
             if (purchasedIds.contains(shopItem.id())) {
