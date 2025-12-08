@@ -36,7 +36,7 @@ public class StreakCalendarView extends View {
     private float cellSize = 110f;
     private float cellSpacing = 10f;
     private float padding = 50f;
-    private float topPadding = 160f;
+    private float topPadding = 210f;
 
     private String[] dayNames = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
@@ -205,21 +205,21 @@ public class StreakCalendarView extends View {
     }
 
     private void drawMonthNavigation(Canvas canvas) {
-        float navY = 70f;
+        float navY = 85f;
 
         Calendar cal = Calendar.getInstance();
         cal.set(currentYear, currentMonth, 1);
         String monthName = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
 
         Paint monthPaint = new Paint(titlePaint);
-        monthPaint.setTextSize(48f);
+        monthPaint.setTextSize(55f);
         monthPaint.setTextAlign(Paint.Align.CENTER);
         monthPaint.setColor(colorTextPrimary);
 
         canvas.drawText(monthName + " " + currentYear,
                 getWidth() / 2f, navY, monthPaint);
 
-        float arrowSize = 30f;
+        float arrowSize = 35f;
         float leftArrowX = 60f;
 
         Paint arrowPaint = new Paint();
@@ -227,7 +227,7 @@ public class StreakCalendarView extends View {
         arrowPaint.setStyle(Paint.Style.FILL);
         arrowPaint.setAntiAlias(true);
 
-        navY = 60f;
+        navY = 65f;
         leftArrowRect = new RectF(
                 leftArrowX - 20,
                 navY - arrowSize/2 - 20,
@@ -262,14 +262,14 @@ public class StreakCalendarView extends View {
     private void drawDayHeaders(Canvas canvas) {
         Paint headerPaint = new Paint(textPaint);
         headerPaint.setColor(colorTextSecondary);
-        headerPaint.setTextSize(32f);
+        headerPaint.setTextSize(38f);
 
         float calendarWidth = (7 * cellSize) + (6 * cellSpacing);
         float startX = (getWidth() - calendarWidth) / 2f;
 
         for (int i = 0; i < 7; i++) {
             float x = startX + (i * (cellSize + cellSpacing)) + cellSize / 2;
-            canvas.drawText(dayNames[i], x, topPadding - 15, headerPaint);
+            canvas.drawText(dayNames[i], x, topPadding - 40, headerPaint);
         }
     }
 
@@ -336,7 +336,7 @@ public class StreakCalendarView extends View {
 
         Paint legendTextPaint = new Paint(textPaint);
         legendTextPaint.setColor(colorTextSecondary);
-        legendTextPaint.setTextSize(26f);
+        legendTextPaint.setTextSize(35f);
         legendTextPaint.setTextAlign(Paint.Align.LEFT);
 
         String[] labels = {"None", "Partial", "Target", "Exceptional"};
@@ -351,13 +351,12 @@ public class StreakCalendarView extends View {
             int color = getColorForStatus(statuses[i]);
             cellPaint.setColor(color);
 
-            RectF rect = new RectF(legendX, legendY, legendX + 40, legendY + 40);
-            canvas.drawRoundRect(rect, 8f, 8f, cellPaint);
-            canvas.drawRoundRect(rect, 8f, 8f, borderPaint);
+            RectF rect = new RectF(legendX - 100, legendY, legendX - 100 + 40, legendY + 40);
+            canvas.drawRoundRect(rect, 10f, 10f, cellPaint);
+            canvas.drawRoundRect(rect, 10f, 10f, borderPaint);
 
-            canvas.drawText(labels[i], legendX + 50, legendY + 28, legendTextPaint);
-
-            legendX += 160;
+            canvas.drawText(labels[i], legendX - 100 + 65, legendY + 28, legendTextPaint);
+            legendX += 200;
         }
     }
 

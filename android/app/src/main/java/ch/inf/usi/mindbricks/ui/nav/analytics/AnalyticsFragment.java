@@ -347,13 +347,10 @@ public class AnalyticsFragment extends Fragment {
      * This is where the Fragment reacts to data changes.
      */
     private void observeViewModel() {
-        Log.d(TAG, "=== Setting up observers ===");
-
         // Observe date range changes
         viewModel.getDateRange().observe(getViewLifecycleOwner(), dateRange -> {
             if (dateRange != null) {
                 String displayText = dateRange.getDisplayName();
-                Log.d(TAG, "Current range: " + dateRange.getDisplayName());
 
                 // Update FAB text
                 if (filterFab != null) {
@@ -364,13 +361,11 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe view state for loading/error/success
         viewModel.getViewState().observe(getViewLifecycleOwner(), state -> {
-            Log.d("Fragment", "*** ViewState changed to: " + state + " ***");
             updateUIState(state);
         });
 
         // Observe weekly stats
         viewModel.getWeeklyStats().observe(getViewLifecycleOwner(), stats -> {
-            Log.d(TAG, "Weekly stats received: " + (stats != null ? "Yes" : "null"));
             if (stats != null && weeklyFocusChart != null) {
                 weeklyFocusChart.setData(stats);
             }
@@ -378,7 +373,6 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe hourly distribution
         viewModel.getHourlyStats().observe(getViewLifecycleOwner(), stats -> {
-            Log.d(TAG, "Hourly stats received: " + (stats != null ? stats.size() + " items" : "null"));
             if (stats != null && hourlyDistributionChart != null) {
                 hourlyDistributionChart.setData(stats);
             }
@@ -386,7 +380,6 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe daily recommendations
         viewModel.getDailyRecommendation().observe(getViewLifecycleOwner(), recommendation -> {
-            Log.d(TAG, "Recommendation received: " + (recommendation != null ? "Yes" : "null"));
             if (recommendation != null && dailyTimelineChart != null) {
                 dailyTimelineChart.setData(recommendation);
             }
@@ -394,7 +387,6 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe energy curve
         viewModel.getEnergyCurveData().observe(getViewLifecycleOwner(), data -> {
-            Log.d(TAG, "Energy curve data received: " + (data != null ? data.size() + " items" : "null"));
             if (data != null && energyCurveChart != null) {
                 energyCurveChart.setData(data);
             }
@@ -402,7 +394,6 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe heatmap
         viewModel.getHeatmapData().observe(getViewLifecycleOwner(), data -> {
-            Log.d(TAG, "Heatmap data received: " + (data != null ? data.size() + " items" : "null"));
             if (data != null && qualityHeatmapChart != null) {
                 qualityHeatmapChart.setData(data);
             }
@@ -410,36 +401,26 @@ public class AnalyticsFragment extends Fragment {
 
         // Observe streak calendar
         viewModel.getStreakData().observe(getViewLifecycleOwner(), data -> {
-            Log.d(TAG, "Streak data: " + (data != null ? data.size() : "null"));
             if (data != null && streakCalendarView != null) {
                 // Initial data load
                 streakCalendarView.setData(data);
-
                 // Set click listener
                 streakCalendarView.setOnDayClickListener(this::showSessionsForDay);
+                streakCalendarView.setOnMonthChangeListener(this::loadStreakDataForMonth);
             }
         });
 
         // Observe goal rings
-        viewModel.getDailyRingsHistory().observe(getViewLifecycleOwner(), history -> {
-            Log.d(TAG, "Daily rings history received: " + (history != null ? history.size() + " days" : "null"));
-            updateDailyRingsDisplay(history);
-        });
+        viewModel.getDailyRingsHistory().observe(getViewLifecycleOwner(), this::updateDailyRingsDisplay);
 
         // Observe AI Recommendations
         viewModel.getAiRecommendations().observe(getViewLifecycleOwner(), recommendation -> {
-            Log.d(TAG, "AI Recommendations received: " +
-                    (recommendation != null ? recommendation.size() + " items" : "null"));
 
             if (recommendation != null && !recommendation.isEmpty() && aiRecommendationView != null) {
-                Log.d(TAG, "Setting data on aiRecommendationView");
                 aiRecommendationView.setData(recommendation.get(0));
 
                 // Post to ensure view has been laid out
-                aiRecommendationView.post(() -> {
-                    Log.d(TAG, "Updating AI legend");
-                    updateAILegend();
-                });
+                aiRecommendationView.post(this::updateAILegend);
             } else {
                 Log.w(TAG, "Cannot update AI recommendation: recommendation=" +
                         (recommendation != null) + ", view=" + (aiRecommendationView != null));
