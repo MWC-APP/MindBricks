@@ -39,7 +39,7 @@ import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 import ch.inf.usi.mindbricks.model.visual.DateRange;
 import ch.inf.usi.mindbricks.model.visual.StreakDay;
-import ch.inf.usi.mindbricks.model.visual.StudySession;
+import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 import ch.inf.usi.mindbricks.ui.charts.AIRecommendationCardView;
 import ch.inf.usi.mindbricks.ui.charts.DailyTimelineChartView;
 import ch.inf.usi.mindbricks.ui.charts.EnergyCurveChartView;
@@ -467,6 +467,55 @@ public class AnalyticsFragment extends Fragment {
         Log.d("Fragment", "=== All observers registered ===");
     }
 
+
+    private View createAILegendItem(AIRecommendationCardView.LegendItem item) {
+        LinearLayout layout = new LinearLayout(requireContext());
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.setGravity(Gravity.CENTER_VERTICAL);
+        layout.setPadding(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
+
+        // Create rounded color box
+        View colorBox = new View(requireContext());
+
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(Color.parseColor(item.colorHex));
+        drawable.setCornerRadius(dpToPx(4));
+        colorBox.setBackground(drawable);
+
+        LinearLayout.LayoutParams boxParams = new LinearLayout.LayoutParams(
+                dpToPx(16), dpToPx(16)
+        );
+        boxParams.setMargins(0, 0, dpToPx(8), 0);
+        colorBox.setLayoutParams(boxParams);
+        layout.addView(colorBox);
+
+        // Create label with themed text color
+        TextView label = new TextView(requireContext());
+        label.setText(item.name);
+        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        label.setTextColor(ContextCompat.getColor(requireContext(), R.color.analytics_text_primary));
+        layout.addView(label);
+
+        return layout;
+    }
+
+    private void showSessionsForDay(StreakDay day) {
+        // TODO: Query database for sessions on this date
+
+        String message = String.format(Locale.getDefault(),
+                "Day: %d/%d/%d\nStatus: %s\nMinutes: %d",
+                day.getDayOfMonth(), day.getMonth() + 1, day.getYear(),
+                day.getStatus().toString(),
+                day.getTotalMinutes()
+        );
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Study Sessions")
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
     /**
      * Update UI based on view state.
      * Shows/hides loading, error, empty, and content views.
@@ -633,7 +682,7 @@ public class AnalyticsFragment extends Fragment {
      *
      * @param session Session to show options for
      */
-    private void showSessionOptionsDialog(StudySession session) {
+    private void showSessionOptionsDialog(StudySessionWithStats session) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Session Options")
                 .setItems(new String[]{"View Details", "Delete Session"}, (dialog, which) -> {
@@ -670,18 +719,12 @@ public class AnalyticsFragment extends Fragment {
                 Log.d(TAG, "No sessions found, generating test data...");
                 TestDataGenerator.addTestSessions(requireContext(), TEST_DATA_COUNT);
 
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Select Time Range")
-                .setItems(options, (dialog, which) -> {
-                    int days = switch (which) {
-                        case 0 -> 7;
-                        case 1 -> 30;
-                        case 2 -> 90;
-                        default -> 365 * 10;
-                    };
-                    viewModel.loadAnalyticsData(days);
-                })
-                .show();
+                // Wait for insertion, then reload
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    viewModel.refreshData();
+                }, 2000);
+            }
+        });
     }
 
     /**
@@ -703,7 +746,7 @@ public class AnalyticsFragment extends Fragment {
     }
 
     private void loadStreakDataForMonth(int month, int year) {
-        List<StudySession> allSessions = viewModel.getSessionHistory().getValue();
+        List<StudySessionWithStats> allSessions = viewModel.getSessionHistory().getValue();
 
         if (allSessions == null) {
             Log.w(TAG, "No sessions available for streak calendar");

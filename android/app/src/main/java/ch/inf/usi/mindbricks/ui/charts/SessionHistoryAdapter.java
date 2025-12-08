@@ -77,7 +77,7 @@ public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAd
 
     @Override
     public void onBindViewHolder(@NonNull SessionViewHolder holder, int position) {
-        StudySession session = sessions.get(position);
+        StudySessionWithStats session = sessions.get(position);
         holder.bind(session, clickListener);
     }
 

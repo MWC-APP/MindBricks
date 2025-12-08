@@ -122,11 +122,18 @@ public class HomeFragment extends Fragment {
 
         // Click listener to open settings activity
         settingsIcon.setOnClickListener(v -> {
-            // This correctly opens your settings fragment
-            SettingsFragment settingsDialog = new SettingsFragment();
-            settingsDialog.show(getParentFragmentManager(), "SettingsDialog");
+            Intent intent = new Intent(requireContext(), SettingsActivity.class);
+            // force to select the Pomodoro tab at the start
+            intent.putExtra(SettingsActivity.EXTRA_TAB_INDEX, 2);
+            startActivity(intent);
         });
 
+        // Initialize timer display with default study duration
+        PreferencesManager prefs = new PreferencesManager(requireContext());
+        int defaultStudyDurationMinutes = prefs.getTimerStudyDuration();
+        updateTimerUI(TimeUnit.MINUTES.toMillis(defaultStudyDurationMinutes));
+
+        // Set up observers to listen for data changes from the ViewModels
         setupObservers();
 
         // Notify the ViewModel that the UI is ready
@@ -135,7 +142,6 @@ public class HomeFragment extends Fragment {
         startSessionButton.setOnClickListener(v -> {
             // If the timer is running, show a confirmation dialog to stop it
             if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {
-                // If a session is already running, show the confirmation dialog to stop it.
                 confirmEndSessionDialog();
             } else {
                 // Check for permission before starting
@@ -154,24 +160,6 @@ public class HomeFragment extends Fragment {
                 showEmotionDialog(999L);
             });
         }
-    }
-
-    /**
-     * This new method reads the saved duration values from SharedPreferences
-     * and tells the ViewModel to start the timer.
-     */
-    private void startDefaultSession() {
-        // Access the same SharedPreferences file used by SettingsFragment
-        SharedPreferences prefs = requireActivity().getSharedPreferences(SettingsFragment.PREFS_NAME, Context.MODE_PRIVATE);
-
-        // Read the saved study duration, defaulting to 25 minutes if not found.
-        int studyDuration = (int) prefs.getFloat(SettingsFragment.KEY_STUDY_DURATION, 25.0f);
-
-        // Read the saved pause duration, defaulting to 5 minutes if not found.
-        int pauseDuration = (int) prefs.getFloat(SettingsFragment.KEY_PAUSE_DURATION, 5.0f);
-
-        // Call the ViewModel to start the Pomodoro session with these values.
-        homeViewModel.pomodoroTechnique(studyDuration, pauseDuration);
     }
 
     // Sets up LiveData observers to automatically update the UI

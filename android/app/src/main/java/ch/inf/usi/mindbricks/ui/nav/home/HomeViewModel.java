@@ -166,7 +166,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public void saveQuestionnaireResponse(SessionQuestionnaire questionnaire) {
-        db.getQueryExecutor().execute(() -> {
+        dbExecutor.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(getApplication());
             long id = db.sessionQuestionnaireDao().insert(questionnaire);
             android.util.Log.d("HomeViewModel", "Questionnaire saved with ID: " + id);

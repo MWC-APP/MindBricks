@@ -25,9 +25,9 @@ import ch.inf.usi.mindbricks.model.visual.GoalRing;
  * Contains methods to transform raw session data into chart-ready statistics.
  */
 public class DataProcessor {
-    public static WeeklyStats calculateWeeklyStats(List<StudySessionWithStats> sessions) {
+    public static WeeklyStats calculateWeeklyStats(List<StudySessionWithStats> allSessions, DateRange dateRange) {
         WeeklyStats stats = new WeeklyStats();
-        List<StudySession> sessions = filterSessionsInRange(allSessions, dateRange);
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
 
         if (sessions.isEmpty()) {
             return stats;
@@ -87,15 +87,14 @@ public class DataProcessor {
         return stats;
     }
 
-    public static List<TimeSlotStats> calculateHourlyDistribution(List<StudySessionWithStats> sessions, DateRange dateRange) {
-        // Create 24 time slots (one for each hour)
+    public static List<TimeSlotStats> calculateHourlyDistribution(List<StudySessionWithStats> allSessions, DateRange dateRange) {        // Create 24 time slots (one for each hour)
         List<TimeSlotStats> hourlyStats = new ArrayList<>();
         for (int hour = 0; hour < 24; hour++) {
             hourlyStats.add(new TimeSlotStats(hour));
         }
 
         // Filter sessions to only include those within the date range
-        List<StudySession> sessions = filterSessionsInRange(allSessions, dateRange);
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
 
         if (sessions.isEmpty()) {
             return hourlyStats;
@@ -128,10 +127,9 @@ public class DataProcessor {
         return hourlyStats;
     }
 
-    public static DailyRecommendation generateDailyRecommendation(List<StudySessionWithStats> sessions, DateRange dateRange) {
+    public static DailyRecommendation generateDailyRecommendation(List<StudySessionWithStats> allSessions, DateRange dateRange) {
         DailyRecommendation recommendation = new DailyRecommendation();
-
-        List<StudySession> sessions = filterSessionsInRange(allSessions, dateRange);
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
 
         if (sessions.isEmpty()) {
             recommendation.setReasonSummary(
@@ -190,7 +188,7 @@ public class DataProcessor {
         return recommendation;
     }
 
-    public static List<HourlyQuality> calculateEnergyCurve(List<StudySession> sessions) {
+    public static List<HourlyQuality> calculateEnergyCurve(List<StudySessionWithStats> sessions) {
         List<HourlyQuality> hourlyData = new ArrayList<>();
 
         // Initialize 24-hour structure
@@ -199,7 +197,7 @@ public class DataProcessor {
 
         Calendar calendar = Calendar.getInstance();
 
-        for (StudySession session : sessions) {
+        for (StudySessionWithStats session : sessions) {
             calendar.setTimeInMillis(session.getTimestamp());
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
@@ -219,12 +217,12 @@ public class DataProcessor {
         return hourlyData;
     }
 
-    public static List<HeatmapCell> calculateQualityHeatmap(List<StudySession> sessions) {
+    public static List<HeatmapCell> calculateQualityHeatmap(List<StudySessionWithStats> sessions) {
         Map<String, HeatmapCell> cellMap = new HashMap<>();
 
         Calendar calendar = Calendar.getInstance();
 
-        for (StudySession session : sessions) {
+        for (StudySessionWithStats session : sessions) {
             calendar.setTimeInMillis(session.getTimestamp());
 
             int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
@@ -255,7 +253,7 @@ public class DataProcessor {
         return result;
     }
 
-    public static List<StreakDay> calculateStreakCalendar(List<StudySession> sessions,
+    public static List<StreakDay> calculateStreakCalendar(List<StudySessionWithStats> sessions,
                                                           int targetMinutes,
                                                           int month,
                                                           int year) {
@@ -274,8 +272,8 @@ public class DataProcessor {
         }
 
         // Filter sessions to only this month
-        List<StudySession> monthSessions = new ArrayList<>();
-        for (StudySession session : sessions) {
+        List<StudySessionWithStats> monthSessions = new ArrayList<>();
+        for (StudySessionWithStats session : sessions) {
             calendar.setTimeInMillis(session.getTimestamp());
             if (calendar.get(Calendar.MONTH) == month &&
                     calendar.get(Calendar.YEAR) == year) {
@@ -283,7 +281,7 @@ public class DataProcessor {
             }
         }
 
-        for (StudySession session : monthSessions) {
+        for (StudySessionWithStats session : monthSessions) {
             calendar.setTimeInMillis(session.getTimestamp());
 
             int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -327,7 +325,7 @@ public class DataProcessor {
         return result;
     }
 
-    public static List<GoalRing> calculateGoalRings(List<StudySession> sessions,
+    public static List<GoalRing> calculateGoalRings(List<StudySessionWithStats> sessions,
                                                     int dailyMinutesTarget,
                                                     float dailyFocusTarget) {
         List<GoalRing> rings = new ArrayList<>();
@@ -337,7 +335,7 @@ public class DataProcessor {
         float totalFocus = 0;
         int sessionCount = 0;
 
-        for (StudySession session : sessions) {
+        for (StudySessionWithStats session : sessions) {
             totalMinutes += session.getDurationMinutes();
             totalFocus += session.getFocusScore();
             sessionCount++;
@@ -375,11 +373,11 @@ public class DataProcessor {
 
     //"ai" generation
     public static AIRecommendation generateAIRecommendations(
-            List<StudySession> allSessions, DateRange dateRange) {
+            List<StudySessionWithStats> allSessions, DateRange dateRange) {
 
         AIRecommendation schedule = new AIRecommendation();
 
-        List<StudySession> sessions = filterSessionsInRange(allSessions, dateRange);
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
         schedule.setTotalSessions(sessions.size());
 
         if (sessions.isEmpty()) {
@@ -630,7 +628,7 @@ public class DataProcessor {
     }
 
     // helpers
-    public static List<StudySession> filterSessionsInRange(List<StudySession> allSessions, DateRange dateRange) {
+    public static List<StudySessionWithStats> filterSessionsInRange(List<StudySessionWithStats> allSessions, DateRange dateRange) {
         if (allSessions == null || allSessions.isEmpty()) {
             return new ArrayList<>();
         }
@@ -639,10 +637,10 @@ public class DataProcessor {
             return new ArrayList<>(allSessions);
         }
 
-        List<StudySession> filtered = new ArrayList<>();
+        List<StudySessionWithStats> filtered = new ArrayList<>();
         int outOfRange = 0;
 
-        for (StudySession session : allSessions) {
+        for (StudySessionWithStats session : allSessions) {
             if (dateRange.contains(session.getTimestamp())) {
                 filtered.add(session);
             } else {
@@ -653,37 +651,37 @@ public class DataProcessor {
         return filtered;
     }
 
-    public static int calculateTotalMinutes(List<StudySession> allSessions, DateRange dateRange) {
-        List<StudySession> sessions = filterSessionsInRange(allSessions, dateRange);
+    public static int calculateTotalMinutes(List<StudySessionWithStats> allSessions, DateRange dateRange) {
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
 
         int total = 0;
-        for (StudySession session : sessions) {
+        for (StudySessionWithStats session : sessions) {
             total += session.getDurationMinutes();
         }
 
         return total;
     }
 
-    public static float calculateAverageFocusScore(List<StudySession> allSessions,
+    public static float calculateAverageFocusScore(List<StudySessionWithStats> allSessions,
                                                    DateRange dateRange) {
-        List<StudySession> sessions = filterSessionsInRange(allSessions, dateRange);
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
 
         if (sessions.isEmpty()) {
             return 0;
         }
 
         float sum = 0;
-        for (StudySession session : sessions) {
+        for (StudySessionWithStats session : sessions) {
             sum += session.getFocusScore();
         }
 
         return sum / sessions.size();
     }
 
-    public static Map<String, List<StudySession>> groupSessionsByTag(List<StudySession> allSessions,
+    public static Map<String, List<StudySessionWithStats>> groupSessionsByTag(List<StudySessionWithStats> allSessions,
                                                                      DateRange dateRange) {
-        List<StudySession> sessions = filterSessionsInRange(allSessions, dateRange);
-        Map<String, List<StudySession>> grouped = new HashMap<>();
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
+        Map<String, List<StudySessionWithStats>> grouped = new HashMap<>();
 
         for (StudySessionWithStats session : sessions) {
             String tag = session.getTagTitle();
@@ -701,7 +699,7 @@ public class DataProcessor {
     }
 
     public static int calculateLongestStreak(List<StudySessionWithStats> allSessions, DateRange dateRange) {
-        List<StudySession> sessions = filterSessionsInRange(allSessions, dateRange);
+        List<StudySessionWithStats> sessions = filterSessionsInRange(allSessions, dateRange);
 
         if (sessions.isEmpty()) {
             return 0;

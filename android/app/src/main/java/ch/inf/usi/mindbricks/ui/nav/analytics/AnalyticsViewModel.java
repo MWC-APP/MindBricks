@@ -65,6 +65,9 @@ public class AnalyticsViewModel extends AndroidViewModel {
     private LiveData<List<StudySessionWithStats>> sessionsSource;
     private final Observer<List<StudySessionWithStats>> sessionsObserver = this::handleSessionsUpdate;
 
+    private int daysToLoad = 30;
+    private List<StudySessionWithStats> allSessions;
+
     public AnalyticsViewModel(@NonNull Application application) {
         super(application);
         this.repository = new StudySessionRepository(application);
@@ -194,10 +197,15 @@ public class AnalyticsViewModel extends AndroidViewModel {
             return;
         }
 
+        // Cache the sessions
         cachedSessions = sessions;
         lastLoadTime = System.currentTimeMillis();
 
-        List<StudySession> filteredSessions = DataProcessor.filterSessionsInRange(
+        // Store all sessions for processing
+        allSessions = sessions;
+
+        // Filter sessions for current range
+        List<StudySessionWithStats> filteredSessions = DataProcessor.filterSessionsInRange(
                 sessions, currentDateRange
         );
 
@@ -208,6 +216,9 @@ public class AnalyticsViewModel extends AndroidViewModel {
             return;
         }
 
+        processAllData(allSessions, currentDateRange);
+    }
+
     private void processAllData(List<StudySessionWithStats> sessions, DateRange dateRange) {
         Log.d(TAG, "=== processAllData START ===");
         Log.d(TAG, "All sessions count: " + (allSessions != null ? allSessions.size() : "null"));
@@ -216,7 +227,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
         processingExecutor.execute(() -> {
             try {
                 // Filter first to check if we have data
-                List<StudySession> filtered = DataProcessor.filterSessionsInRange(
+                List<StudySessionWithStats> filtered = DataProcessor.filterSessionsInRange(
                         allSessions, dateRange);
 
                 Log.d(TAG, "Filtered sessions: " + filtered.size());
@@ -264,7 +275,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
                 );
                 streakData.postValue(streak);
 
-                List<StudySession> todaySessions = DataProcessor.filterSessionsInRange(
+                List<StudySessionWithStats> todaySessions = DataProcessor.filterSessionsInRange(
                         allSessions, DateRange.lastNDays(1));
                 List<GoalRing> rings = DataProcessor.calculateGoalRings(todaySessions, 120, 70);
                 goalRingsData.postValue(rings);
@@ -288,27 +299,10 @@ public class AnalyticsViewModel extends AndroidViewModel {
         });
     }
 
-    public void deleteSession(StudySession session) {
-        repository.deleteSession(session, this::refreshData);
+    public void deleteSession(StudySessionWithStats session) {
+        repository.deleteSession(session.session, this::refreshData);
     }
 
-    // loaders
-
-    public void loadWeeklyStats() {
-        if (cachedSessions != null && isCacheValid()) {
-            processingExecutor.execute(() -> {
-                WeeklyStats stats = DataProcessor.calculateWeeklyStats(cachedSessions, currentDateRange);
-                weeklyStats.postValue(stats);
-            });
-        } else {
-            loadData();
-        }
-    }
-
-    public void loadRecentSessions(int limit) {
-        LiveData<List<StudySession>> sessionsLiveData = repository.getRecentSessions(limit);
-        observeOnce(sessionsLiveData, sessionHistory::setValue);
-    }
     public void refreshData() {
         Log.d(TAG, "Refreshing data (cache invalidated)");
         cachedSessions = null;
@@ -325,6 +319,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
         return currentDateRange;
     }
 
+    // Getters for LiveData
     public LiveData<WeeklyStats> getWeeklyStats() {
         return weeklyStats;
     }
@@ -335,17 +330,41 @@ public class AnalyticsViewModel extends AndroidViewModel {
 
     public LiveData<DailyRecommendation> getDailyRecommendation() {
         return dailyRecommendation;
-    public void deleteSession(StudySessionWithStats session) {
-        repository.deleteSession(session.session, this::refreshData);
     }
 
-    // Getters for LiveData
-    public LiveData<WeeklyStats> getWeeklyStats() { return weeklyStats; }
-    public LiveData<List<TimeSlotStats>> getHourlyStats() { return hourlyStats; }
-    public LiveData<DailyRecommendation> getDailyRecommendation() { return dailyRecommendation; }
-    public LiveData<List<StudySessionWithStats>> getSessionHistory() { return sessionHistory; }
-    public LiveData<ViewState> getViewState() { return viewState; }
-    public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<List<HourlyQuality>> getEnergyCurveData() {
+        return energyCurveData;
+    }
+
+    public LiveData<List<HeatmapCell>> getHeatmapData() {
+        return heatmapData;
+    }
+
+    public LiveData<List<StreakDay>> getStreakData() {
+        return streakData;
+    }
+
+    public LiveData<List<GoalRing>> getGoalRingsData() {
+        return goalRingsData;
+    }
+
+    public LiveData<List<AIRecommendation>> getAiRecommendations() {
+        return aiRecommendations;
+    }
+
+    public LiveData<List<StudySessionWithStats>> getSessionHistory() {
+        return sessionHistory;
+    }
+
+    public LiveData<ViewState> getViewState() {
+        return viewState;
+    }
+
+
+
+    public LiveData<String> getErrorMessage() {
+        return errorMessage;
+    }
 
     public enum ViewState {
         LOADING, SUCCESS, ERROR, EMPTY
