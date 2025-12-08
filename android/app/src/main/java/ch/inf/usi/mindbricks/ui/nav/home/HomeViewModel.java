@@ -138,7 +138,7 @@ public class HomeViewModel extends AndroidViewModel {
             public void onFinish() {
                 // end the cycle if long pause
                 if (isLongPause) {
-                    SoundPlayer.playSound(getApplication(), R.raw.end_cycle);
+                    SoundPlayer.playSound(getApplication(), R.raw.end_session);
                     notificationHelper.showNotification("Cycle Complete!", "Great work. Ready for the next round?", 2);
                     stopTimerAndReset();
                 } else {
