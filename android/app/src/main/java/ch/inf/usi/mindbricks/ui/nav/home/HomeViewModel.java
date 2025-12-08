@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import java.util.concurrent.TimeUnit;
 import ch.inf.usi.mindbricks.database.AppDatabase;
+import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
 import ch.inf.usi.mindbricks.util.SessionRecordingManager;
 
@@ -47,6 +48,8 @@ public class HomeViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Integer> _earnedCoinsEvent = new MutableLiveData<>();
     public final LiveData<Integer> earnedCoinsEvent = _earnedCoinsEvent;
+
+    public final MutableLiveData<Long> showQuestionnaireEvent = new MutableLiveData<>();
 
     public HomeViewModel(@NonNull Application application) {
         super(application);
@@ -104,12 +107,18 @@ public class HomeViewModel extends AndroidViewModel {
 
         if (currentStudySession != null) {
             sessionRecordingManager.stopSession(currentStudySession);
+            completeSession(currentStudySession.getId());
+
             currentStudySession = null;
         }
 
         _currentState.setValue(PomodoroState.IDLE);
         _stateTitle.setValue("Ready to start?");
         _currentTime.setValue(0L);
+    }
+
+    private void completeSession(long sessionID){
+        showQuestionnaireEvent.postValue(sessionID);
     }
 
     private void startCountdown(long duration) {
@@ -169,6 +178,14 @@ public class HomeViewModel extends AndroidViewModel {
             _stateTitle.setValue(_stateTitle.getValue());
             startCountdown(remainingTimeInMillis);
         }
+    }
+
+    public void saveQuestionnaireResponse(SessionQuestionnaire questionnaire) {
+        db.getQueryExecutor().execute(() -> {
+            AppDatabase db = AppDatabase.getInstance(getApplication());
+            long id = db.sessionQuestionnaireDao().insert(questionnaire);
+            android.util.Log.d("HomeViewModel", "Questionnaire saved with ID: " + id);
+        });
     }
 
     public void onCoinsAwarded() {

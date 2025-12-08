@@ -23,7 +23,10 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
+import ch.inf.usi.mindbricks.ui.nav.home.questionnare.DetailedQuestionsDialogFragment;
+import ch.inf.usi.mindbricks.ui.nav.home.questionnare.EmotionSelectDialogFragment;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 
 public class HomeFragment extends Fragment {
@@ -87,6 +90,14 @@ public class HomeFragment extends Fragment {
                 startDefaultSession();
             }
         });
+
+        // test questionnare
+        Button testButton = view.findViewById(R.id.test_questionnaire_button);
+        if (testButton != null) {
+            testButton.setOnClickListener(v -> {
+                showEmotionDialog(999L);
+            });
+        }
     }
 
     /**
@@ -136,6 +147,13 @@ public class HomeFragment extends Fragment {
                 coinBalanceTextView.setText(String.valueOf(balance));
             }
         });
+
+        homeViewModel.showQuestionnaireEvent.observe(getViewLifecycleOwner(), sessionId -> {
+            if (sessionId != null && sessionId > 0) {
+                showEmotionDialog(sessionId);
+                homeViewModel.showQuestionnaireEvent.setValue(null);
+            }
+        });
     }
 
 
@@ -164,5 +182,53 @@ public class HomeFragment extends Fragment {
         }
         String message = (amount == 1) ? "+1 Coin!" : String.format(Locale.getDefault(), "+%d Coins!", amount);
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    // questionnares -> short and detailed
+    private void showEmotionDialog(long sessionId) {
+        EmotionSelectDialogFragment dialog = new EmotionSelectDialogFragment();
+        dialog.setListener((emotionIndex, wantsDetailedQuestions) -> {
+            if (wantsDetailedQuestions) {
+                showDetailedQuestionnaire(sessionId, emotionIndex);
+            } else {
+                saveQuickQuestionnaire(sessionId, emotionIndex);
+            }
+        });
+        dialog.show(getChildFragmentManager(), "emotion_dialog");
+    }
+
+    private void showDetailedQuestionnaire(long sessionId, int emotionIndex) {
+        DetailedQuestionsDialogFragment dialog = DetailedQuestionsDialogFragment.newInstance(emotionIndex);
+        dialog.setListener((emotion, enthusiasm, energy, engagement, satisfaction, anticipation) -> {
+            saveDetailedQuestionnaire(sessionId, emotion, enthusiasm, energy,
+                    engagement, satisfaction, anticipation);
+        });
+        dialog.show(getChildFragmentManager(), "detailed_questionnaire");
+    }
+
+    private void saveQuickQuestionnaire(long sessionId, int emotionIndex) {
+        SessionQuestionnaire questionnaire = new SessionQuestionnaire();
+        questionnaire.setSessionId(sessionId);
+        questionnaire.setTimeStamp(System.currentTimeMillis());
+        questionnaire.setInitialEmotion(emotionIndex);
+        questionnaire.setAnsweredDetailedQuestions(false);
+
+        homeViewModel.saveQuestionnaireResponse(questionnaire);
+    }
+
+    private void saveDetailedQuestionnaire(long sessionId, int emotionIndex,
+                                           int enthusiasm, int energy, int engagement, int satisfaction, int anticipation) {
+        SessionQuestionnaire questionnaire = new SessionQuestionnaire();
+        questionnaire.setSessionId(sessionId);
+        questionnaire.setTimeStamp(System.currentTimeMillis());
+        questionnaire.setInitialEmotion(emotionIndex);
+        questionnaire.setAnsweredDetailedQuestions(true);
+        questionnaire.setEnthusiasmRating(enthusiasm);
+        questionnaire.setEnergyRating(energy);
+        questionnaire.setEngagementRating(engagement);
+        questionnaire.setSatisfactionRating(satisfaction);
+        questionnaire.setAnticipationRating(anticipation);
+
+        homeViewModel.saveQuestionnaireResponse(questionnaire);
     }
 }

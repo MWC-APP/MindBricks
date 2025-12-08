@@ -532,6 +532,6 @@
         android:contentDescription="Filter analytics"
         app:icon="@android:drawable/ic_menu_sort_by_size"
         app:iconTint="@android:color/white"
-        app:backgroundTint="#9D83CE" />
+        app:backgroundTint="@color/chart_scale_4" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
