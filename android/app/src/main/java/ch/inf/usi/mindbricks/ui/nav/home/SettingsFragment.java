@@ -20,6 +20,7 @@ import com.google.android.material.slider.Slider;
 import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 public class SettingsFragment extends DialogFragment {
 
@@ -112,5 +113,7 @@ public class SettingsFragment extends DialogFragment {
         editor.putFloat(KEY_PAUSE_DURATION, pauseDurationSlider.getValue());
         editor.putFloat(KEY_LONG_PAUSE_DURATION, longPauseDurationSlider.getValue());
         editor.apply();
+        SoundPlayer.playSound(getContext(), R.raw.save_settings); // playsettings sound
+
     }
 }

@@ -10,7 +10,10 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.NotificationHelper;
+import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
@@ -60,6 +63,8 @@ public class HomeViewModel extends AndroidViewModel {
         currentState.setValue(PomodoroState.STUDY); // Set the state to STUDY
         long studyDurationMillis = TimeUnit.MINUTES.toMillis(studyDurationMinutes);
 
+        SoundPlayer.playSound(getApplication(), R.raw.start_session);
+
         // Save new session (to get its id) + start foreground service
         long startTime = System.currentTimeMillis();
         StudySession session = new StudySession(startTime, studyDurationMinutes, "General", Color.GRAY);
@@ -92,6 +97,7 @@ public class HomeViewModel extends AndroidViewModel {
 
             @Override
             public void onFinish() {
+                SoundPlayer.playSound(getApplication(), R.raw.end_session);
                 // Stop Service and complete Session
                 completeSessionAndStopService();
                 notificationHelper.showNotification("Study Complete!", "Time for a well-deserved break.", 1);
@@ -121,7 +127,7 @@ public class HomeViewModel extends AndroidViewModel {
             pauseDurationMillis = TimeUnit.MINUTES.toMillis(pauseDurationMinutes);
         }
 
-        // Create and start a new countdown timer for the pause
+        // Create and start a new timer for the pause
         timer = new CountDownTimer(pauseDurationMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -132,10 +138,11 @@ public class HomeViewModel extends AndroidViewModel {
             public void onFinish() {
                 // end the cycle if long pause
                 if (isLongPause) {
-                    notificationHelper.showNotification("Cycle Complete!", "Great work. Ready for the next round?", 2);
+                    SoundPlayer.playSound(getApplication(), R.raw.end_cycle);
+                    notificationHelper.showNotification("Cycle Complete!", "Great work!", 2);
                     stopTimerAndReset();
                 } else {
-                    //  continue to the next study session.
+                    //  continue to the next study session
                     notificationHelper.showNotification("Break's Over!", "Time to get back to studying.", 3);
                     startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
                 }
@@ -147,6 +154,9 @@ public class HomeViewModel extends AndroidViewModel {
     public void stopTimerAndReset() {
         if (timer != null) {
             timer.cancel();
+            if(currentState.getValue() == PomodoroState.STUDY){
+                SoundPlayer.playSound(getApplication(), R.raw.end_session);
+            }
         }
         completeSessionAndStopService();
         this.sessionCounter = 0;

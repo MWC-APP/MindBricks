@@ -16,6 +16,7 @@ import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
+import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 public class SettingsPomodoroFragment extends Fragment {
 
@@ -87,6 +88,7 @@ public class SettingsPomodoroFragment extends Fragment {
         prefs.setTimerStudyDuration((int) studyDurationSlider.getValue());
         prefs.setTimerShortPauseDuration((int) pauseDurationSlider.getValue());
         prefs.setTimerLongPauseDuration((int) longPauseDurationSlider.getValue());
+
     }
 
     private void updateLabel(MaterialTextView label, int minutes) {

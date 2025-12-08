@@ -15,6 +15,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import ch.inf.usi.mindbricks.R;
+import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -53,12 +54,15 @@ public class SettingsActivity extends AppCompatActivity {
         if (initialTab > 0 && initialTab < adapter.getItemCount()) {
             viewPager.setCurrentItem(initialTab, false);
         }
+
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             getOnBackPressedDispatcher().onBackPressed();
+            // added save_settings sound when leaving the settigs activity
+            SoundPlayer.playSound(this, R.raw.save_settings);
             return true;
         }
         return super.onOptionsItemSelected(item);
