@@ -1,5 +1,6 @@
 package ch.inf.usi.mindbricks.ui.nav.home;
 
+import android.Manifest;
 import android.app.Application;
 import android.content.Intent;
 import android.graphics.Color;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.NotificationHelper;
+import ch.inf.usi.mindbricks.util.PermissionManager;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
@@ -58,14 +60,21 @@ public class HomeViewModel extends AndroidViewModel {
         if (currentState.getValue() != PomodoroState.IDLE) {
             return;
         }
+
+        boolean hasMicPermission = PermissionManager.hasPermission(getApplication(), Manifest.permission.RECORD_AUDIO);
+        if (!hasMicPermission) {
+            android.util.Log.w("HomeViewModel", "Microphone permission not granted. SensorService will not be started.");
+        }
+
         // Reset the session counter at the beginning of a new cycle
         this.sessionCounter = 0;
         // Start the first study session
-        startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
+        startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes, hasMicPermission);
     }
 
+
     // Starts a study session
-    private void startStudySession(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes) {
+    private void startStudySession(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes, boolean startSensorService) {
         this.sessionCounter++;
         currentState.setValue(PomodoroState.STUDY); // Set the state to STUDY
         long studyDurationMillis = TimeUnit.MINUTES.toMillis(studyDurationMinutes);
@@ -81,10 +90,12 @@ public class HomeViewModel extends AndroidViewModel {
             currentSessionId = db.studySessionDao().insert(session);
             android.util.Log.d("HomeViewModel", "Session inserted with ID: " + currentSessionId);
 
-            Intent serviceIntent = new Intent(getApplication(), SensorService.class);
-            serviceIntent.setAction(SensorService.ACTION_START_SESSION);
-            serviceIntent.putExtra(SensorService.EXTRA_SESSION_ID, currentSessionId);
-            getApplication().startForegroundService(serviceIntent);
+            if(startSensorService) {
+                Intent serviceIntent = new Intent(getApplication(), SensorService.class);
+                serviceIntent.setAction(SensorService.ACTION_START_SESSION);
+                serviceIntent.putExtra(SensorService.EXTRA_SESSION_ID, currentSessionId);
+                getApplication().startForegroundService(serviceIntent);
+            }
         });
 
         timer = new CountDownTimer(studyDurationMillis, 1000) {
@@ -155,7 +166,8 @@ public class HomeViewModel extends AndroidViewModel {
                 } else {
                     //  continue to the next study session
                     notificationHelper.showNotification("Break's Over!", "Time to get back to studying.", 3);
-                    startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
+                    boolean hasMicPermission = PermissionManager.hasPermission(getApplication(), Manifest.permission.RECORD_AUDIO);
+                    startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes, hasMicPermission);
                 }
             }
         }.start();

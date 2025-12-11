@@ -69,19 +69,23 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Register permission request callback
-        audioPermissionRequest = PermissionManager.registerSinglePermission(
-                this,
-                Manifest.permission.RECORD_AUDIO,
-                this::startDefaultSession,
-                () -> Toast.makeText(getContext(), "Microphone permission is required for focus sessions.", Toast.LENGTH_LONG).show()
-        );
-
+        // Its job is to finally start the session, regardless of the outcome.
         motionPermissionRequest = PermissionManager.registerSinglePermission(
                 this,
                 Manifest.permission.ACTIVITY_RECOGNITION,
                 this::startDefaultSession,
-                () -> Toast.makeText(getContext(), "Significant motion permission is required for focus session.", Toast.LENGTH_LONG).show()
+                this::startDefaultSession
+                // in both cases start as default, so if permission is denied it will just don't work
+        );
+
+        // Its job is to trigger the next request in the chain.
+        audioPermissionRequest = PermissionManager.registerSinglePermission(
+                this,
+                Manifest.permission.RECORD_AUDIO,
+                () -> motionPermissionRequest.launch(),
+                () -> motionPermissionRequest.launch()
+                // in both cases start as default, so if permission is denied it will just don't work
+
         );
     }
 
