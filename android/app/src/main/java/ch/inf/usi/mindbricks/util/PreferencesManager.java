@@ -1,9 +1,7 @@
 package ch.inf.usi.mindbricks.util;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-
-import com.google.gson.Gson;
+import android.content.SharedPreferences;import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -202,5 +200,13 @@ public class PreferencesManager {
 
     public void setTimerLongPauseDuration(int minutes) {
         preferences.edit().putInt(PreferencesKey.TIMER_LONG_PAUSE_DURATION.getName(), minutes).apply();
+    }
+
+    public boolean isFirstSession() {
+        return preferences.getBoolean(PreferencesKey.IS_FIRST_SESSION.getName(), true);
+    }
+
+    public void setFirstSession(boolean isFirst) {
+        preferences.edit().putBoolean(PreferencesKey.IS_FIRST_SESSION.getName(), isFirst).apply();
     }
 }

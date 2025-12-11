@@ -152,18 +152,28 @@ public class HomeFragment extends Fragment {
             if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {
                 confirmEndSessionDialog();
             } else {
-                // Check for permission before starting
+                PreferencesManager prefsListener = new PreferencesManager(requireContext());
+                boolean isFirstTime = prefsListener.isFirstSession();
 
-                if (PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO)) {
-                    startDefaultSession();
-                } else {
-                    audioPermissionRequest.launch();
-                }
+                // If both permissions are already granted, we don't need any special logic.
+                boolean hasAudio = PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO);
+                boolean hasMotion = PermissionManager.hasPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION);
 
-                if (PermissionManager.hasPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION)) {
+                if (hasAudio && hasMotion) { // check both permissios
                     startDefaultSession();
+                } else if (isFirstTime) {
+                    prefsListener.setFirstSession(false);
+
+                    // Sequentially ask for the missing permissions.
+                    if (!hasAudio) {
+                        // Ask for audio
+                        audioPermissionRequest.launch();
+                    } else {
+                        // ask for motion
+                        motionPermissionRequest.launch();
+                    }
                 } else {
-                    motionPermissionRequest.launch();
+                    startDefaultSession();
                 }
             }
         });
