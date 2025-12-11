@@ -53,6 +53,7 @@ public class HomeFragment extends Fragment {
     private ConstraintLayout sessionDotsLayout;
 
     private PermissionManager.PermissionRequest audioPermissionRequest;
+    private PermissionManager.PermissionRequest motionPermissionRequest;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -68,12 +69,23 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Register permission request callback
+        // Its job is to finally start the session, regardless of the outcome.
+        motionPermissionRequest = PermissionManager.registerSinglePermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION,
+                this::startDefaultSession,
+                this::startDefaultSession
+                // in both cases start as default, so if permission is denied it will just don't work
+        );
+
+        // Its job is to trigger the next request in the chain.
         audioPermissionRequest = PermissionManager.registerSinglePermission(
                 this,
                 Manifest.permission.RECORD_AUDIO,
-                this::startDefaultSession,
-                () -> Toast.makeText(getContext(), "Microphone permission is required for focus sessions.", Toast.LENGTH_LONG).show()
+                () -> motionPermissionRequest.launch(),
+                () -> motionPermissionRequest.launch()
+                // in both cases start as default, so if permission is denied it will just don't work
+
         );
     }
 
@@ -144,16 +156,26 @@ public class HomeFragment extends Fragment {
             if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {
                 confirmEndSessionDialog();
             } else {
-                // Check for permission before starting
-                if (PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO)) {
+                PreferencesManager prefsListener = new PreferencesManager(requireContext());
+                boolean isFirstTime = prefsListener.isFirstSession();
+
+                // If both permissions are already granted, we don't need any special logic.
+                boolean hasAudio = PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO);
+                boolean hasMotion = PermissionManager.hasPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION);
+
+                if (hasAudio && hasMotion) { // check both permissios at runtime instead of onboarding activity
                     startDefaultSession();
+                } else if (isFirstTime) {
+                    prefsListener.setFirstSession(false);
+                        audioPermissionRequest.launch();
+                        motionPermissionRequest.launch();
                 } else {
-                    audioPermissionRequest.launch();
+                    startDefaultSession();
                 }
             }
         });
 
-        // test questionnare
+        // test questionnaire
         Button testButton = view.findViewById(R.id.test_questionnaire_button);
         if (testButton != null) {
             testButton.setOnClickListener(v -> {

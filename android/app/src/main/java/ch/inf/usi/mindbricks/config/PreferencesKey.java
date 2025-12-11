@@ -18,7 +18,9 @@ public enum PreferencesKey {
     TIMER_STUDY_DURATION("timer_study_duration"),
     TIMER_SHORT_PAUSE_DURATION("timer_short_pause_duration"),
     TIMER_LONG_PAUSE_DURATION("timer_long_pause_duration"),
-    USER_AVATAR_URI("user_avatar_uri");
+    USER_AVATAR_URI("user_avatar_uri"),
+
+    IS_FIRST_SESSION("is_first_session");
 
     private final String name;
 
