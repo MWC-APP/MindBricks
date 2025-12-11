@@ -159,7 +159,7 @@ public class HomeFragment extends Fragment {
                 boolean hasAudio = PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO);
                 boolean hasMotion = PermissionManager.hasPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION);
 
-                if (hasAudio && hasMotion) { // check both permissios
+                if (hasAudio && hasMotion) { // check both permissios at runtime instead of onboarding activity
                     startDefaultSession();
                 } else if (isFirstTime) {
                     prefsListener.setFirstSession(false);
