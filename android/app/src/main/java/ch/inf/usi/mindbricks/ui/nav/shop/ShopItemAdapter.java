@@ -34,9 +34,9 @@ public class ShopItemAdapter extends RecyclerView.Adapter<ShopItemAdapter.ShopIt
     @Override
     public void onBindViewHolder(@NonNull ShopItemViewHolder holder, int position) {
         ShopItem currentItem = items.get(position);
-        holder.itemName.setText(currentItem.name());
-        holder.itemPrice.setText(String.valueOf(currentItem.price()));
-        holder.itemImage.setImageResource(currentItem.imageResourceId());
+        holder.itemName.setText(currentItem.getName());
+        holder.itemPrice.setText(String.valueOf(currentItem.getPrice()));
+        holder.itemImage.setImageResource(currentItem.getDrawableResId());
 
         // Set the listener on the entire item view
         holder.itemView.setOnClickListener(v -> {

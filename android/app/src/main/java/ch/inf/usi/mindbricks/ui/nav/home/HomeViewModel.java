@@ -47,6 +47,8 @@ public class HomeViewModel extends AndroidViewModel {
     public final MutableLiveData<NextPhase> nextPhase = new MutableLiveData<>(NextPhase.FOCUS);
     public final MutableLiveData<Integer> earnedCoinsEvent = new MutableLiveData<>();
 
+    public final MutableLiveData<Long> studyElapsedTime = new MutableLiveData<>(0L);
+
     private int sessionCounter = 0;
     private Tag currentSessionTag;
     private final NotificationHelper notificationHelper;
@@ -63,7 +65,6 @@ public class HomeViewModel extends AndroidViewModel {
     // The main entry point to start a new Pomodoro cycle
     // help source: https://stackoverflow.com/questions/39215947/stuck-on-trying-to-resume-paused-stopped-function-pomodoro-timer
     public void pomodoroTechnique(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes, Tag tag) {
-        // Prevent starting a new timer if one is already running.
         if (currentState.getValue() != PomodoroState.IDLE) {
             return;
         }
@@ -75,7 +76,6 @@ public class HomeViewModel extends AndroidViewModel {
             android.util.Log.w("HomeViewModel", "Microphone permission not granted. SensorService will not be started.");
         }
 
-        // Reset the session counter at the beginning of a new cycle
         this.sessionCounter = 0;
         nextPhase.setValue(NextPhase.FOCUS);
         // Start the first study session
@@ -109,17 +109,16 @@ public class HomeViewModel extends AndroidViewModel {
     // Starts a study session
     private void startStudySession(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes, boolean startSensorService) {
         this.sessionCounter++;
-        currentState.setValue(PomodoroState.STUDY); // Set the state to STUDY
+        currentState.setValue(PomodoroState.STUDY);
         long studyDurationMillis = TimeUnit.MINUTES.toMillis(studyDurationMinutes);
 
         SoundPlayer.playSound(getApplication(), R.raw.start_session);
         VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_START);
 
-        // Save new session (to get its id) + start foreground service
         long startTime = System.currentTimeMillis();
         String tagName = (currentSessionTag != null) ? currentSessionTag.title() : "General";
         int tagColor = (currentSessionTag != null) ? currentSessionTag.color() : Color.GRAY;
-        
+
         StudySession session = new StudySession(startTime, studyDurationMinutes, tagName, tagColor);
 
         dbExecutor.execute(() -> {
@@ -141,13 +140,13 @@ public class HomeViewModel extends AndroidViewModel {
             @Override
             public void onTick(long millisUntilFinished) {
                 currentTime.postValue(millisUntilFinished);
+                studyElapsedTime.postValue(studyDurationMillis - millisUntilFinished);
 
-                // Award 1 coin for each completed minute of studying.
                 long currentMinute = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
                 if (lastMinute > currentMinute) {
                     earnedCoinsEvent.postValue(1);
                 }
-                lastMinute = currentMinute; // Update the last minute tracker
+                lastMinute = currentMinute;
             }
 
             @Override
@@ -157,11 +156,8 @@ public class HomeViewModel extends AndroidViewModel {
                 // Stop Service and complete Session
                 completeSessionAndStopService();
                 notificationHelper.showNotification("Study Complete!", "Time for a well-deserved break.", 1);
-
-                // Award 3 bonus coins at the successful end of the session
                 earnedCoinsEvent.postValue(3);
 
-                // Decide whether to start a short pause or a long pause
                 if (sessionCounter < 4) {
                     startPauseSession(false, studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
                 } else {
@@ -183,23 +179,20 @@ public class HomeViewModel extends AndroidViewModel {
             pauseDurationMillis = TimeUnit.MINUTES.toMillis(pauseDurationMinutes);
         }
 
-        // Create and start a new timer for the pause
         timer = new CountDownTimer(pauseDurationMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                currentTime.postValue(millisUntilFinished); // Update the UI with  remaining time
+                currentTime.postValue(millisUntilFinished);
             }
 
             @Override
             public void onFinish() {
-                // end the cycle if long pause
                 if (isLongPause) {
                     SoundPlayer.playSound(getApplication(), R.raw.end_cycle);
                     VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.CYCLE_COMPLETE);
                     notificationHelper.showNotification("Cycle Complete!", "Great work!", 2);
                     stopTimerAndReset();
                 } else {
-                    //  continue to the next study session
                     notificationHelper.showNotification("Break's Over!", "Time to get back to studying.", 3);
                     boolean hasMicPermission = PermissionManager.hasPermission(getApplication(), Manifest.permission.RECORD_AUDIO);
                     startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes, hasMicPermission);
@@ -278,6 +271,7 @@ public class HomeViewModel extends AndroidViewModel {
         currentState.setValue(PomodoroState.IDLE);
         nextPhase.setValue(NextPhase.FOCUS);
         currentTime.setValue(0L);
+        studyElapsedTime.setValue(0L);
     }
 
     public void saveQuestionnaireResponse(SessionQuestionnaire questionnaire) {
@@ -289,34 +283,28 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     private void completeSessionAndStopService() {
-        // Stop service
         Intent serviceIntent = new Intent(getApplication(), SensorService.class);
         serviceIntent.setAction(SensorService.ACTION_STOP_SESSION);
         getApplication().startService(serviceIntent);
 
-        // Store data in DB
         if (currentSessionId != -1) {
             long sessionIdToUpdate = currentSessionId;
             dbExecutor.execute(() -> {
                 AppDatabase db = AppDatabase.getInstance(getApplication());
-                // Get aggregation
                 float avgNoise = db.sessionSensorLogDao().getAverageNoise(sessionIdToUpdate);
                 float avgLight = db.sessionSensorLogDao().getAverageLight(sessionIdToUpdate);
                 int motionCount = db.sessionSensorLogDao().getMotionCount(sessionIdToUpdate);
 
                 android.util.Log.d("HomeViewModel", "Completing session " + sessionIdToUpdate + ". Stats: Noise=" + avgNoise + ", Light=" + avgLight + ", Motion=" + motionCount);
-                // TODO: Implement actual DB update for stats
             });
             currentSessionId = -1;
         }
     }
 
-    // Resets the coin event LiveData to prevent it from re-firing
     public void onCoinsAwarded() {
         earnedCoinsEvent.setValue(null);
     }
 
-    // Resets the timer display if the activity is recreated while the timer is idle
     public void activityRecreated() {
         if (currentState.getValue() == PomodoroState.IDLE) {
             currentTime.setValue(0L);

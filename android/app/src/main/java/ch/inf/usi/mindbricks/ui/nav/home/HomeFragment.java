@@ -39,6 +39,8 @@ import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
+import ch.inf.usi.mindbricks.ui.nav.home.city.CityViewModel;
+import ch.inf.usi.mindbricks.ui.nav.home.city.IsometricCityView;
 import ch.inf.usi.mindbricks.ui.nav.home.questionnare.DetailedQuestionsDialogFragment;
 import ch.inf.usi.mindbricks.ui.nav.home.questionnare.EmotionSelectDialogFragment;
 import ch.inf.usi.mindbricks.ui.settings.SettingsActivity;
@@ -68,6 +70,9 @@ public class HomeFragment extends Fragment {
 
     private PermissionManager.PermissionRequest audioPermissionRequest;
     private PermissionManager.PermissionRequest motionPermissionRequest;
+
+    private IsometricCityView cityView;
+    private CityViewModel cityViewModel;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -99,7 +104,6 @@ public class HomeFragment extends Fragment {
                 () -> motionPermissionRequest.launch(),
                 () -> motionPermissionRequest.launch()
                 // in both cases start as default, so if permission is denied it will just don't work
-
         );
     }
 
@@ -137,6 +141,10 @@ public class HomeFragment extends Fragment {
         startSessionButton = view.findViewById(R.id.start_stop_button);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
         settingsIcon = view.findViewById(R.id.settings_icon);
+        cityView = view.findViewById(R.id.cityView);
+
+        // Initialize cityViewModel before any observer uses it
+        cityViewModel = new ViewModelProvider(this).get(CityViewModel.class);
 
         setupTagSpinner();
 
@@ -161,19 +169,15 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // Initialize timer display with default study duration
         PreferencesManager prefs = new PreferencesManager(requireContext());
         int defaultStudyDurationMinutes = prefs.getTimerStudyDuration();
         updateTimerUI(TimeUnit.MINUTES.toMillis(defaultStudyDurationMinutes));
 
-        // Set up observers to listen for data changes from the ViewModels
         setupObservers();
 
-        // Notify the ViewModel that the UI is ready
         homeViewModel.activityRecreated();
-        // help source: https://stackoverflow.com/questions/25640598/android-dialog-with-countdown-timer?
+
         startSessionButton.setOnClickListener(v -> {
-            // If the timer is running, show a confirmation dialog to stop it
             if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {
                 confirmEndSessionDialog();
             } else {
@@ -211,18 +215,29 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // test questionnaire
         Button testButton = view.findViewById(R.id.test_questionnaire_button);
         if (testButton != null) {
-            testButton.setOnClickListener(v -> {
-                showEmotionDialog(999L);
-            });
+            testButton.setOnClickListener(v -> showEmotionDialog(999L));
         }
+
+        // Initialize slots
+        cityViewModel.initializeSlots(5, 5);
+
+        // Observe LiveData to update the view
+        cityViewModel.getSlots().observe(getViewLifecycleOwner(), slots -> {
+            cityView.setSlots(slots);
+        });
+
+        // Unlock a random slot every minute of study
+        homeViewModel.studyElapsedTime.observe(getViewLifecycleOwner(), elapsedMillis -> {
+            int minutes = (int) (elapsedMillis / 60000);
+            if (minutes > 0 && elapsedMillis % 60000 < 1000) {
+                cityViewModel.unlockRandomSlot();
+            }
+        });
     }
 
-    // Sets up LiveData observers to automatically update the UI
     private void setupObservers() {
-        // Observe the timer's current state
         homeViewModel.currentState.observe(getViewLifecycleOwner(), state -> {
             boolean isRunning = state != HomeViewModel.PomodoroState.IDLE;
             boolean isStudying = state == HomeViewModel.PomodoroState.STUDY;
@@ -237,7 +252,6 @@ public class HomeFragment extends Fragment {
             settingsIcon.setEnabled(!isStudying);
             settingsIcon.setAlpha(isStudying ? 0.5f : 1.0f);
 
-            // Temporarily disable the button to prevent rapid clicks when state changes
             if (isRunning) {
                 startSessionButton.setEnabled(false);
                 new Handler(Looper.getMainLooper()).postDelayed(() -> startSessionButton.setEnabled(true), 1500);
@@ -257,15 +271,12 @@ public class HomeFragment extends Fragment {
 
         // Observe events for earning coins
         homeViewModel.earnedCoinsEvent.observe(getViewLifecycleOwner(), amount -> {
-            // Check if there is a valid amount of coins to award
             if (amount != null && amount > 0) {
                 earnCoin(amount);
-                // Reset the event in the ViewModel to prevent it from firing again on config change
                 homeViewModel.onCoinsAwarded();
             }
         });
 
-        // Observe the countdown timer's current time to update the display
         homeViewModel.currentTime.observe(getViewLifecycleOwner(), millis -> {
             if (millis == 0L && homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
                 PreferencesManager prefs = new PreferencesManager(requireContext());
@@ -275,11 +286,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // Observe the user's total coin balance from the shared ProfileViewModel
         profileViewModel.coins.observe(getViewLifecycleOwner(), balance -> {
-            if (balance != null) {
-                coinBalanceTextView.setText(String.valueOf(balance));
-            }
+            if (balance != null) coinBalanceTextView.setText(String.valueOf(balance));
         });
 
         homeViewModel.showQuestionnaireEvent.observe(getViewLifecycleOwner(), sessionId -> {
@@ -290,18 +298,13 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    // Reads timer durations from SharedPreferences and starts a Pomodoro cycle
     private void startDefaultSession() {
         PreferencesManager prefs = new PreferencesManager(requireContext());
-
-        // Retrieve study settings
         int studyDuration = prefs.getTimerStudyDuration();
         int shortPauseDuration = prefs.getTimerShortPauseDuration();
         int longPauseDuration = prefs.getTimerLongPauseDuration();
 
         Tag selectedTag = (Tag) tagSpinner.getSelectedItem();
-
-        // start focus session
         homeViewModel.pomodoroTechnique(studyDuration, shortPauseDuration, longPauseDuration, selectedTag);
     }
 
@@ -320,20 +323,15 @@ public class HomeFragment extends Fragment {
 
     // Updates the color and width of the session indicator dots based on the current state
     private void updateSessionDots() {
-        // Perform a safety check to avoid null pointer exceptions
         if (homeViewModel == null || sessionDots == null || sessionDotsLayout == null) return;
 
-        // Tell TransitionManager to watch the container and animate any layout changes
         TransitionManager.beginDelayedTransition(sessionDotsLayout);
 
         int currentSession = homeViewModel.getSessionCounter();
         HomeViewModel.PomodoroState currentState = homeViewModel.currentState.getValue();
 
-        //  Reset all dots to their default inactive state
         for (ImageView dot : sessionDots) {
             dot.setImageResource(R.drawable.dot_inactive);
-
-            // Reset layout parameters to be a small 12dp circle
             ViewGroup.LayoutParams params = dot.getLayoutParams();
             params.width = (int) (12 * getResources().getDisplayMetrics().density);
             dot.setLayoutParams(params);
@@ -463,31 +461,23 @@ public class HomeFragment extends Fragment {
         builder.show();
     }
 
-    // Formats milliseconds into a "MM:SS" string and updates the timer TextView
     private void updateTimerUI(long millisUntilFinished) {
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(minutes);
         timerTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
     }
 
-    // Adds coins to the user's profile and shows a toast message
     private void earnCoin(int amount) {
-        if (profileViewModel != null) {
-            profileViewModel.addCoins(amount);
-        }
+        if (profileViewModel != null) profileViewModel.addCoins(amount);
         String message = (amount == 1) ? "+1 Coin!" : String.format(Locale.getDefault(), "+%d Coins!", amount);
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-    // questionnares -> short and detailed
     private void showEmotionDialog(long sessionId) {
         EmotionSelectDialogFragment dialog = new EmotionSelectDialogFragment();
         dialog.setListener((emotionIndex, wantsDetailedQuestions) -> {
-            if (wantsDetailedQuestions) {
-                showDetailedQuestionnaire(sessionId, emotionIndex);
-            } else {
-                saveQuickQuestionnaire(sessionId, emotionIndex);
-            }
+            if (wantsDetailedQuestions) showDetailedQuestionnaire(sessionId, emotionIndex);
+            else saveQuickQuestionnaire(sessionId, emotionIndex);
         });
         dialog.show(getChildFragmentManager(), "emotion_dialog");
     }
@@ -517,7 +507,6 @@ public class HomeFragment extends Fragment {
         questionnaire.setTimeStamp(System.currentTimeMillis());
         questionnaire.setInitialEmotion(emotionIndex);
         questionnaire.setAnsweredDetailedQuestions(false);
-
         homeViewModel.saveQuestionnaireResponse(questionnaire);
     }
 
@@ -533,12 +522,10 @@ public class HomeFragment extends Fragment {
         questionnaire.setEngagementRating(engagement);
         questionnaire.setSatisfactionRating(satisfaction);
         questionnaire.setAnticipationRating(anticipation);
-
         homeViewModel.saveQuestionnaireResponse(questionnaire);
     }
 
     private void setupTagSpinner() {
-        // load tags from preferences
         PreferencesManager prefs = new PreferencesManager(requireContext());
         List<Tag> tags = prefs.getUserTags();
 
@@ -661,5 +648,4 @@ public class HomeFragment extends Fragment {
         // show dialog
         dialog.show();
     }
-
 }
