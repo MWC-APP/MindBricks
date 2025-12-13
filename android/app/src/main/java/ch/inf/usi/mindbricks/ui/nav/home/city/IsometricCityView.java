@@ -26,7 +26,6 @@ public class IsometricCityView extends View {
         paintOutline.setStrokeWidth(4f);
     }
 
-
     public void setSlots(List<CitySlot> slots) {
         this.slots = slots;
         invalidate(); // redraw the view
@@ -38,7 +37,6 @@ public class IsometricCityView extends View {
 
         if (slots == null || slots.isEmpty()) return;
 
-        // Determine grid size
         int maxCol = 0, maxRow = 0;
         for (CitySlot slot : slots) {
             if (slot.getCol() > maxCol) maxCol = slot.getCol();
@@ -48,39 +46,37 @@ public class IsometricCityView extends View {
         float cellWidth = getWidth() / (float) (maxCol + maxRow + 2);
         float cellHeight = getHeight() / (float) (maxCol + maxRow + 2);
 
-        for (CitySlot slot : slots) {
-            // Convert grid to isometric coordinates
-            float isoX = (slot.getCol() - slot.getRow()) * cellWidth / 2 + getWidth() / 2f;
-            float isoY = (slot.getCol() + slot.getRow()) * cellHeight / 2;
+        float scaleFactor = 1.8f;
+        cellWidth *= scaleFactor;
+        cellHeight *= scaleFactor;
 
-            // Draw diamond shape
+        float yOffset = getHeight() / 6f;
+
+        for (CitySlot slot : slots) {
+            float isoX = (slot.getCol() - slot.getRow()) * cellWidth / 2 + getWidth() / 2f;
+            float isoY = (slot.getCol() + slot.getRow()) * cellHeight / 2 + yOffset;
+
             float halfWidth = cellWidth / 2f;
             float halfHeight = cellHeight / 2f;
 
-            float[] points = {
-                    isoX, isoY - halfHeight,      // top
-                    isoX + halfWidth, isoY,       // right
-                    isoX, isoY + halfHeight,      // bottom
-                    isoX - halfWidth, isoY        // left
+            // Diamond vertices
+            float[] verts = {
+                    isoX, isoY - halfHeight,  // top
+                    isoX + halfWidth, isoY,    // right
+                    isoX, isoY + halfHeight,   // bottom
+                    isoX - halfWidth, isoY     // left
             };
 
-            // Fill the diamond
-            Paint paint = slot.isUnlocked() ? paintUnlocked : paintLocked;
-            canvas.drawPath(createDiamondPath(points), paint);
+            // Draw filled diamond
+            Paint fillPaint = slot.isUnlocked() ? paintUnlocked : paintLocked;
+            canvas.drawVertices(Canvas.VertexMode.TRIANGLE_FAN, verts.length, verts, 0,
+                    null, 0, null, 0, null, 0, 0, fillPaint);
 
             // Draw outline
-            canvas.drawPath(createDiamondPath(points), paintOutline);
+            canvas.drawLine(verts[0], verts[1], verts[2], verts[3], paintOutline);
+            canvas.drawLine(verts[2], verts[3], verts[4], verts[5], paintOutline);
+            canvas.drawLine(verts[4], verts[5], verts[6], verts[7], paintOutline);
+            canvas.drawLine(verts[6], verts[7], verts[0], verts[1], paintOutline);
         }
     }
-
-    private android.graphics.Path createDiamondPath(float[] points) {
-        android.graphics.Path path = new android.graphics.Path();
-        path.moveTo(points[0], points[1]);
-        path.lineTo(points[2], points[3]);
-        path.lineTo(points[4], points[5]);
-        path.lineTo(points[6], points[7]);
-        path.close();
-        return path;
-    }
-
 }

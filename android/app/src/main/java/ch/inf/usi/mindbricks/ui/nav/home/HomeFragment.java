@@ -200,7 +200,7 @@ public class HomeFragment extends Fragment {
         // Unlock a random slot every minute of study
         homeViewModel.studyElapsedTime.observe(getViewLifecycleOwner(), elapsedMillis -> {
             int minutes = (int) (elapsedMillis / 60000);
-            if (minutes > 0 && elapsedMillis % 60000 < 1000) { // trigger once per minute
+            if (minutes > 0 && elapsedMillis % 60000 < 1000) {
                 cityViewModel.unlockRandomSlot();
             }
         });
