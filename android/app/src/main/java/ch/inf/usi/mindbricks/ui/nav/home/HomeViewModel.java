@@ -19,7 +19,9 @@ import java.util.concurrent.TimeUnit;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.NotificationHelper;
 import ch.inf.usi.mindbricks.util.PermissionManager;
+import ch.inf.usi.mindbricks.util.PreferencesManager;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
+import ch.inf.usi.mindbricks.util.VibrationHelper;
 
 import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.Tag;
@@ -36,10 +38,17 @@ public class HomeViewModel extends AndroidViewModel {
         LONG_PAUSE
     }
 
+    public enum NextPhase {
+        FOCUS,
+        SHORT_BREAK,
+        LONG_BREAK
+    }
+
     private CountDownTimer timer;
 
     public final MutableLiveData<Long> currentTime = new MutableLiveData<>(0L);
     public final MutableLiveData<PomodoroState> currentState = new MutableLiveData<>(PomodoroState.IDLE);
+    public final MutableLiveData<NextPhase> nextPhase = new MutableLiveData<>(NextPhase.FOCUS);
     public final MutableLiveData<Integer> earnedCoinsEvent = new MutableLiveData<>();
 
     private int sessionCounter = 0;
@@ -72,8 +81,32 @@ public class HomeViewModel extends AndroidViewModel {
 
         // Reset the session counter at the beginning of a new cycle
         this.sessionCounter = 0;
+        nextPhase.setValue(NextPhase.FOCUS);
         // Start the first study session
         startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes, hasMicPermission);
+    }
+
+    // Continues to the next phase based on the current nextPhase value
+    public void continueToNextPhase(int studyDurationMinutes, int pauseDurationMinutes, int longPauseDurationMinutes) {
+        if (currentState.getValue() != PomodoroState.IDLE) {
+            return;
+        }
+
+        NextPhase phase = nextPhase.getValue();
+        if (phase == null) phase = NextPhase.FOCUS;
+
+        switch (phase) {
+            case FOCUS:
+                boolean hasMicPermission = PermissionManager.hasPermission(getApplication(), Manifest.permission.RECORD_AUDIO);
+                startStudySession(studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes, hasMicPermission);
+                break;
+            case SHORT_BREAK:
+                startPauseSession(false, studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
+                break;
+            case LONG_BREAK:
+                startPauseSession(true, studyDurationMinutes, pauseDurationMinutes, longPauseDurationMinutes);
+                break;
+        }
     }
 
 
@@ -180,6 +213,62 @@ public class HomeViewModel extends AndroidViewModel {
         }.start();
     }
 
+    // Skips the current step and proceeds to the next one in the cycle
+    public void skipCurrentStep() {
+        if (timer != null) {
+            timer.cancel();
+        }
+
+        PomodoroState state = currentState.getValue();
+        if (state == null) state = PomodoroState.IDLE;
+
+        // Get the stored durations from preferences
+        PreferencesManager prefs = new PreferencesManager(getApplication());
+        int studyDuration = prefs.getTimerStudyDuration();
+        int shortPauseDuration = prefs.getTimerShortPauseDuration();
+        int longPauseDuration = prefs.getTimerLongPauseDuration();
+
+        switch (state) {
+            case STUDY:
+                // Complete the current study session and prepare for break
+                SoundPlayer.playSound(getApplication(), R.raw.end_session);
+                VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.SESSION_CANCELLED);
+                completeSessionAndStopService();
+
+                // Set up for next phase but don't start timer
+                currentState.setValue(PomodoroState.IDLE);
+                if (sessionCounter < 4) {
+                    // Prepare for short break
+                    nextPhase.setValue(NextPhase.SHORT_BREAK);
+                    currentTime.setValue(TimeUnit.MINUTES.toMillis(shortPauseDuration));
+                } else {
+                    // Prepare for long break
+                    nextPhase.setValue(NextPhase.LONG_BREAK);
+                    currentTime.setValue(TimeUnit.MINUTES.toMillis(longPauseDuration));
+                }
+                break;
+
+            case PAUSE:
+            case LONG_PAUSE:
+                // If it was a long pause, reset the cycle first (before state change)
+                if (state == PomodoroState.LONG_PAUSE) {
+                    SoundPlayer.playSound(getApplication(), R.raw.end_cycle);
+                    VibrationHelper.vibrate(getApplication(), VibrationHelper.VibrationType.CYCLE_COMPLETE);
+                    sessionCounter = 0;
+                }
+
+                // Prepare for next study session but don't start timer
+                currentState.setValue(PomodoroState.IDLE);
+                nextPhase.setValue(NextPhase.FOCUS);
+                currentTime.setValue(TimeUnit.MINUTES.toMillis(studyDuration));
+                break;
+
+            default:
+                // Already idle, do nothing
+                break;
+        }
+    }
+
     // Stops the timer and resets the state to IDLE
     public void stopTimerAndReset() {
         if (timer != null) {
@@ -191,6 +280,7 @@ public class HomeViewModel extends AndroidViewModel {
         completeSessionAndStopService();
         this.sessionCounter = 0;
         currentState.setValue(PomodoroState.IDLE);
+        nextPhase.setValue(NextPhase.FOCUS);
         currentTime.setValue(0L);
     }
 

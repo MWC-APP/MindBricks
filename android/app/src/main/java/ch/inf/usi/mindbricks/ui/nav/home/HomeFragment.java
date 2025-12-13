@@ -43,9 +43,11 @@ import ch.inf.usi.mindbricks.util.ProfileViewModel;
 public class HomeFragment extends Fragment {
 
     private TextView timerTextView;
+    private TextView stateLabel;
     private Spinner tagSpinner;
     private Button startSessionButton;
     private TextView coinBalanceTextView;
+    private ImageView settingsIcon;
 
     private HomeViewModel homeViewModel;
     private ProfileViewModel profileViewModel;
@@ -121,10 +123,11 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         timerTextView = view.findViewById(R.id.timer_text_view);
+        stateLabel = view.findViewById(R.id.state_label);
         tagSpinner = view.findViewById(R.id.tag_spinner);
         startSessionButton = view.findViewById(R.id.start_stop_button);
         coinBalanceTextView = view.findViewById(R.id.coin_balance_text);
-        ImageView settingsIcon = view.findViewById(R.id.settings_icon);
+        settingsIcon = view.findViewById(R.id.settings_icon);
 
         setupTagSpinner();
 
@@ -140,10 +143,13 @@ public class HomeFragment extends Fragment {
 
         // Click listener to open settings activity
         settingsIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), SettingsActivity.class);
-            // force to select the Pomodoro tab at the start
-            intent.putExtra(SettingsActivity.EXTRA_TAB_INDEX, 2);
-            startActivity(intent);
+            // Only open settings if enabled (not during focus session)
+            if (settingsIcon.isEnabled()) {
+                Intent intent = new Intent(requireContext(), SettingsActivity.class);
+                // force to select the Pomodoro tab at the start
+                intent.putExtra(SettingsActivity.EXTRA_TAB_INDEX, 2);
+                startActivity(intent);
+            }
         });
 
         // Initialize timer display with default study duration
@@ -162,21 +168,36 @@ public class HomeFragment extends Fragment {
             if (homeViewModel.currentState.getValue() != HomeViewModel.PomodoroState.IDLE) {
                 confirmEndSessionDialog();
             } else {
-                PreferencesManager prefsListener = new PreferencesManager(requireContext());
-                boolean isFirstTime = prefsListener.isFirstSession();
+                HomeViewModel.NextPhase nextPhase = homeViewModel.nextPhase.getValue();
+                int sessionCounter = homeViewModel.getSessionCounter();
 
-                // If both permissions are already granted, we don't need any special logic.
-                boolean hasAudio = PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO);
-                boolean hasMotion = PermissionManager.hasPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION);
+                // If we're continuing an existing cycle (after a break), just continue
+                if (sessionCounter > 0) {
+                    startNextPhase();
+                }
+                // If we're starting a break, continue to the next phase
+                else if (nextPhase == HomeViewModel.NextPhase.SHORT_BREAK ||
+                         nextPhase == HomeViewModel.NextPhase.LONG_BREAK) {
+                    startNextPhase();
+                }
+                // Otherwise, start new cycle
+                else {
+                    PreferencesManager prefsListener = new PreferencesManager(requireContext());
+                    boolean isFirstTime = prefsListener.isFirstSession();
 
-                if (hasAudio && hasMotion) { // check both permissios at runtime instead of onboarding activity
-                    startDefaultSession();
-                } else if (isFirstTime) {
-                    prefsListener.setFirstSession(false);
+                    // check if both permissions are already granted
+                    boolean hasAudio = PermissionManager.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO);
+                    boolean hasMotion = PermissionManager.hasPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION);
+
+                    if (hasAudio && hasMotion) {
+                        startDefaultSession();
+                    } else if (isFirstTime) {
+                        prefsListener.setFirstSession(false);
                         audioPermissionRequest.launch();
                         motionPermissionRequest.launch();
-                } else {
-                    startDefaultSession();
+                    } else {
+                        startDefaultSession();
+                    }
                 }
             }
         });
@@ -195,12 +216,17 @@ public class HomeFragment extends Fragment {
         // Observe the timer's current state
         homeViewModel.currentState.observe(getViewLifecycleOwner(), state -> {
             boolean isRunning = state != HomeViewModel.PomodoroState.IDLE;
+            boolean isStudying = state == HomeViewModel.PomodoroState.STUDY;
 
-            // Update the button text
-            startSessionButton.setText(isRunning ? R.string.stop_session : R.string.start_session);
+            // Update the button text and appearance based on state
+            updateButtonForState(state, homeViewModel.nextPhase.getValue());
 
             // Lock the bottom navigation during study session
-            navigationLocker.setNavigationEnabled(state != HomeViewModel.PomodoroState.STUDY);
+            navigationLocker.setNavigationEnabled(!isStudying);
+
+            // Lock the settings icon during study session with visual feedback
+            settingsIcon.setEnabled(!isStudying);
+            settingsIcon.setAlpha(isStudying ? 0.5f : 1.0f);
 
             // Temporarily disable the button to prevent rapid clicks when state changes
             if (isRunning) {
@@ -210,6 +236,14 @@ public class HomeFragment extends Fragment {
                 startSessionButton.setEnabled(true);
             }
             updateSessionDots();
+        });
+
+        // Observe the next phase to update button and dots when it changes
+        homeViewModel.nextPhase.observe(getViewLifecycleOwner(), nextPhase -> {
+            if (homeViewModel.currentState.getValue() == HomeViewModel.PomodoroState.IDLE) {
+                updateButtonForState(homeViewModel.currentState.getValue(), nextPhase);
+                updateSessionDots();
+            }
         });
 
         // Observe events for earning coins
@@ -255,11 +289,24 @@ public class HomeFragment extends Fragment {
         int studyDuration = prefs.getTimerStudyDuration();
         int shortPauseDuration = prefs.getTimerShortPauseDuration();
         int longPauseDuration = prefs.getTimerLongPauseDuration();
-        
+
         Tag selectedTag = (Tag) tagSpinner.getSelectedItem();
 
         // start focus session
         homeViewModel.pomodoroTechnique(studyDuration, shortPauseDuration, longPauseDuration, selectedTag);
+    }
+
+    // Continues to the next phase (break or focus) based on current state
+    private void startNextPhase() {
+        PreferencesManager prefs = new PreferencesManager(requireContext());
+
+        // Retrieve study settings
+        int studyDuration = prefs.getTimerStudyDuration();
+        int shortPauseDuration = prefs.getTimerShortPauseDuration();
+        int longPauseDuration = prefs.getTimerLongPauseDuration();
+
+        // Continue to the next phase
+        homeViewModel.continueToNextPhase(studyDuration, shortPauseDuration, longPauseDuration);
     }
 
     // Updates the color and width of the session indicator dots based on the current state
@@ -283,34 +330,128 @@ public class HomeFragment extends Fragment {
             dot.setLayoutParams(params);
         }
 
-        // If a study session is active, modify the corresponding dot
-        if (currentState == HomeViewModel.PomodoroState.STUDY && currentSession > 0 && currentSession <= sessionDots.size()) {
-            // Get the currently active dot
-            ImageView activeDot = sessionDots.get(currentSession - 1);
+        // Show completed sessions based on current state
+        if (currentSession > 0 && currentSession <= sessionDots.size()) {
+            if (currentState == HomeViewModel.PomodoroState.STUDY) {
+                // During focus: show current session as active (pill shape)
+                ImageView activeDot = sessionDots.get(currentSession - 1);
+                activeDot.setImageResource(R.drawable.dot_active);
 
-            // Change its drawable to the pill shape
-            activeDot.setImageResource(R.drawable.dot_active);
+                // Change dot width to pill shape
+                ViewGroup.LayoutParams params = activeDot.getLayoutParams();
+                params.width = (int) (32 * getResources().getDisplayMetrics().density);
+                activeDot.setLayoutParams(params);
 
-            // Change dot width
-            ViewGroup.LayoutParams params = activeDot.getLayoutParams();
-            params.width = (int) (32 * getResources().getDisplayMetrics().density);
-            activeDot.setLayoutParams(params);
+                // Show all previous sessions as completed
+                for (int i = 0; i < currentSession - 1; i++) {
+                    sessionDots.get(i).setImageResource(R.drawable.dot_active);
+                }
+            } else {
+                // During break, idle, or waiting for next session: show all completed sessions
+                for (int i = 0; i < currentSession; i++) {
+                    sessionDots.get(i).setImageResource(R.drawable.dot_active);
+                }
+            }
         }
     }
 
 
+    // Updates the button text and style based on current state
+    private void updateButtonForState(HomeViewModel.PomodoroState state, HomeViewModel.NextPhase nextPhase) {
+        if (state == null) state = HomeViewModel.PomodoroState.IDLE;
+        if (nextPhase == null) nextPhase = HomeViewModel.NextPhase.FOCUS;
+
+        switch (state) {
+            case IDLE:
+                stateLabel.setVisibility(View.GONE);
+                switch (nextPhase) {
+                    case FOCUS:
+                        startSessionButton.setText(R.string.start_session);
+                        startSessionButton.setBackgroundTintList(
+                            getResources().getColorStateList(R.color.analytics_accent_blue, null));
+                        break;
+                    case SHORT_BREAK:
+                        startSessionButton.setText("Start Break");
+                        startSessionButton.setBackgroundTintList(
+                            getResources().getColorStateList(R.color.analytics_accent_green, null));
+                        break;
+                    case LONG_BREAK:
+                        startSessionButton.setText("Start Long Break");
+                        startSessionButton.setBackgroundTintList(
+                            getResources().getColorStateList(R.color.analytics_accent_purple, null));
+                        break;
+                }
+                break;
+
+            case STUDY:
+                startSessionButton.setText("End Focus");
+                startSessionButton.setBackgroundTintList(
+                    getResources().getColorStateList(R.color.md_theme_error, null));
+                stateLabel.setText("Focusing...");
+                stateLabel.setTextColor(getResources().getColor(R.color.md_theme_error, null));
+                stateLabel.setVisibility(View.VISIBLE);
+                break;
+
+            case PAUSE:
+                startSessionButton.setText("Skip Break");
+                startSessionButton.setBackgroundTintList(
+                    getResources().getColorStateList(R.color.analytics_accent_green, null));
+                stateLabel.setText("Short Break");
+                stateLabel.setTextColor(getResources().getColor(R.color.analytics_accent_green, null));
+                stateLabel.setVisibility(View.VISIBLE);
+                break;
+
+            case LONG_PAUSE:
+                startSessionButton.setText("Skip Long Break");
+                startSessionButton.setBackgroundTintList(
+                    getResources().getColorStateList(R.color.analytics_accent_purple, null));
+                stateLabel.setText("Long Break");
+                stateLabel.setTextColor(getResources().getColor(R.color.analytics_accent_purple, null));
+                stateLabel.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
     // Shows a confirmation dialog before stopping an active session
     private void confirmEndSessionDialog() {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("End Cycle?")
-                .setMessage("Are you sure you want to stop the current Pomodoro cycle?")
-                .setPositiveButton("Confirm", (dialog, which) -> {
-                    // stop timer
-                    homeViewModel.stopTimerAndReset();
-                    Toast.makeText(getContext(), "Pomodoro cycle stopped.", Toast.LENGTH_SHORT).show();
+        HomeViewModel.PomodoroState currentState = homeViewModel.currentState.getValue();
+        String title;
+        String message;
+        String skipButtonText;
+
+        if (currentState == HomeViewModel.PomodoroState.STUDY) {
+            title = "Focus Session Options";
+            message = "You're currently in a focus session. What would you like to do?";
+            skipButtonText = "Skip to Break";
+        } else if (currentState == HomeViewModel.PomodoroState.LONG_PAUSE) {
+            title = "Long Break Options";
+            message = "You're on a long break. What would you like to do?";
+            skipButtonText = "End Break";
+        } else {
+            title = "Break Options";
+            message = "You're on a break. What would you like to do?";
+            skipButtonText = "Skip to Focus";
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(skipButtonText, (dialog, which) -> {
+                    homeViewModel.skipCurrentStep();
+                    Toast.makeText(getContext(), "Skipped to next step", Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel", null)
-                .show();
+                .setNegativeButton("Cancel", null);
+
+        // Only show "End Entire Cycle" option if not in long pause
+        // NOTE: after the long pause, we have already finished the cycle. Useless
+        if (currentState != HomeViewModel.PomodoroState.LONG_PAUSE) {
+            builder.setNeutralButton("End Entire Cycle", (dialog, which) -> {
+                homeViewModel.stopTimerAndReset();
+                Toast.makeText(getContext(), "Pomodoro cycle stopped.", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        builder.show();
     }
 
     // Formats milliseconds into a "MM:SS" string and updates the timer TextView
@@ -343,10 +484,20 @@ public class HomeFragment extends Fragment {
     }
 
     private void showDetailedQuestionnaire(long sessionId, int emotionIndex) {
+        // FIXME: we need to use a new view rather than a dialog (a bit messy)
         DetailedQuestionsDialogFragment dialog = DetailedQuestionsDialogFragment.newInstance(emotionIndex);
-        dialog.setListener((emotion, enthusiasm, energy, engagement, satisfaction, anticipation) -> {
-            saveDetailedQuestionnaire(sessionId, emotion, enthusiasm, energy,
-                    engagement, satisfaction, anticipation);
+        dialog.setListener(new DetailedQuestionsDialogFragment.OnQuestionnaireCompleteListener() {
+            @Override
+            public void onQuestionnaireComplete(int emotion, int enthusiasm, int energy,
+                                                int engagement, int satisfaction, int anticipation) {
+                saveDetailedQuestionnaire(sessionId, emotion, enthusiasm, energy,
+                        engagement, satisfaction, anticipation);
+            }
+
+            @Override
+            public void onQuestionnaireSkipped(int emotionIndex) {
+                saveQuickQuestionnaire(sessionId, emotionIndex);
+            }
         });
         dialog.show(getChildFragmentManager(), "detailed_questionnaire");
     }
