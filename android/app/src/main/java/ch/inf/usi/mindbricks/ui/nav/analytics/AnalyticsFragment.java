@@ -419,12 +419,38 @@ public class AnalyticsFragment extends Fragment {
         viewModel.getSessionHistory().observe(getViewLifecycleOwner(), sessions -> {
             Log.d(TAG, "Session history received: " + (sessions != null ? sessions.size() + " items" : "null"));
             if (sessions != null) {
-                sessionHistoryAdapter.setData(sessions);
+                // for large datasets, update UI asynchronously to prevent blocking
+                // NOTE: this is done to avoid showing the spinner for a fraction of a second
+                if (sessions.size() > 100) {
+                    // Show progress bar for large datasets
+                    if (progressBar != null && historyContainer.getVisibility() == View.VISIBLE) {
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
 
-                // Update session count display
-                if (sessionCountText != null) {
-                    String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
-                    sessionCountText.setText(countText);
+                    // Use handler to avoid blocking main thread
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        sessionHistoryAdapter.setData(sessions);
+
+                        // Update session count display
+                        if (sessionCountText != null) {
+                            String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
+                            sessionCountText.setText(countText);
+                        }
+
+                        // Hide progress indicator
+                        if (progressBar != null) {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
+                } else {
+                    // For small datasets, update immediately
+                    sessionHistoryAdapter.setData(sessions);
+
+                    // Update session count display
+                    if (sessionCountText != null) {
+                        String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
+                        sessionCountText.setText(countText);
+                    }
                 }
             }
         });
