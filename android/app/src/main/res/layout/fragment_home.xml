@@ -64,6 +64,9 @@
 
 
     <!-- Tag Spinner -->
+
+    <!-- Main Image -->
+
     <Spinner
         android:id="@+id/tag_spinner"
         android:layout_width="wrap_content"
@@ -77,13 +80,12 @@
         app:layout_constraintHorizontal_bias="0.467"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings_icon"
-        app:layout_constraintVertical_bias="0.046" />
+        app:layout_constraintVertical_bias="0.0" />
 
-    <!-- Main Image -->
     <ch.inf.usi.mindbricks.ui.nav.home.city.IsometricCityView
         android:id="@+id/cityView"
-        android:layout_width="322dp"
-        android:layout_height="283dp"
+        android:layout_width="321dp"
+        android:layout_height="316dp"
         app:layout_constraintBottom_toTopOf="@+id/timer_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"

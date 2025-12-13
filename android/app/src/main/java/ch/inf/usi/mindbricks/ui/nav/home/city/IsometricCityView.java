@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.AttributeSet;
 import android.view.View;
+import android.util.AttributeSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,18 +46,18 @@ public class IsometricCityView extends View {
         float cellWidth = getWidth() / (float) (maxCol + maxRow + 2);
         float cellHeight = getHeight() / (float) (maxCol + maxRow + 2);
 
-        float scaleFactor = 1.8f;
+        float scaleFactor = 2f;
         cellWidth *= scaleFactor;
         cellHeight *= scaleFactor;
 
-        float yOffset = getHeight() / 6f;
+        float yOffset = getHeight() / 10f;
 
         for (CitySlot slot : slots) {
-            float isoX = (slot.getCol() - slot.getRow()) * cellWidth / 2 + getWidth() / 2f;
-            float isoY = (slot.getCol() + slot.getRow()) * cellHeight / 2 + yOffset;
-
             float halfWidth = cellWidth / 2f;
-            float halfHeight = cellHeight / 2f;
+            float halfHeight = cellHeight / 4f; // isometric adjustment for proper perspective
+
+            float isoX = (slot.getCol() - slot.getRow()) * halfWidth + getWidth() / 2f;
+            float isoY = (slot.getCol() + slot.getRow()) * halfHeight + yOffset;
 
             // Diamond vertices
             float[] verts = {
