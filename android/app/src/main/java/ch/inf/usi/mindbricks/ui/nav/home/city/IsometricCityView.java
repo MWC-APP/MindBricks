@@ -2,6 +2,8 @@ package ch.inf.usi.mindbricks.ui.nav.home.city;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,6 +14,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 
 public class IsometricCityView extends View {
@@ -20,7 +23,6 @@ public class IsometricCityView extends View {
     private final Paint paintUnlocked = new Paint();
     private final Paint paintLocked = new Paint();
     private final Paint paintOutline = new Paint();
-    private final Paint paintBuilding = new Paint();
 
     private float cellWidth;
     private float cellHeight;
@@ -32,7 +34,6 @@ public class IsometricCityView extends View {
         paintOutline.setColor(Color.BLACK);
         paintOutline.setStyle(Paint.Style.STROKE);
         paintOutline.setStrokeWidth(4f);
-        paintBuilding.setColor(Color.BLUE);
     }
 
     public void setSlots(List<CitySlot> slots) {
@@ -67,11 +68,9 @@ public class IsometricCityView extends View {
             canvas.drawRect(left, top, right, bottom, paintOutline);
 
             // Draw building if assigned
-            if (slot.getBuilding() != null) {
-                float cx = left + cellWidth / 2f;
-                float cy = top + cellHeight / 2f;
-                float radius = Math.min(cellWidth, cellHeight) / 4f;
-                canvas.drawCircle(cx, cy, radius, paintBuilding);
+            if (slot.getBuildingResId() != null) {
+                Bitmap buildingBitmap = BitmapFactory.decodeResource(getResources(), slot.getBuildingResId());
+                canvas.drawBitmap(buildingBitmap, null, new android.graphics.Rect((int) left, (int) top, (int) right, (int) bottom), null);
             }
         }
     }
@@ -107,18 +106,21 @@ public class IsometricCityView extends View {
     private void showBuildingSelectionDialog(CitySlot slot) {
         Context context = getContext();
         PreferencesManager prefs = new PreferencesManager(context);
-        String[] purchasedBuildings = prefs.getPurchasedItemIds().toArray(new String[0]);
+
+        String[] purchasedBuildings = {"House 1"};
+        Integer[] buildingResIds = {R.drawable.house1};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Select Building");
+
         builder.setItems(purchasedBuildings, (dialog, which) -> {
-            slot.setBuilding(purchasedBuildings[which]);
+            slot.setBuildingResId(buildingResIds[which]);
             invalidate();
         });
 
-        if (slot.getBuilding() != null) {
+        if (slot.getBuildingResId() != null) {
             builder.setNeutralButton("Remove Building", (dialog, which) -> {
-                slot.setBuilding(null);
+                slot.setBuildingResId(null);
                 invalidate();
             });
         }
