@@ -145,7 +145,6 @@ public class HomeFragment extends Fragment {
 
         // Initialize cityViewModel before any observer uses it
         cityViewModel = new ViewModelProvider(this).get(CityViewModel.class);
-        settingsIcon = view.findViewById(R.id.settings_icon);
 
         setupTagSpinner();
 
