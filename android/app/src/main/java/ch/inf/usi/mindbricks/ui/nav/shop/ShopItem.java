@@ -3,14 +3,14 @@ package ch.inf.usi.mindbricks.ui.nav.shop;
 public class ShopItem {
     private final String id;
     private final String name;
-    private final int drawableResId;
     private final int price;
+    private final int drawableResId;
 
-    public ShopItem(String id, String name, int drawableResId, int price) {
+    public ShopItem(String id, String name, int price, int drawableResId) {
         this.id = id;
         this.name = name;
-        this.drawableResId = drawableResId;
         this.price = price;
+        this.drawableResId = drawableResId;
     }
 
     public String getId() { return id; }

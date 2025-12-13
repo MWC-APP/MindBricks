@@ -57,11 +57,11 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         shopRecyclerView2.setScrollBarFadeDuration(0);
 
         List<ShopItem> items = new ArrayList<>();
-        items.add(new ShopItem("avatar_cool_1", "name1",  R.drawable.ic_avatar_placeholder, 1));
-        items.add(new ShopItem("avatar_pro_2", "name2", R.drawable.house1, 2));
-        /*items.add(new ShopItem("theme_dark_3", "name3", 3, R.drawable.ic_avatar_placeholder));
-        items.add(new ShopItem("golden_brick", "name4", 10, R.drawable.ic_coin_icon));
-        items.add(new ShopItem("another_brick", "name5", 5, R.drawable.ic_home_black_24dp));*/
+        items.add(new ShopItem("building_1", "house1",  1, R.drawable.house1));
+        items.add(new ShopItem("building_2", "house2",2,  R.drawable.house1));
+        items.add(new ShopItem("building_3", "house3", 3, R.drawable.ic_avatar_placeholder));
+        items.add(new ShopItem("building_4", "house4", 10, R.drawable.ic_coin_icon));
+        items.add(new ShopItem("building_5", "house5", 5, R.drawable.ic_home_black_24dp));
 
         ShopItemAdapter adapter1 = new ShopItemAdapter(items, this);
         ShopItemAdapter adapter2 = new ShopItemAdapter(items, this);
