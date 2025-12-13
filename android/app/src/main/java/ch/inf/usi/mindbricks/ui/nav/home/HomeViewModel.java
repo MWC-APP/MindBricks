@@ -5,11 +5,7 @@ import android.app.Application;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.concurrent.ExecutorService;
