@@ -526,7 +526,7 @@ public class DataProcessor {
 
     //"ai" generation
     public static AIRecommendation generateAIRecommendations(
-            List<StudySessionWithStats> allSessions, DateRange dateRange) {
+            List<StudySessionWithStats> allSessions, Context context, DateRange dateRange) {
 
         AIRecommendation schedule = new AIRecommendation();
 
@@ -567,7 +567,7 @@ public class DataProcessor {
         }
 
         // Generate activity blocks based on patterns
-        generateActivityBlocks(schedule, hourScores, avgProductivity);
+        generateActivityBlocks(schedule, context, hourScores, avgProductivity);
 
         // Generate summary message
         String summary = generateScheduleSummary(schedule, hourScores);
@@ -577,26 +577,40 @@ public class DataProcessor {
     }
 
     private static void generateActivityBlocks(AIRecommendation schedule,
+                                               Context context,
                                                List<HourScore> hourScores,
                                                float avgProductivity) {
 
         AIRecommendation.ActivityType[] hourlyActivities =
                 new AIRecommendation.ActivityType[24];
 
+        CalendarIntegrationHelper calendarHelper = new CalendarIntegrationHelper(context);
+        int calendarBlockedHours = calendarHelper.applyCalendarConstraints(
+                hourlyActivities,
+                System.currentTimeMillis()
+        );
+
         // TODO add values to be customizable
         // Default schedule based on typical patterns
         // Sleep hours
         for (int h = 0; h < 6; h++) {
-            hourlyActivities[h] = AIRecommendation.ActivityType.SLEEP;
+            if(hourlyActivities[h] == null)
+                hourlyActivities[h] = AIRecommendation.ActivityType.SLEEP;
         }
         for (int h = 23; h < 24; h++) {
-            hourlyActivities[h] = AIRecommendation.ActivityType.SLEEP;
+            if(hourlyActivities[h] == null)
+                hourlyActivities[h] = AIRecommendation.ActivityType.SLEEP;
         }
 
         // Meal times
-        hourlyActivities[7] = AIRecommendation.ActivityType.MEALS;
-        hourlyActivities[12] = AIRecommendation.ActivityType.MEALS;
-        hourlyActivities[19] = AIRecommendation.ActivityType.MEALS;
+        if(hourlyActivities[7] == null)
+            hourlyActivities[7] = AIRecommendation.ActivityType.MEALS;
+
+        if(hourlyActivities[12] == null)
+            hourlyActivities[12] = AIRecommendation.ActivityType.MEALS;
+
+        if(hourlyActivities[19] == null)
+            hourlyActivities[19] = AIRecommendation.ActivityType.MEALS;
 
 
         //  TODO based on the questions the ifs will be deterministic.

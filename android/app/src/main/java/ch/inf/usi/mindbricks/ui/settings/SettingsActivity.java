@@ -44,8 +44,11 @@ public class SettingsActivity extends AppCompatActivity {
                 tab.setText(R.string.settings_tab_profile);
             } else if (position == 1) {
                 tab.setText(R.string.settings_tab_study_plan);
-            } else {
+            } else if (position == 2){
                 tab.setText(R.string.settings_tab_pomodoro);
+            }
+            else{
+                tab.setText("Debug");
             }
         }).attach();
 
@@ -81,14 +84,17 @@ public class SettingsActivity extends AppCompatActivity {
                 return new SettingsProfileFragment();
             } else if (position == 1) {
                 return new SettingsStudyPlanFragment();
-            } else {
+            } else if(position == 2){
                 return new SettingsPomodoroFragment();
+            }
+            else{
+                return new SettingsDebugFragment();
             }
         }
 
         @Override
         public int getItemCount() {
-            return 3;
+            return 4;
         }
     }
 }

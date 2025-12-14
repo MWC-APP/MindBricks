@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
+import ch.inf.usi.mindbricks.model.visual.CalendarEvent;
 import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
 import ch.inf.usi.mindbricks.util.database.DatabaseSeeder;
@@ -17,7 +18,15 @@ import ch.inf.usi.mindbricks.util.database.DatabaseSeeder;
 /**
  * Room database for MindBricks app
  */
-@Database(entities = {StudySession.class, SessionSensorLog.class, SessionQuestionnaire.class}, version = 4, exportSchema = false)
+@Database(entities = {
+            StudySession.class,
+            SessionSensorLog.class,
+            SessionQuestionnaire.class,
+            CalendarEvent.class
+        },
+        version = 5,
+        exportSchema = false
+)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
@@ -26,7 +35,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract StudySessionDao studySessionDao();
     public abstract SessionSensorLogDao sessionSensorLogDao();
     public abstract SessionQuestionnaireDao sessionQuestionnaireDao();
-
+    public abstract CalendarEventDao calendarEventDao();
     private static final RoomDatabase.Callback DB_CALLBACK = new RoomDatabase.Callback(){
         // called on the database thread -> safe
         @Override
@@ -54,7 +63,10 @@ public abstract class AppDatabase extends RoomDatabase {
                             "mindbricks_database"
                     )
                     .addCallback(DB_CALLBACK)
-                    .fallbackToDestructiveMigrationOnDowngrade(true)
+                    //.fallbackToDestructiveMigrationOnDowngrade(true)
+                    // For development: destroys and recreates DB on version change
+                    // For production: use proper migrations instead
+                    .fallbackToDestructiveMigration()
                     .build();
         }
         return INSTANCE;

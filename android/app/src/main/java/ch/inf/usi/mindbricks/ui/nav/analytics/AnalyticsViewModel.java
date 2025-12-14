@@ -289,7 +289,7 @@ public class AnalyticsViewModel extends AndroidViewModel {
                 dailyRingsHistory.postValue(history);
 
                 List<AIRecommendation> recommendations = new ArrayList<>();
-                recommendations.add(DataProcessor.generateAIRecommendations(filtered, dateRange));
+                recommendations.add(DataProcessor.generateAIRecommendations(filtered, getApplication().getApplicationContext(), dateRange));
                 aiRecommendations.postValue(recommendations);
 
                 sessionHistory.postValue(filtered);
