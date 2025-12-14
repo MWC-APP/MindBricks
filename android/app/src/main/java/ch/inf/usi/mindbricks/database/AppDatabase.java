@@ -12,18 +12,18 @@ import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 import ch.inf.usi.mindbricks.model.visual.StudySession;
-import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
-import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
 import ch.inf.usi.mindbricks.util.database.DatabaseSeeder;
+import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
 
 
 /**
  * Room database for MindBricks app
  */
 @Database(entities = {
-        StudySessionWithStats.class,
+        StudySession.class,
         SessionSensorLog.class,
         SessionQuestionnaire.class,
+        CalendarEvent.class,
         Tag.class
         },
         version = 6,
@@ -68,6 +68,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     )
                     .addCallback(DB_CALLBACK)
                     .fallbackToDestructiveMigrationOnDowngrade(true)
+                    .fallbackToDestructiveMigration()
                     .build();
         }
         return INSTANCE;
