@@ -136,7 +136,7 @@ public class AnalyticsFragment extends Fragment {
         observeViewModel();
 
         // Generate test data if database is empty
-        generateTestDataIfNeeded();
+        //generateTestDataIfNeeded(); -> can use debug tools
 
         // Daily rings
         setupDailyRingsRecyclerView(view);
