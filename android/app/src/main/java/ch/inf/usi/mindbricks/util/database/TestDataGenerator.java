@@ -373,7 +373,7 @@ public class TestDataGenerator {
         calendar.add(Calendar.DAY_OF_MONTH, -1);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
-        StudySession midnightSession = new StudySession(calendar.getTimeInMillis(), 45, (new Tag("Midnight Cramming", COLORS[4])).getId();
+        StudySession midnightSession = new StudySession(calendar.getTimeInMillis(), 45, (new Tag("Midnight Cramming", COLORS[4])).getId());
         midnightSession.setFocusScore(55f);
         midnightSession.setCoinsEarned(25);
         sessions.add(midnightSession);
@@ -438,8 +438,8 @@ public class TestDataGenerator {
             StudySession session = new StudySession(
                     calendar.getTimeInMillis(),
                     duration,
-                    SUBJECTS[subjectIndex],
-                    COLORS[subjectIndex]
+                    (new Tag(SUBJECTS[subjectIndex],
+                    COLORS[subjectIndex])).getId()
             );
 
             // Focus score influenced by environment
