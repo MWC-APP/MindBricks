@@ -19,6 +19,7 @@ import java.util.Set;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
+import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 public class IsometricCityView extends View {
 
@@ -146,6 +147,7 @@ public class IsometricCityView extends View {
         builder.setItems(names.toArray(new String[0]), (dialog, which) -> {
             slot.setBuildingResId(resIds.get(which));
             invalidate();
+            SoundPlayer.playSound(getContext(), R.raw.build_house);
         });
 
         if (slot.getBuildingResId() != null) {
