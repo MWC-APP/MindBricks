@@ -1,7 +1,9 @@
 package ch.inf.usi.mindbricks.game;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class TileWorldState {
 
@@ -186,6 +188,92 @@ public class TileWorldState {
      */
     public TilePlacement getPlacementAt(int row, int col) {
         return getPlacements().get(key(row, col));
+    }
+
+    /**
+     * Get all unique placements that would be overlapped by placing a tile at the given position
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param height Height of the tile
+     * @param width Width of the tile
+     * @return Set of TilePlacement objects that overlap with the new placement
+     */
+    public Set<TilePlacement> getOverlappingPlacements(int row, int col, int height, int width) {
+        Set<TilePlacement> overlapping = new HashSet<>();
+        Map<String, TilePlacement> placements = getPlacements();
+
+        // linear scan surroundings
+        for (int r = row; r < row + height; r++) {
+            for (int c = col; c < col + width; c++) {
+                TilePlacement placement = placements.get(key(r, c));
+                if (placement != null) {
+                    overlapping.add(placement);
+                }
+            }
+        }
+
+        // return found conflicts
+        return overlapping;
+    }
+
+    /**
+     * Check if placing a tile would cause any collisions
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param height Height of the tile
+     * @param width Width of the tile
+     * @return True if there are collisions, false otherwise
+     */
+    public boolean hasCollisions(int row, int col, int height, int width) {
+        // Check bounds first
+        if (row < 0 || col < 0 || row + height > rows || col + width > cols) {
+            return false; // Out of bounds, not a collision
+        }
+
+        // Check for occupied cells
+        return !getOverlappingPlacements(row, col, height, width).isEmpty();
+    }
+
+    /**
+     * Create a new world state with specified placements removed and a new tile placed
+     *
+     * @param placementsToRemove Set of placements to remove
+     * @param row Row index for new placement
+     * @param col Column index for new placement
+     * @param tileId Tile ID for new placement
+     * @param height Height of new placement
+     * @param width Width of new placement
+     * @return New TileWorldState with removed conflicting items and new placement applied
+     */
+    public TileWorldState withReplacedPlacement(Set<TilePlacement> placementsToRemove,
+                                                int row, int col, String tileId, int height, int width) {
+        // Copy existing maps
+        Map<String, String> tilesCopy = new HashMap<>(getPlacedTiles());
+        Map<String, TilePlacement> placementCopy = new HashMap<>(getPlacements());
+
+        // Remove all cells occupied by placements to remove
+        for (TilePlacement toRemove : placementsToRemove) {
+            for (int r = toRemove.getAnchorRow(); r < toRemove.getAnchorRow() + toRemove.getHeight(); r++) {
+                for (int c = toRemove.getAnchorCol(); c < toRemove.getAnchorCol() + toRemove.getWidth(); c++) {
+                    tilesCopy.remove(key(r, c));
+                    placementCopy.remove(key(r, c));
+                }
+            }
+        }
+
+        // Place the new tile
+        TilePlacement placement = new TilePlacement(tileId, width, height, row, col);
+        for (int r = row; r < row + height; r++) {
+            for (int c = col; c < col + width; c++) {
+                tilesCopy.put(key(r, c), tileId);
+                placementCopy.put(key(r, c), placement);
+            }
+        }
+
+        // Return new state
+        return new TileWorldState(rows, cols, baseTileId, tilesCopy, placementCopy);
     }
 
     /**

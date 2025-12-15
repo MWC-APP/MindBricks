@@ -16,11 +16,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import ch.inf.usi.mindbricks.game.TileAsset;
 import ch.inf.usi.mindbricks.game.TileBitmapLoader;
@@ -38,6 +35,11 @@ public class IsometricCityView extends View {
      * Paint object for filling the base tile area.
      */
     private final Paint baseFill = new Paint();
+
+    /**
+     * Paint object for highlighting the drop area during drag.
+     */
+    private final Paint dragHighlightPaint = new Paint();
 
     /**
      * Current state of the tile world (grid and placements).
@@ -86,13 +88,15 @@ public class IsometricCityView extends View {
 
     /**
      * Current scale factor for zooming.
+     * Default increased to start more zoomed-in for better view of multi-cell buildings.
      */
-    private float scaleFactor = 1.2f;
+    private float scaleFactor = 1.8f;
 
     /**
      * Minimum allowed scale factor.
+     * Increased to prevent excessive zoom-out that makes buildings too small.
      */
-    private static final float MIN_SCALE = 0.6f;
+    private static final float MIN_SCALE = 1.0f;
 
     /**
      * Maximum allowed scale factor.
@@ -124,6 +128,11 @@ public class IsometricCityView extends View {
      */
     private final ScaleGestureDetector scaleGestureDetector;
 
+    // Drag state tracking
+    private String draggingTileId = null;
+    private int draggingRow = -1;
+    private int draggingCol = -1;
+
     /**
      * Constructor method.
      * @param context Context of the view
@@ -140,6 +149,10 @@ public class IsometricCityView extends View {
 
         // set base fill color (fill any gaps in the grid)
         baseFill.setColor(Color.argb(255, 205, 230, 200));
+
+        // set drag highlight color (orange, semi-transparent)
+        dragHighlightPaint.setColor(Color.argb(128, 255, 165, 0));
+        dragHighlightPaint.setStyle(Paint.Style.FILL);
 
         // initialize scale gesture detector (pinch-to-zoom support)
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
@@ -222,7 +235,24 @@ public class IsometricCityView extends View {
             Log.e("IsometricCityView", "Base tile ID '" + worldState.getBaseTileId() + "' could not be resolved. Impossible to draw base tile.");
         }
 
-        // draw each tile
+        // Determine drop zone bounds if dragging
+        int dropStartRow = -1, dropEndRow = -1;
+        int dropStartCol = -1, dropEndCol = -1;
+
+        if (draggingTileId != null && draggingRow != -1 && draggingCol != -1) {
+            TileAsset asset = assetIndex.get(draggingTileId);
+            if (asset != null) {
+                int[] size = asset.getSize();
+                int h = size[0];
+                int w = size[1];
+                dropStartRow = draggingRow;
+                dropEndRow = draggingRow + h - 1;
+                dropStartCol = draggingCol;
+                dropEndCol = draggingCol + w - 1;
+            }
+        }
+
+        // Pass 1: Draw base tiles (ground) for all cells
         for (int r = 0; r < worldState.getRows(); r++) {
             for (int c = 0; c < worldState.getCols(); c++) {
                 // identify tile rectangle (cell of the grid)
@@ -235,7 +265,30 @@ public class IsometricCityView extends View {
                 canvas.drawRect(left, top, right, bottom, baseFill);
 
                 // draw base tile
-                drawGridBitmap(canvas, baseTile, left, top, tileWidth, tileHeight, 1.0f);
+                if (baseTile != null) {
+                    drawGridBitmap(canvas, baseTile, left, top, tileWidth, tileHeight, 1.0f);
+                }
+
+                // Check if we need to highlight this cell
+                boolean isDropZone = r >= dropStartRow && r <= dropEndRow && c >= dropStartCol && c <= dropEndCol;
+                boolean isDragging = draggingTileId != null;
+                boolean isOccupied = worldState.getPlacementAt(r, c) != null;
+
+                // Draw drag highlight if this cell is within the drop zone OR (dragging is active AND cell is occupied)
+                if (isDropZone || (isDragging && isOccupied)) {
+                    canvas.drawRect(left, top, right, bottom, dragHighlightPaint);
+                }
+            }
+        }
+
+        // Pass 2: Draw placed objects and grid outlines
+        for (int r = 0; r < worldState.getRows(); r++) {
+            for (int c = 0; c < worldState.getCols(); c++) {
+                // identify tile rectangle (cell of the grid)
+                float left = originX + c * tileWidth;
+                float top = originY + r * tileHeight;
+                float right = left + tileWidth;
+                float bottom = top + tileHeight;
 
                 // get tile at this position of the grid
                 TilePlacement placement = worldState.getPlacementAt(r, c);
@@ -246,9 +299,18 @@ public class IsometricCityView extends View {
 
                 // draw only the anchor cell of the tile placement
                 if (placement != null && isAnchor) {
-                    Bitmap placed = resolveBitmap(placement.getTileId(), (int) (tileWidth * placement.getWidth()), (int) (tileHeight * placement.getHeight()));
+                    // adjust with scaling
                     float targetW = tileWidth * placement.getWidth();
                     float targetH = tileHeight * placement.getHeight();
+
+                    // load bitmap with expected size
+                    Bitmap placed = resolveBitmap(
+                        placement.getTileId(),
+                        (int) targetW,
+                        (int) targetH
+                    );
+
+                    // draw bitmap
                     drawGridBitmap(canvas, placed, left, top, targetW, targetH, 0.98f);
                 }
 
@@ -410,10 +472,43 @@ public class IsometricCityView extends View {
     private boolean handleDrag(View view, DragEvent event) {
         switch (event.getAction()) {
             case DragEvent.ACTION_DRAG_STARTED: // accept all drag events
+                // Get the tile ID from localState
+                if (event.getLocalState() instanceof String) {
+                    draggingTileId = (String) event.getLocalState();
+                }
                 // make sure to change the alpha of the grid outline to indicate drop target
                 gridOutline.setAlpha(128);
                 invalidate();
                 return true;
+
+            case DragEvent.ACTION_DRAG_LOCATION:
+                // detect which cell we are hovering
+                int[] pos = screenToGrid(event.getX(), event.getY());
+
+                // if detected -> update state
+                if (pos != null) {
+                    if (draggingRow != pos[0] || draggingCol != pos[1]) {
+                        draggingRow = pos[0];
+                        draggingCol = pos[1];
+                        invalidate();
+                    }
+                }
+                // if not detected -> reset
+                else {
+                    if (draggingRow != -1 || draggingCol != -1) {
+                        draggingRow = -1;
+                        draggingCol = -1;
+                        invalidate();
+                    }
+                }
+                return true;
+
+            case DragEvent.ACTION_DRAG_EXITED:
+                draggingRow = -1;
+                draggingCol = -1;
+                invalidate();
+                return true;
+
             case DragEvent.ACTION_DROP: // handle tile drop
                 if (onTileDropListener == null) return false; // ignore if no listener is set
 
@@ -426,30 +521,36 @@ public class IsometricCityView extends View {
                 // check if drop location is inside the exclusion zone
                 if (event.getY() >= exclusionZoneTopY) {
                     // cancel drop + reset state
-                    gridOutline.setAlpha(0);
-                    invalidate();
+                    resetDragState();
                     return false;
                 }
 
                 // convert screen coordinates to grid coordinates
                 int[] grid = screenToGrid(event.getX(), event.getY());
 
-                // reset grid outline alpha
-                gridOutline.setAlpha(0);
-
-                // FIXME: handle cases when the grid is under a scrollable container
-                try {
-                    if (grid != null) {
-                        onTileDropListener.onTileDropped(grid[0], grid[1], tileId);
-                        return true;
-                    }
-                    return false;
-                } finally {
-                    // redraw to change grid outline back to normal
-                    invalidate();
+                boolean handled = false;
+                if (grid != null) {
+                    onTileDropListener.onTileDropped(grid[0], grid[1], tileId);
+                    handled = true;
                 }
+
+                resetDragState();
+                return handled;
+
+            case DragEvent.ACTION_DRAG_ENDED:
+                resetDragState();
+                return true;
+
             default:
                 return true;
         }
+    }
+
+    private void resetDragState() {
+        draggingTileId = null;
+        draggingRow = -1;
+        draggingCol = -1;
+        gridOutline.setAlpha(0);
+        invalidate();
     }
 }

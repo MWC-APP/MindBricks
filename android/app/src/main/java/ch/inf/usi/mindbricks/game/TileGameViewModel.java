@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.Map;
+import java.util.Set;
 
 public class TileGameViewModel extends AndroidViewModel {
 
@@ -143,6 +144,81 @@ public class TileGameViewModel extends AndroidViewModel {
 
         // generate new world state with the tile placed
         TileWorldState updated = state.withPlacement(row, col, tileId, height, width);
+        worldState.setValue(updated);
+        worldRepository.saveWorld(updated);
+
+        return true;
+    }
+
+    /**
+     * Check if placing a tile would cause collisions with existing placements
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param height Number of rows the tile occupies
+     * @param width Number of columns the tile occupies
+     * @return True if there are collisions, false otherwise (or if out of bounds)
+     */
+    public boolean hasCollisions(int row, int col, int height, int width) {
+        TileWorldState state = worldState.getValue();
+        if (state == null) return false;
+        return state.hasCollisions(row, col, height, width);
+    }
+
+    /**
+     * Check if placement is within bounds
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param height Number of rows the tile occupies
+     * @param width Number of columns the tile occupies
+     * @return True if within bounds, false otherwise
+     */
+    public boolean isWithinBounds(int row, int col, int height, int width) {
+        TileWorldState state = worldState.getValue();
+        if (state == null) return false;
+        return row >= 0 && col >= 0 &&
+               row + height <= state.getRows() &&
+               col + width <= state.getCols();
+    }
+
+    /**
+     * Get the number of buildings that would be destroyed by placing a tile
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param height Number of rows the tile occupies
+     * @param width Number of columns the tile occupies
+     * @return Number of unique buildings that would be destroyed
+     */
+    public int getDestructionCount(int row, int col, int height, int width) {
+        TileWorldState state = worldState.getValue();
+        if (state == null) return 0;
+        return state.getOverlappingPlacements(row, col, height, width).size();
+    }
+
+    /**
+     * Place a tile by replacing/destroying existing placements
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param tileId Tile identifier
+     * @param height Number of rows the tile occupies
+     * @param width Number of columns the tile occupies
+     * @return True if the tile was placed successfully, false otherwise
+     */
+    public boolean placeTileWithReplacement(int row, int col, String tileId, int height, int width) {
+        TileWorldState state = worldState.getValue();
+        if (state == null || tileId == null) return false;
+
+        // Check bounds
+        if (!isWithinBounds(row, col, height, width)) return false;
+
+        // Get overlapping placements
+        Set<TilePlacement> overlapping = state.getOverlappingPlacements(row, col, height, width);
+
+        // Create new state with replacements
+        TileWorldState updated = state.withReplacedPlacement(overlapping, row, col, tileId, height, width);
         worldState.setValue(updated);
         worldRepository.saveWorld(updated);
 

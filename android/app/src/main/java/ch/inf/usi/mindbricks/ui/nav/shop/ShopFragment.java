@@ -37,6 +37,7 @@ import ch.inf.usi.mindbricks.game.TileGameViewModel;
 import ch.inf.usi.mindbricks.game.TileType;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
+import ch.inf.usi.mindbricks.util.VibrationHelper;
 
 public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyClickListener {
 
@@ -345,11 +346,74 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
             return;
         }
 
-        // get the size of the tile to place
-        int[] size = sizeForTile(tileId);
+        // get the tile asset
+        TileAsset asset = assetIndex.get(tileId);
+        if (asset == null) {
+            Toast.makeText(requireContext(), "Unknown tile type.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // place tile and check for success (fails on out-of-bounds or occupied space)
-        boolean placed = tileGameViewModel.placeTile(row, col, tileId, size[0], size[1]);
+        // get the size of the tile to place
+        int[] size = asset.getSize();
+        int height = size[0];
+        int width = size[1];
+
+        // check if placement is within bounds
+        if (!tileGameViewModel.isWithinBounds(row, col, height, width)) {
+            Toast.makeText(requireContext(), "Can't place tile there - outside grid bounds.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // check for collisions
+        boolean hasCollisions = tileGameViewModel.hasCollisions(row, col, height, width);
+
+        if (hasCollisions) {
+            // show dialog asking user if they want to replace existing buildings
+            int destructionCount = tileGameViewModel.getDestructionCount(row, col, height, width);
+            showReplacementDialog(row, col, tileId, height, width, destructionCount);
+        } else {
+            // no collisions, place normally
+            attemptPlacement(row, col, tileId, height, width);
+        }
+    }
+
+    /**
+     * Show a dialog asking the user to replace existing buildings
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param tileId Tile ID to place
+     * @param height Height of placement
+     * @param width Width of placement
+     * @param destructionCount Number of buildings that will be destroyed
+     */
+    private void showReplacementDialog(int row, int col, String tileId, int height, int width, int destructionCount) {
+        String message = destructionCount == 1
+                ? "This will destroy 1 existing building. Continue?"
+                : "This will destroy " + destructionCount + " existing buildings. Continue?";
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Replace Buildings?")
+                .setMessage(message)
+                .setPositiveButton("Replace", (dialog, which) -> {
+                    // remove items from map
+                    attemptPlacementWithReplacement(row, col, tileId, height, width);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /**
+     * Attempt to place a tile normally (no collisions)
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param tileId Tile ID
+     * @param height Height of placement
+     * @param width Width of placement
+     */
+    private void attemptPlacement(int row, int col, String tileId, int height, int width) {
+        boolean placed = tileGameViewModel.placeTile(row, col, tileId, height, width);
         if (!placed) {
             Toast.makeText(requireContext(), "Couldn't place tile there.", Toast.LENGTH_SHORT).show();
             return;
@@ -359,8 +423,35 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         tileGameViewModel.consumeFromInventory(tileId);
 
         // notify user
-        Toast.makeText(requireContext(), "Placed tile at (" + row + "," + col + ")", Toast.LENGTH_SHORT).show();
+        VibrationHelper.vibrate(requireContext(), VibrationHelper.VibrationType.PLACE_TILE);
+        SoundPlayer.playSound(requireContext(), R.raw.purchase);
+    }
+
+    /**
+     * Attempt to place a tile with replacement
+     *
+     * @param row Row index
+     * @param col Column index
+     * @param tileId Tile ID
+     * @param height Height of placement
+     * @param width Width of placement
+     */
+    private void attemptPlacementWithReplacement(int row, int col, String tileId, int height, int width) {
+        boolean placed = tileGameViewModel.placeTileWithReplacement(row, col, tileId, height, width);
+        if (!placed) {
+            Toast.makeText(requireContext(), "Couldn't place tile there.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // consume from inventory
+        tileGameViewModel.consumeFromInventory(tileId);
+
+        // notify user with feedback
+        Toast.makeText(requireContext(), "Tile placed! Buildings destroyed.", Toast.LENGTH_SHORT).show();
         SoundPlayer.playSound(getContext(), R.raw.purchase);
+
+        // vibrate to indicate destruction
+        VibrationHelper.vibrate(requireContext(), VibrationHelper.VibrationType.DESTROY_TILE);
     }
 
     /**
@@ -419,7 +510,7 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
      */
     private void startDragForAsset(TileAsset asset, View view) {
         View.DragShadowBuilder shadow = new View.DragShadowBuilder(view);
-        view.startDragAndDrop(ClipData.newPlainText("tileId", asset.id()), shadow, null, 0);
+        view.startDragAndDrop(ClipData.newPlainText("tileId", asset.id()), shadow, asset.id(), 0);
     }
 
     /**
@@ -447,18 +538,6 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
             return PurchaseQuantity.MULTIPLE.quantity;
         }
         return PurchaseQuantity.SINGLE.quantity;
-    }
-
-    /**
-     * Get the size (in grid cells) occupied by the tile with the given ID.
-     * FIXME: if we have time, find a way to compute the actual size of the tile instead of assuming 1x1. Right now a house uses the same space as a small rock.
-     *
-     *
-     * @param ignored Tile identifier
-     * @return Array with two elements: [height, width]
-     */
-    private int[] sizeForTile(String ignored) {
-        return new int[]{1, 1};
     }
 
     /**

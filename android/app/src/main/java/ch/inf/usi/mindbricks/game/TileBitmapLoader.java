@@ -80,8 +80,17 @@ public class TileBitmapLoader {
                 : loadFromAsset(asset.assetPath()); // from individual image file
         if (raw == null) return null;
 
-        // scale to desired size
-        Bitmap scaled = Bitmap.createScaledBitmap(raw, width, height, true);
+        // Calculate aspect-preserving scaled dimensions
+        float originalWidth = raw.getWidth();
+        float originalHeight = raw.getHeight();
+
+        float scale = Math.min((float) width / originalWidth, (float) height / originalHeight);
+
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+
+        // scale to target size maintaining aspect ratio
+        Bitmap scaled = Bitmap.createScaledBitmap(raw, scaledWidth, scaledHeight, true);
         sizedCache.put(cacheKey, scaled);
 
         // cleanup raw bitmap if different from scaled
