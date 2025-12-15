@@ -111,7 +111,7 @@ public class IsometricCityView extends View {
     /**
      * Margin for clamping pan to prevent the map from going too far off-screen.
      */
-    private static final float PAN_MARGIN_DP = 50f;
+    private static final float PAN_MARGIN_DP = 0f; // FIXME: removed as we didn't have time to implement water borders
 
     /**
      * Current pan offsets for panning the view.
