@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import ch.inf.usi.mindbricks.BuildConfig;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.database.AppDatabase;
 import ch.inf.usi.mindbricks.model.Tag;
@@ -200,10 +201,15 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // TODO: REMOVE THIS BEFORE SUBMISSION!!! ONLY FOR TESTING
+        // Dev mode - test questionnaire button
         Button testButton = view.findViewById(R.id.test_questionnaire_button);
         if (testButton != null) {
-            testButton.setOnClickListener(v -> showEmotionDialog(999L));
+            if (BuildConfig.DEBUG) {
+                testButton.setVisibility(View.VISIBLE);
+                testButton.setOnClickListener(v -> showEmotionDialog(999L));
+            } else {
+                testButton.setVisibility(View.GONE);
+            }
         }
     }
 

@@ -19,6 +19,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.List;
 
+import ch.inf.usi.mindbricks.BuildConfig;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.drivers.calendar.CalendarDriver;
 import ch.inf.usi.mindbricks.model.visual.calendar.CalendarSyncService;
@@ -59,7 +60,8 @@ public class SettingsActivity extends AppCompatActivity {
             else if (position == 3){
                 tab.setText(R.string.settings_tab_calendar);
             }
-            else{
+            // Dev mode - debug tab
+            else if (position == 4 && BuildConfig.DEBUG){
                 tab.setText(R.string.settings_tab_debug);
             }
         }).attach();
@@ -154,14 +156,15 @@ public class SettingsActivity extends AppCompatActivity {
             else if(position == 3) {
                 return new SettingsCalendarFragment();
             }
-            else{
+            else if(position == 4 && BuildConfig.DEBUG){
                 return new SettingsDebugFragment();
             }
         }
 
         @Override
         public int getItemCount() {
-            return 5;
+            // Show debug tab only in debug builds
+            return BuildConfig.DEBUG ? 5 : 4;
         }
     }
 }
