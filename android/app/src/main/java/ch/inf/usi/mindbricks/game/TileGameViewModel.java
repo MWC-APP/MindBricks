@@ -15,12 +15,12 @@ public class TileGameViewModel extends AndroidViewModel {
     /**
      * Default number of rows and columns for the tile world
      */
-    private static final int DEFAULT_ROWS = 15;
+    private static final int DEFAULT_ROWS = 40;
 
     /**
      * Default number of columns for the tile world
      */
-    private static final int DEFAULT_COLS = 15;
+    private static final int DEFAULT_COLS = 40;
 
     /**
      * Default base tile for the world (grass tile, bottom left in the tileset)

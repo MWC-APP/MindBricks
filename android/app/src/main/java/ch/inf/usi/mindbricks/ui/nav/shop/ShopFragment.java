@@ -541,6 +541,11 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
     }
 
     /**
+     * Flag to track if the initial map positioning has been done.
+     */
+    private boolean initialPositioningDone = false;
+
+    /**
      * Update the exclusion zone in the city view based on the current bottom sheet position.
      */
     private void updateExclusionZone() {
@@ -561,6 +566,12 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
 
         // Update exclusion zone
         binding.cityView.setExclusionZoneTopY(relativeTopY);
+
+        // Perform initial centering if needed
+        if (!initialPositioningDone && relativeTopY > 0) {
+            binding.cityView.recenterMap();
+            initialPositioningDone = true;
+        }
     }
 
     @Override

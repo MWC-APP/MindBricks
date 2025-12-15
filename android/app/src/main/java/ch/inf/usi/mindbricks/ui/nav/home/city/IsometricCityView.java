@@ -90,18 +90,23 @@ public class IsometricCityView extends View {
      * Current scale factor for zooming.
      * Default increased to start more zoomed-in for better view of multi-cell buildings.
      */
-    private float scaleFactor = 1.8f;
+    private float scaleFactor = MAX_SCALE;
 
     /**
      * Minimum allowed scale factor.
      * Increased to prevent excessive zoom-out that makes buildings too small.
      */
-    private static final float MIN_SCALE = 1.0f;
+    private static final float MIN_SCALE = 2.0f;
 
     /**
      * Maximum allowed scale factor.
      */
     private static final float MAX_SCALE = 4f;
+
+    /**
+     * Multiplicative factory for zoom sensitivity (lower = less)
+     */
+    private static final float ZOOM_SENSITIVITY_FACTOR = 0.5f;
 
     /**
      * Current pan offsets for panning the view.
@@ -158,8 +163,9 @@ public class IsometricCityView extends View {
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             @Override
             public boolean onScale(@NonNull ScaleGestureDetector detector) {
-                // update scale factor based on gesture
-                scaleFactor *= detector.getScaleFactor();
+                // update scale factor based on gesture + apply sensitivity
+                float scaleFactorChange = 1.0f + (detector.getScaleFactor() - 1.0f) * ZOOM_SENSITIVITY_FACTOR;
+                scaleFactor *= scaleFactorChange;
                 // clamp scale factor to min/max limits
                 scaleFactor = Math.max(MIN_SCALE, Math.min(scaleFactor, MAX_SCALE));
                 // force redraw of canvas
@@ -206,6 +212,34 @@ public class IsometricCityView extends View {
      */
     public void setExclusionZoneTopY(float topY) {
         this.exclusionZoneTopY = topY;
+    }
+
+    /**
+     * Recenter the map in the visible area (above the exclusion zone).
+     */
+    public void recenterMap() {
+        if (worldState == null || getWidth() == 0 || getHeight() == 0) return;
+
+        // recompute geometry
+        computeGeometry();
+
+        // Calculate visible height (view height - covered bottom part)
+        float visibleHeight = (exclusionZoneTopY < getHeight()) ? exclusionZoneTopY : getHeight();
+
+        // compute true center
+        float gridCenterX = getWidth() / 2f;
+        float gridCenterY = getHeight() / 2f;
+
+        // Target center on screen (center of the visible area)
+        float targetCenterX = getWidth() / 2f;
+        float targetCenterY = visibleHeight / 2f;
+
+        // recompute correct pan to center
+        panX = targetCenterX - gridCenterX * scaleFactor;
+        panY = targetCenterY - gridCenterY * scaleFactor;
+
+        // redraw
+        invalidate();
     }
 
     @Override
@@ -477,7 +511,7 @@ public class IsometricCityView extends View {
                     draggingTileId = (String) event.getLocalState();
                 }
                 // make sure to change the alpha of the grid outline to indicate drop target
-                gridOutline.setAlpha(128);
+                gridOutline.setAlpha(50);
                 invalidate();
                 return true;
 
