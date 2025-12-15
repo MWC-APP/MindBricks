@@ -242,7 +242,10 @@ public class AnalyticsFragment extends Fragment {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
 
         // Setup swipe to refresh
-        swipeRefreshLayout.setOnRefreshListener(() -> viewModel.refreshData());
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            Log.d(TAG, "Swipe refresh triggered");
+            viewModel.refreshData();
+        });
 
         // Daily Rings
         RecyclerView dailyRingsRecyclerView = view.findViewById(R.id.dailyRingsRecyclerView);
@@ -1008,13 +1011,16 @@ public class AnalyticsFragment extends Fragment {
             Log.d(TAG, "Reloading calendar for current month");
             loadStreakDataForMonth(currentMonth, currentYear);
         }
-
-        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
         Log.d(TAG, "onDestroyView");
     }
 }

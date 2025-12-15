@@ -189,7 +189,6 @@ public class AnalyticsViewModel extends AndroidViewModel {
         }
 
         sessionsSource = repository.getSessionsSince(queryStartTime);
-
         sessionsSource.observeForever(sessionsObserver);
     }
 
@@ -471,11 +470,20 @@ public class AnalyticsViewModel extends AndroidViewModel {
 
         Log.d(TAG, "Refreshing data (cache invalidated)");
         isRefreshing = true;
+
         cachedSessions = null;
         resultCache = null;
 
+        if (sessionsSource != null) {
+            sessionsSource.removeObserver(sessionsObserver);
+            sessionsSource = null;
+        }
+
         if (currentDateRange != null) {
-            loadDataForRange(currentDateRange);
+            // Force reload by temporarily clearing currentDateRange
+            DateRange rangeToReload = currentDateRange;
+            currentDateRange = null;  // This will allow loadDataForRange to proceed
+            loadDataForRange(rangeToReload);
         }
 
         // Reset flag after a short delay
