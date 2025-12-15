@@ -28,7 +28,6 @@ import ch.inf.usi.mindbricks.util.SoundPlayer;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    public static final String EXTRA_TAB_INDEX = "tab_index";
     private CalendarSyncService syncService;
 
     @Override
@@ -66,14 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }).attach();
 
-        // Handle initial tab selection (needed for pomodoro settings from home)
-        int initialTab = getIntent().getIntExtra(EXTRA_TAB_INDEX, 0);
-        if (initialTab > 0 && initialTab < adapter.getItemCount()) {
-            viewPager.setCurrentItem(initialTab, false);
-        }
-
         syncService = CalendarSyncService.getInstance(this);
-
     }
 
     @Override
@@ -159,6 +151,8 @@ public class SettingsActivity extends AppCompatActivity {
             else if(position == 4 && BuildConfig.DEBUG){
                 return new SettingsDebugFragment();
             }
+            // Fallback (should not happen in production)
+            return new SettingsProfileFragment();
         }
 
         @Override
