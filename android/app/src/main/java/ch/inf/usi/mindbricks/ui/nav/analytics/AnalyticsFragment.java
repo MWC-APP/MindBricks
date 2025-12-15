@@ -418,41 +418,17 @@ public class AnalyticsFragment extends Fragment {
         // Observe session history
         viewModel.getSessionHistory().observe(getViewLifecycleOwner(), sessions -> {
             Log.d(TAG, "Session history received: " + (sessions != null ? sessions.size() + " items" : "null"));
-            if (sessions != null) {
-                // for large datasets, update UI asynchronously to prevent blocking
-                // NOTE: this is done to avoid showing the spinner for a fraction of a second
-                if (sessions.size() > 100) {
-                    // Show progress bar for large datasets
-                    if (progressBar != null && historyContainer.getVisibility() == View.VISIBLE) {
-                        progressBar.setVisibility(View.VISIBLE);
-                    }
 
-                    // Use handler to avoid blocking main thread
-                    new Handler(Looper.getMainLooper()).post(() -> {
-                        sessionHistoryAdapter.setData(sessions);
+            if (sessions == null) return;
 
-                        // Update session count display
-                        if (sessionCountText != null) {
-                            String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
-                            sessionCountText.setText(countText);
-                        }
+            new Handler(Looper.getMainLooper()).post(() -> {
+                sessionHistoryAdapter.setData(sessions);
 
-                        // Hide progress indicator
-                        if (progressBar != null) {
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    });
-                } else {
-                    // For small datasets, update immediately
-                    sessionHistoryAdapter.setData(sessions);
-
-                    // Update session count display
-                    if (sessionCountText != null) {
-                        String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
-                        sessionCountText.setText(countText);
-                    }
+                if (sessionCountText != null) {
+                    String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
+                    sessionCountText.setText(countText);
                 }
-            }
+            });
         });
 
         Log.d(TAG, "=== All observers registered ===");
@@ -926,10 +902,16 @@ public class AnalyticsFragment extends Fragment {
     }
 
     private void loadStreakDataForMonth(int month, int year) {
-        List<StudySessionWithStats> allSessions = viewModel.getSessionHistory().getValue();
+        List<StudySessionWithStats> allSessions = viewModel.getAllSessionsForCalendar();
 
-        if (allSessions == null) {
+        if (allSessions == null || allSessions.isEmpty()) {
             Log.w(TAG, "No sessions available for streak calendar");
+            List<StreakDay> emptyMonth = DataProcessor.calculateStreakCalendar(
+                    new ArrayList<>(), 60, month, year
+            );
+            if (streakCalendarView != null) {
+                streakCalendarView.setData(emptyMonth);
+            }
             return;
         }
 
@@ -944,6 +926,7 @@ public class AnalyticsFragment extends Fragment {
             streakCalendarView.setData(monthData);
         }
     }
+
 
     private int dpToPx(int dp) {
         return (int) TypedValue.applyDimension(

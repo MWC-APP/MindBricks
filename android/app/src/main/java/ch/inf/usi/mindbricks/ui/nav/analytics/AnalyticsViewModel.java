@@ -37,6 +37,7 @@ import ch.inf.usi.mindbricks.util.evaluation.RecommendationEngine;
  */
 public class AnalyticsViewModel extends AndroidViewModel {
     private static final String TAG = "AnalyticsViewModel";
+    private static final boolean VERBOSE_LOGGING = true;
 
     private final StudySessionRepository repository;
     private final Executor processingExecutor;
@@ -153,7 +154,6 @@ public class AnalyticsViewModel extends AndroidViewModel {
             return;
         }
 
-        // Check if range actually changed to avoid unnecessary work
         if (currentDateRange != null && currentDateRange.equals(dateRange)) {
             Log.d(TAG, "Range unchanged, skipping reload: " + dateRange.getDisplayName());
             return;
@@ -166,17 +166,16 @@ public class AnalyticsViewModel extends AndroidViewModel {
 
         viewState.setValue(ViewState.LOADING);
 
-        long startTime = System.currentTimeMillis() - (daysToLoad * 24L * 60 * 60 * 1000);
         long queryStartTime = calculateQueryStartTime(dateRange);
-
         Log.d(TAG, "Database query start time: " + queryStartTime);
 
         if (sessionsSource != null) {
             sessionsSource.removeObserver(sessionsObserver);
+            sessionsSource = null;
         }
 
-        sessionsSource = repository.getSessionsSince(startTime);
         sessionsSource = repository.getSessionsSince(queryStartTime);
+
         sessionsSource.observeForever(sessionsObserver);
     }
 
@@ -223,27 +222,19 @@ public class AnalyticsViewModel extends AndroidViewModel {
     }
 
     private void handleSessionsUpdate(List<StudySessionWithStats> sessions) {
-        // Cancel any pending debounced update
-        if (pendingUpdate != null) {
-            debounceHandler.removeCallbacks(pendingUpdate);
-        }
-
-        // Schedule debounced update
-        pendingUpdate = () -> handleSessionsUpdateImmediate(sessions);
-        debounceHandler.postDelayed(pendingUpdate, DEBOUNCE_DELAY_MS);
-    }
-
-    private void handleSessionsUpdateImmediate(List<StudySessionWithStats> sessions) {
-        Log.d(TAG, "Sessions updated from database: " +
-                (sessions != null ? sessions.size() + " sessions" : "null"));
+        if (VERBOSE_LOGGING) Log.d(TAG, ">>> handleSessionsUpdate START");
+        if (VERBOSE_LOGGING) Log.d(TAG, "    Sessions count: " + (sessions != null ? sessions.size() : "null"));
+        if (VERBOSE_LOGGING) Log.d(TAG, "    Current range: " + (currentDateRange != null ? currentDateRange.getDisplayName() : "null"));
 
         if (sessions == null) {
+            Log.e(TAG, "    Sessions is NULL - setting ERROR state");
             errorMessage.setValue("Error loading sessions from database");
             viewState.setValue(ViewState.ERROR);
             return;
         }
 
         if (sessions.isEmpty()) {
+            Log.w(TAG, "    Sessions is EMPTY - setting EMPTY state");
             sessionHistory.setValue(sessions);
             viewState.setValue(ViewState.EMPTY);
             return;
@@ -252,146 +243,164 @@ public class AnalyticsViewModel extends AndroidViewModel {
         // Cache the sessions
         cachedSessions = sessions;
         lastLoadTime = System.currentTimeMillis();
-
-        // Store all sessions for processing
         allSessions = sessions;
 
-        // Filter sessions for current range
-        List<StudySessionWithStats> filteredSessions = DataProcessor.filterSessionsInRange(
-                sessions, currentDateRange
-        );
+        if (VERBOSE_LOGGING) Log.d(TAG, "    Moving to background thread for filtering...");
 
-        if (filteredSessions.isEmpty()) {
-            Log.w(TAG, "No sessions in current range: " + currentDateRange.getDisplayName());
-            sessionHistory.setValue(filteredSessions);
-            viewState.setValue(ViewState.EMPTY);
-            return;
-        }
-
-        processAllData(allSessions, currentDateRange);
-    }
-
-    private void processAllData(List<StudySessionWithStats> sessions, DateRange dateRange) {
-        Log.d(TAG, "=== processAllData START ===");
-        Log.d(TAG, "All sessions count: " + (allSessions != null ? allSessions.size() : "null"));
-        Log.d(TAG, "Date range: " + dateRange.getDisplayName());
-
-        if (resultCache != null && resultCache.isValid(sessions, dateRange)) {
-            Log.d(TAG, "Using cached results - skipping computation");
-
-            // Post cached values
-            weeklyStats.postValue(resultCache.weeklyStats);
-            hourlyStats.postValue(resultCache.hourlyStats);
-            dailyRecommendation.postValue(resultCache.dailyRecommendation);
-            energyCurveData.postValue(resultCache.energyCurve);
-            heatmapData.postValue(resultCache.heatmap);
-            streakData.postValue(resultCache.streak);
-            dailyRingsHistory.postValue(resultCache.dailyRings);
-            aiRecommendations.postValue(resultCache.aiRecommendations);
-            sessionHistory.postValue(resultCache.filteredSessions);
-            viewState.postValue(ViewState.SUCCESS);
-
-            return;
-        }
-
-        Log.d(TAG, "Cache miss - computing new results");
-
+        // Move ALL processing to background thread
         processingExecutor.execute(() -> {
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Background thread started");
+
             try {
-                // Filter first to check if we have data
-                List<StudySessionWithStats> filtered = DataProcessor.filterSessionsInRange(
-                        allSessions, dateRange);
+                // Filter sessions for current range
+                if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Filtering sessions...");
+                List<StudySessionWithStats> filteredSessions = DataProcessor.filterSessionsInRange(
+                        sessions, currentDateRange
+                );
 
-                Log.d(TAG, "Filtered sessions: " + filtered.size());
+                if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Filtered count: " + filteredSessions.size());
 
-                if (filtered.isEmpty()) {
-                    sessionHistory.postValue(filtered);
+                if (filteredSessions.isEmpty()) {
+                    Log.w(TAG, "    [BG] No sessions in range - posting EMPTY state");
+                    sessionHistory.postValue(filteredSessions);
                     viewState.postValue(ViewState.EMPTY);
                     return;
                 }
 
-                // Process data
-                WeeklyStats weekly = DataProcessor.calculateWeeklyStats(allSessions, dateRange);
-                weeklyStats.postValue(weekly);
-
-                List<TimeSlotStats> hourly = DataProcessor.calculateHourlyDistribution(allSessions, dateRange);
-                hourlyStats.postValue(hourly);
-
-                RecommendationEngine engine = new RecommendationEngine(getApplication());
-                AIRecommendation adaptiveSchedule = engine.generateAdaptiveSchedule(
-                        allSessions,
-                        System.currentTimeMillis()
-                );
-
-                dailyRecommendation.postValue(adaptiveSchedule);
-                Log.d(TAG, "Recommendations computed");
-
-
-                List<HourlyQuality> energyCurve = DataProcessor.calculateEnergyCurve(filtered);
-                energyCurveData.postValue(energyCurve);
-
-                List<HeatmapCell> heatmap = DataProcessor.calculateQualityHeatmap(filtered, dateRange);
-                heatmapData.postValue(heatmap);
-
-                Calendar cal = Calendar.getInstance();
-                int currentMonth = cal.get(Calendar.MONTH);
-                int currentYear = cal.get(Calendar.YEAR);
-
-                List<StreakDay> streak = DataProcessor.calculateStreakCalendar(
-                        allSessions,
-                        60,
-                        currentMonth,
-                        currentYear
-                );
-                streakData.postValue(streak);
-
-                /*
-                List<StudySessionWithStats> todaySessions = DataProcessor.filterSessionsInRange(
-                        allSessions, DateRange.lastNDays(1));
-                List<GoalRing> rings = DataProcessor.calculateGoalRings(context, todaySessions, 120, 70);
-                goalRingsData.postValue(rings);
-                */
-
-                List<DailyRings> history = DataProcessor.calculateDailyRingsHistory(
-                        getApplication(),
-                        allSessions,
-                        currentDateRange,
-                        30,
-                        5
-                );
-                dailyRingsHistory.postValue(history);
-
-                List<AIRecommendation> recommendations = new ArrayList<>();
-                recommendations.add(DataProcessor.generateAIRecommendations(filtered, getApplication().getApplicationContext(), dateRange));
-                aiRecommendations.postValue(recommendations);
-
-                sessionHistory.postValue(filtered);
-                viewState.postValue(ViewState.SUCCESS);
-
-                sessionHistory.postValue(filtered);
-
-                // Store in cache
-                resultCache = new ResultCache(sessions, dateRange);
-                resultCache.weeklyStats = weekly;
-                resultCache.hourlyStats = hourly;
-                resultCache.dailyRecommendation = adaptiveSchedule;
-                resultCache.energyCurve = energyCurve;
-                resultCache.heatmap = heatmap;
-                resultCache.streak = streak;
-                resultCache.dailyRings = history;
-                resultCache.aiRecommendations = recommendations;
-                resultCache.filteredSessions = filtered;
-
-                Log.d(TAG, "Results cached successfully");
-
-                viewState.postValue(ViewState.SUCCESS);
+                if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Starting data processing...");
+                processAllDataInBackground(sessions, currentDateRange, filteredSessions);
 
             } catch (Exception e) {
-                Log.e(TAG, "ERROR in processAllData", e);
+                Log.e(TAG, "    [BG] ERROR in handleSessionsUpdate background", e);
                 errorMessage.postValue("Error processing data: " + e.getMessage());
                 viewState.postValue(ViewState.ERROR);
             }
         });
+
+        if (VERBOSE_LOGGING) Log.d(TAG, "<<< handleSessionsUpdate END (background work queued)");
+    }
+
+    private void processAllDataInBackground(List<StudySessionWithStats> allSessions,
+                                            DateRange dateRange,
+                                            List<StudySessionWithStats> filteredSessions) {
+        if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] >>> processAllDataInBackground START");
+        if (VERBOSE_LOGGING) Log.d(TAG, "    [BG]     All sessions: " + (allSessions != null ? allSessions.size() : "null"));
+        if (VERBOSE_LOGGING) Log.d(TAG, "    [BG]     Filtered: " + filteredSessions.size());
+        if (VERBOSE_LOGGING) Log.d(TAG, "    [BG]     Range: " + dateRange.getDisplayName());
+
+        try {
+            // Check cache first
+            if (resultCache != null && resultCache.isValid(allSessions, dateRange)) {
+                if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] ✅ Using CACHED results");
+
+                weeklyStats.postValue(resultCache.weeklyStats);
+                hourlyStats.postValue(resultCache.hourlyStats);
+                dailyRecommendation.postValue(resultCache.dailyRecommendation);
+                energyCurveData.postValue(resultCache.energyCurve);
+                heatmapData.postValue(resultCache.heatmap);
+                streakData.postValue(resultCache.streak);
+                dailyRingsHistory.postValue(resultCache.dailyRings);
+                aiRecommendations.postValue(resultCache.aiRecommendations);
+                sessionHistory.postValue(resultCache.filteredSessions);
+                viewState.postValue(ViewState.SUCCESS);
+
+                if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] <<< processAllDataInBackground END (cached)");
+                return;
+            }
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Cache miss - computing new results");
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Computing weekly stats...");
+            WeeklyStats weekly = DataProcessor.calculateWeeklyStats(allSessions, dateRange);
+            weeklyStats.postValue(weekly);
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Computing hourly stats...");
+            List<TimeSlotStats> hourly = DataProcessor.calculateHourlyDistribution(allSessions, dateRange);
+            hourlyStats.postValue(hourly);
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Computing AI recommendation...");
+            RecommendationEngine engine = new RecommendationEngine(getApplication());
+            AIRecommendation adaptiveSchedule = engine.generateAdaptiveSchedule(
+                    allSessions,
+                    System.currentTimeMillis()
+            );
+            dailyRecommendation.postValue(adaptiveSchedule);
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Computing energy curve...");
+            List<HourlyQuality> energyCurve = DataProcessor.calculateEnergyCurve(filteredSessions);
+            energyCurveData.postValue(energyCurve);
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Computing heatmap...");
+            List<HeatmapCell> heatmap = DataProcessor.calculateQualityHeatmap(filteredSessions, dateRange);
+            heatmapData.postValue(heatmap);
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Computing streak calendar...");
+            Calendar cal = Calendar.getInstance();
+            int currentMonth = cal.get(Calendar.MONTH);
+            int currentYear = cal.get(Calendar.YEAR);
+            List<StreakDay> streak = DataProcessor.calculateStreakCalendar(
+                    allSessions,
+                    60,
+                    currentMonth,
+                    currentYear
+            );
+            streakData.postValue(streak);
+
+            // Daily Rings - Cap for ALL_TIME
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Computing daily rings...");
+            DateRange ringsDateRange = dateRange;
+            if (dateRange.getRangeType() == DateRange.RangeType.ALL_TIME) {
+                ringsDateRange = DateRange.lastNDays(90);
+                if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] ALL_TIME detected, capping rings to last 90 days");
+            }
+
+            List<DailyRings> history = DataProcessor.calculateDailyRingsHistory(
+                    getApplication(),
+                    allSessions,
+                    ringsDateRange,
+                    30,
+                    5
+            );
+            dailyRingsHistory.postValue(history);
+
+            // AI Recommendations
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Computing AI recommendations...");
+            List<AIRecommendation> recommendations = new ArrayList<>();
+            recommendations.add(DataProcessor.generateAIRecommendations(
+                    filteredSessions,
+                    getApplication().getApplicationContext(),
+                    dateRange
+            ));
+            aiRecommendations.postValue(recommendations);
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Posting session history...");
+            sessionHistory.postValue(filteredSessions);
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Caching results...");
+            resultCache = new ResultCache(allSessions, dateRange);
+            resultCache.weeklyStats = weekly;
+            resultCache.hourlyStats = hourly;
+            resultCache.dailyRecommendation = adaptiveSchedule;
+            resultCache.energyCurve = energyCurve;
+            resultCache.heatmap = heatmap;
+            resultCache.streak = streak;
+            resultCache.dailyRings = history;
+            resultCache.aiRecommendations = recommendations;
+            resultCache.filteredSessions = filteredSessions;
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] Posting SUCCESS state");
+            viewState.postValue(ViewState.SUCCESS);
+
+            if (VERBOSE_LOGGING) Log.d(TAG, "    [BG] <<< processAllDataInBackground END (success)");
+
+        } catch (Exception e) {
+            Log.e(TAG, "    [BG] ❌ ERROR in processAllDataInBackground", e);
+            errorMessage.postValue("Error processing data: " + e.getMessage());
+            viewState.postValue(ViewState.ERROR);
+        }
+    }
+    public List<StudySessionWithStats> getAllSessionsForCalendar() {
+        return allSessions != null ? allSessions : new ArrayList<>();
     }
 
     public void deleteSession(StudySessionWithStats session) {

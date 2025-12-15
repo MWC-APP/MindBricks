@@ -19,6 +19,11 @@ public class HeatmapCell {
         this.sessionCount = sessionCount;
     }
 
+    public HeatmapCell(int dayOfWeek, int hourOfDay) {
+        this.dayOfMonth = dayOfWeek;
+        this.hour = hourOfDay;
+    }
+
     public int getDayOfMonth() {
         return dayOfMonth;
     }
