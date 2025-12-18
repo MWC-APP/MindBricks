@@ -60,4 +60,22 @@
 
     <!-- Debug tab -->
     <string name="settings_tab_debug_balance_result_message">Added %d coins!</string>
+
+    <string name="debug_toast_generating_basic">Generating 50 test sessions...</string>
+    <string name="debug_toast_generated_basic">50 sessions generated!</string>
+    <string name="debug_toast_generating_large">Generating 500 sessions... Please wait.</string>
+    <string name="debug_toast_generated_large">500 sessions generated!</string>
+    <string name="debug_toast_cleared">All sessions cleared</string>
+    <string name="debug_toast_questionnaire_completed">Detailed questionnaire completed!</string>
+    <string name="debug_toast_questionnaire_skipped">Quick questionnaire saved.</string>
+    <string name="debug_toast_check_prefix">✓ %s</string>
+
+    <string name="debug_dialog_large_title">Generate Large Dataset</string>
+    <string name="debug_dialog_large_message">This will generate 500 sessions with full data. This may take a few seconds.</string>
+    <string name="debug_action_generate">Generate</string>
+    <string name="debug_action_cancel">Cancel</string>
+
+    <string name="debug_dialog_clear_title">Clear Database</string>
+    <string name="debug_dialog_clear_message">Are you sure you want to delete ALL sessions?\n\nThis includes:\n• All study sessions\n• All sensor logs\n• All questionnaire responses\n\nThis cannot be undone!</string>
+    <string name="debug_action_delete_all">Delete All</string>
 </resources>

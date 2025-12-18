@@ -2,4 +2,36 @@
 <resources>
     <string name="start_session">Start Study Session</string>
     <string name="start_timer_digits">"00:00:00"</string>
+
+    <!-- Timer States & Actions -->
+    <string name="timer_action_start_break">Start Break</string>
+    <string name="timer_action_start_long_break">Start Long Break</string>
+    <string name="timer_action_end_focus">End Focus</string>
+    <string name="timer_state_focusing">Focusing...</string>
+    <string name="timer_action_skip_break">Skip Break</string>
+    <string name="timer_state_short_break">Short Break</string>
+    <string name="timer_action_skip_long_break">Skip Long Break</string>
+    <string name="timer_state_long_break">Long Break</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_focus_options_title">Focus Session Options</string>
+    <string name="dialog_focus_options_message">You\'re currently in a focus session. What would you like to do?</string>
+    <string name="dialog_action_skip_to_break">Skip to Break</string>
+
+    <string name="dialog_long_break_options_title">Long Break Options</string>
+    <string name="dialog_long_break_options_message">You\'re on a long break. What would you like to do?</string>
+    <string name="dialog_action_end_break">End Break</string>
+
+    <string name="dialog_break_options_title">Break Options</string>
+    <string name="dialog_break_options_message">You\'re on a break. What would you like to do?</string>
+    <string name="dialog_action_skip_to_focus">Skip to Focus</string>
+
+    <string name="dialog_action_cancel">Cancel</string>
+    <string name="dialog_action_end_cycle">End Entire Cycle</string>
+
+    <!-- Toasts -->
+    <string name="toast_skipped_step">Skipped to next step</string>
+    <string name="toast_cycle_stopped">Pomodoro cycle stopped.</string>
+    <string name="toast_coins_earned_single">+1 Coin!</string>
+    <string name="toast_coins_earned_multiple">+%d Coins!</string>
 </resources>

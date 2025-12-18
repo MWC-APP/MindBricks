@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="emotion_labels">
+        <item>Happy</item>
+        <item>Excited</item>
+        <item>Calm</item>
+        <item>Neutral</item>
+        <item>Tired</item>
+        <item>Frustrated</item>
+        <item>Stressed</item>
+    </string-array>
+    
+    <string name="emotion_dialog_title">How did you feel during this session?</string>
+    
+    <string name="questionnaire_question_enthusiasm">I felt enthusiastic about the task I just completed.</string>
+    <string name="questionnaire_question_energy">I experienced a sense of energy and alertness while working.</string>
+    <string name="questionnaire_question_engagement">I was absorbed and fully engaged in what I was doing.</string>
+    <string name="questionnaire_question_satisfaction">I felt satisfied with my performance in the last session.</string>
+    <string name="questionnaire_question_anticipation">I looked forward to the next Pomodoro interval.</string>
+    
+    <string name="questionnaire_label_strongly_disagree">Strongly Disagree</string>
+    <string name="questionnaire_label_strongly_agree">Strongly Agree</string>
+</resources>

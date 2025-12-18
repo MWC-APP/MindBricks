@@ -33,16 +33,6 @@ public class EmotionSelectDialogFragment extends DialogFragment {
             R.drawable.sentiment_very_satisfied_24px,
     };
 
-    private final String[] emotionLabels = {
-            "Happy",
-            "Excited",
-            "Calm",
-            "Neutral",
-            "Tired",
-            "Frustrated",
-            "Stressed"
-    };
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -52,7 +42,7 @@ public class EmotionSelectDialogFragment extends DialogFragment {
         setupEmotionGrid(view);
 
         return new AlertDialog.Builder(requireContext())
-                .setTitle("How did you feel during this session?")
+                .setTitle(R.string.emotion_dialog_title)
                 .setView(view)
                 .setCancelable(false)
                 .create();
@@ -104,6 +94,7 @@ public class EmotionSelectDialogFragment extends DialogFragment {
         emotionView.setClickable(true);
         emotionView.setFocusable(true);
         emotionView.setBackgroundResource(android.R.drawable.list_selector_background);
+        String[] emotionLabels = getResources().getStringArray(R.array.emotion_labels);
         emotionView.setContentDescription(emotionLabels[emotionIndex]);
         emotionView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 

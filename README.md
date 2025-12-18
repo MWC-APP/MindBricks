@@ -16,7 +16,7 @@ Here is the full list of the refactors I (@lucadibello) managed to do during in 
 - [x] Renamed UI resource files to follow a consistent naming convention: `activity_*` for activities, `fragment_*` for fragments, `component_*` for custom views/components, `item_*` for RecyclerView items.
 - [x] Splitting string resources into multiple files based on their usage (e.g., `strings_home.xml`, `strings_settings.xml`, etc).
 - [x] Removed the substring "AI" from all resource files (misleading, we are not using any AI in the app. Just structured data and simple algorithms). Leftover from the initial idea of the app
+- [x] Remove unused layout resources.
 
 - [] Adding `@author` tags to all classes to make it clear who did what
 - [] Added Javadocs to all classes, methods, fields, etc.
-- [] Remove unused layout resources.

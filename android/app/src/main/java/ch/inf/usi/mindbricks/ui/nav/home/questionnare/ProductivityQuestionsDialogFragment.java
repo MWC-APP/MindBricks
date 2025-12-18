@@ -19,16 +19,6 @@ import ch.inf.usi.mindbricks.util.questionnaire.ProductivityQuestionnaireResult;
 
 public class ProductivityQuestionsDialogFragment extends DialogFragment {
 
-    // FIXME: we should move these to a separate resources file!
-    private static final String QUESTION_ENTHUSIASM = "I felt enthusiastic about the task I just completed.";
-    private static final String QUESTION_ENERGY = "I experienced a sense of energy and alertness while working.";
-    private static final String QUESTION_ENGAGEMENT = "I was absorbed and fully engaged in what I was doing.";
-    private static final String QUESTION_SATISFACTION = "I felt satisfied with my performance in the last session.";
-    private static final String QUESTION_ANTICIPATION = "I looked forward to the next Pomodoro interval.";
-    // Rating scale labels
-    private static final String LABEL_MIN = "Strongly Disagree";
-    private static final String LABEL_MAX = "Strongly Agree";
-
     /**
      * The enthusiasm rating of the questionnaire in range {@link ProductivityQuestionnaireConfig#MIN_RATING} to
      * {@link ProductivityQuestionnaireConfig#MAX_RATING}.
@@ -88,11 +78,11 @@ public class ProductivityQuestionsDialogFragment extends DialogFragment {
 
         // setup each question
         LinearLayout questionsContainer = view.findViewById(R.id.questions_container);
-        setupQuestion(questionsContainer, QUESTION_ENTHUSIASM, rating -> enthusiasmRating = rating);
-        setupQuestion(questionsContainer, QUESTION_ENERGY, rating -> energyRating = rating);
-        setupQuestion(questionsContainer, QUESTION_ENGAGEMENT, rating -> engagementRating = rating);
-        setupQuestion(questionsContainer, QUESTION_SATISFACTION, rating -> satisfactionRating = rating);
-        setupQuestion(questionsContainer, QUESTION_ANTICIPATION, rating -> anticipationRating = rating);
+        setupQuestion(questionsContainer, getString(R.string.questionnaire_question_enthusiasm), rating -> enthusiasmRating = rating);
+        setupQuestion(questionsContainer, getString(R.string.questionnaire_question_energy), rating -> energyRating = rating);
+        setupQuestion(questionsContainer, getString(R.string.questionnaire_question_engagement), rating -> engagementRating = rating);
+        setupQuestion(questionsContainer, getString(R.string.questionnaire_question_satisfaction), rating -> satisfactionRating = rating);
+        setupQuestion(questionsContainer, getString(R.string.questionnaire_question_anticipation), rating -> anticipationRating = rating);
 
         // Set up submit button
         Button submitButton = view.findViewById(R.id.submit_button);
@@ -148,8 +138,8 @@ public class ProductivityQuestionsDialogFragment extends DialogFragment {
         // add labels
         TextView minLabel = questionView.findViewById(R.id.rating_min_label);
         TextView maxLabel = questionView.findViewById(R.id.rating_max_label);
-        minLabel.setText(LABEL_MIN);
-        maxLabel.setText(LABEL_MAX);
+        minLabel.setText(R.string.questionnaire_label_strongly_disagree);
+        maxLabel.setText(R.string.questionnaire_label_strongly_agree);
 
         // Set rating -> change listener
         ratingBar.setOnRatingBarChangeListener((bar, rating, fromUser) -> {

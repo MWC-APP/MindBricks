@@ -43,9 +43,6 @@ public class WeeklyFocusChartView extends LinearLayout {
     int colorGray;
     int colorZero;
 
-    // Day labels for X-axis
-    private static final String[] DAY_LABELS = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-
     public WeeklyFocusChartView(Context context) {
         super(context);
         init(context);
@@ -98,7 +95,8 @@ public class WeeklyFocusChartView extends LinearLayout {
         xAxis.setLabelCount(7);
 
         // Set day labels
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(DAY_LABELS));
+        String[] dayLabels = getContext().getResources().getStringArray(R.array.weekdays_short);
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(dayLabels));
 
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
@@ -112,7 +110,7 @@ public class WeeklyFocusChartView extends LinearLayout {
         leftAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return String.format(Locale.getDefault(), "%.0f min", value);
+                return String.format(Locale.getDefault(), getContext().getString(R.string.analytics_chart_axis_min), value);
             }
         });
 
@@ -130,7 +128,7 @@ public class WeeklyFocusChartView extends LinearLayout {
             return;
         }
 
-        BarDataSet dataSet = new BarDataSet(entries, "Study Minutes");
+        BarDataSet dataSet = new BarDataSet(entries, getContext().getString(R.string.analytics_chart_label_study_minutes));
         styleDataSet(dataSet, stats);
 
         BarData barData = new BarData(dataSet);
@@ -179,25 +177,25 @@ public class WeeklyFocusChartView extends LinearLayout {
         List<LegendEntry> entries = new ArrayList<>();
 
         LegendEntry high = new LegendEntry();
-        high.label = "High Focus (≥80%)";
+        high.label = getContext().getString(R.string.analytics_chart_legend_high);
         high.formColor = colorHigh;
         high.form = Legend.LegendForm.SQUARE;
         entries.add(high);
 
         LegendEntry med = new LegendEntry();
-        med.label = "Good Focus (≥60%)";
+        med.label = getContext().getString(R.string.analytics_chart_legend_med);
         med.formColor = colorMed;
         med.form = Legend.LegendForm.SQUARE;
         entries.add(med);
 
         LegendEntry low = new LegendEntry();
-        low.label = "Medium Focus (≥40%)";
+        low.label = getContext().getString(R.string.analytics_chart_legend_low);
         low.formColor = colorLow;
         low.form = Legend.LegendForm.SQUARE;
         entries.add(low);
 
         LegendEntry veryLow = new LegendEntry();
-        veryLow.label = "Low Focus (<40%)";
+        veryLow.label = getContext().getString(R.string.analytics_chart_legend_very_low);
         veryLow.formColor = colorZero;
         veryLow.form = Legend.LegendForm.SQUARE;
         entries.add(veryLow);
@@ -243,7 +241,7 @@ public class WeeklyFocusChartView extends LinearLayout {
         int minutes = totalMinutes % 60;
 
         String summary = String.format(Locale.getDefault(),
-                "Total: %dh %dm • Avg Focus: %.0f%%",
+                getContext().getString(R.string.analytics_chart_summary_total),
                 hours, minutes, avgFocusScore);
 
         summaryText.setText(summary);
@@ -252,8 +250,8 @@ public class WeeklyFocusChartView extends LinearLayout {
 
     private void showEmptyState() {
         barChart.clear();
-        barChart.setNoDataText("No study sessions this week");
-        summaryText.setText("Start studying to see your weekly progress!");
+        barChart.setNoDataText(getContext().getString(R.string.analytics_chart_empty_data));
+        summaryText.setText(R.string.analytics_chart_empty_summary);
         summaryText.setVisibility(VISIBLE);
     }
 
@@ -285,7 +283,7 @@ public class WeeklyFocusChartView extends LinearLayout {
 
             float focusScore = stats.getDayFocusScore(dayIndex);
             return String.format(Locale.getDefault(),
-                    "%.0fm\n",
+                    getContext().getString(R.string.analytics_chart_value_format),
                     value);
         }
     }

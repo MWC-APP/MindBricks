@@ -98,40 +98,35 @@ public class SettingsDebugFragment extends Fragment {
 
         // Generate basic test data (50 sessions)
         btnGenerateBasic.setOnClickListener(v -> {
-            showToast("Generating 50 test sessions...");
+            showToast(getString(R.string.debug_toast_generating_basic));
             TestDataGenerator.addTestSessions(requireContext(), 50);
-            showCompletionToast("50 sessions generated!");
+            showCompletionToast(getString(R.string.debug_toast_generated_basic));
         });
 
         // Generate large dataset (500 sessions)
         btnGenerateLarge.setOnClickListener(v -> {
             new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Generate Large Dataset")
-                    .setMessage("This will generate 500 sessions with full data. This may take a few seconds.")
-                    .setPositiveButton("Generate", (dialog, which) -> {
-                        showToast("Generating 500 sessions... Please wait.");
+                    .setTitle(R.string.debug_dialog_large_title)
+                    .setMessage(R.string.debug_dialog_large_message)
+                    .setPositiveButton(R.string.debug_action_generate, (dialog, which) -> {
+                        showToast(getString(R.string.debug_toast_generating_large));
                         TestDataGenerator.addTestSessions(requireContext(), 500);
-                        showCompletionToast("500 sessions generated!");
+                        showCompletionToast(getString(R.string.debug_toast_generated_large));
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(R.string.debug_action_cancel, null)
                     .show();
         });
 
         // Clear database with confirmation
         btnClearDatabase.setOnClickListener(v -> {
             new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Clear Database")
-                    .setMessage("Are you sure you want to delete ALL sessions?\n\n" +
-                            "This includes:\n" +
-                            "• All study sessions\n" +
-                            "• All sensor logs\n" +
-                            "• All questionnaire responses\n\n" +
-                            "This cannot be undone!")
-                    .setPositiveButton("Delete All", (dialog, which) -> {
+                    .setTitle(R.string.debug_dialog_clear_title)
+                    .setMessage(R.string.debug_dialog_clear_message)
+                    .setPositiveButton(R.string.debug_action_delete_all, (dialog, which) -> {
                         TestDataGenerator.clearAllSessions(requireContext());
-                        showToast("All sessions cleared");
+                        showToast(getString(R.string.debug_toast_cleared));
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(R.string.debug_action_cancel, null)
                     .show();
         });
     }
@@ -147,12 +142,12 @@ public class SettingsDebugFragment extends Fragment {
             productivityQuestionnaire.setListener(new ProductivityQuestionsDialogFragment.OnQuestionnaireActionListener() {
                 @Override
                 public void onQuestionnaireComplete(ProductivityQuestionnaireResult result) {
-                    showToast("Detailed questionnaire completed!");
+                    showToast(getString(R.string.debug_toast_questionnaire_completed));
                 }
 
                 @Override
                 public void onQuestionnaireSkipped() {
-                    showToast("Quick questionnaire saved.");
+                    showToast(getString(R.string.debug_toast_questionnaire_skipped));
                 }
             });
 
@@ -181,7 +176,7 @@ public class SettingsDebugFragment extends Fragment {
     private void showCompletionToast(String message) {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (getContext() != null) {
-                Toast.makeText(requireContext(), "✓ " + message, Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), getString(R.string.debug_toast_check_prefix, message), Toast.LENGTH_LONG).show();
             }
         }, 2500);
     }

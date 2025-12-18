@@ -320,12 +320,12 @@ public class HomeFragment extends HomeFragmentHelper {
                                 getResources().getColorStateList(R.color.analytics_accent_blue, null));
                         break;
                     case SHORT_BREAK:
-                        startSessionButton.setText("Start Break");
+                        startSessionButton.setText(R.string.timer_action_start_break);
                         startSessionButton.setBackgroundTintList(
                                 getResources().getColorStateList(R.color.analytics_accent_green, null));
                         break;
                     case LONG_BREAK:
-                        startSessionButton.setText("Start Long Break");
+                        startSessionButton.setText(R.string.timer_action_start_long_break);
                         startSessionButton.setBackgroundTintList(
                                 getResources().getColorStateList(R.color.analytics_accent_purple, null));
                         break;
@@ -333,28 +333,28 @@ public class HomeFragment extends HomeFragmentHelper {
                 break;
 
             case STUDY:
-                startSessionButton.setText("End Focus");
+                startSessionButton.setText(R.string.timer_action_end_focus);
                 startSessionButton.setBackgroundTintList(
                         getResources().getColorStateList(R.color.md_theme_error, null));
-                stateLabel.setText("Focusing...");
+                stateLabel.setText(R.string.timer_state_focusing);
                 stateLabel.setTextColor(getResources().getColor(R.color.md_theme_error, null));
                 stateLabel.setVisibility(View.VISIBLE);
                 break;
 
             case PAUSE:
-                startSessionButton.setText("Skip Break");
+                startSessionButton.setText(R.string.timer_action_skip_break);
                 startSessionButton.setBackgroundTintList(
                         getResources().getColorStateList(R.color.analytics_accent_green, null));
-                stateLabel.setText("Short Break");
+                stateLabel.setText(R.string.timer_state_short_break);
                 stateLabel.setTextColor(getResources().getColor(R.color.analytics_accent_green, null));
                 stateLabel.setVisibility(View.VISIBLE);
                 break;
 
             case LONG_PAUSE:
-                startSessionButton.setText("Skip Long Break");
+                startSessionButton.setText(R.string.timer_action_skip_long_break);
                 startSessionButton.setBackgroundTintList(
                         getResources().getColorStateList(R.color.analytics_accent_purple, null));
-                stateLabel.setText("Long Break");
+                stateLabel.setText(R.string.timer_state_long_break);
                 stateLabel.setTextColor(getResources().getColor(R.color.analytics_accent_purple, null));
                 stateLabel.setVisibility(View.VISIBLE);
                 break;
@@ -369,17 +369,17 @@ public class HomeFragment extends HomeFragmentHelper {
         String skipButtonText;
 
         if (currentState == HomeViewModel.PomodoroState.STUDY) {
-            title = "Focus Session Options";
-            message = "You're currently in a focus session. What would you like to do?";
-            skipButtonText = "Skip to Break";
+            title = getString(R.string.dialog_focus_options_title);
+            message = getString(R.string.dialog_focus_options_message);
+            skipButtonText = getString(R.string.dialog_action_skip_to_break);
         } else if (currentState == HomeViewModel.PomodoroState.LONG_PAUSE) {
-            title = "Long Break Options";
-            message = "You're on a long break. What would you like to do?";
-            skipButtonText = "End Break";
+            title = getString(R.string.dialog_long_break_options_title);
+            message = getString(R.string.dialog_long_break_options_message);
+            skipButtonText = getString(R.string.dialog_action_end_break);
         } else {
-            title = "Break Options";
-            message = "You're on a break. What would you like to do?";
-            skipButtonText = "Skip to Focus";
+            title = getString(R.string.dialog_break_options_title);
+            message = getString(R.string.dialog_break_options_message);
+            skipButtonText = getString(R.string.dialog_action_skip_to_focus);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext())
@@ -387,16 +387,16 @@ public class HomeFragment extends HomeFragmentHelper {
                 .setMessage(message)
                 .setPositiveButton(skipButtonText, (dialog, which) -> {
                     homeViewModel.skipCurrentStep();
-                    Toast.makeText(getContext(), "Skipped to next step", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.toast_skipped_step, Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel", null);
+                .setNegativeButton(R.string.dialog_action_cancel, null);
 
         // Only show "End Entire Cycle" option if not in long pause
         // NOTE: after the long pause, we have already finished the cycle. Useless
         if (currentState != HomeViewModel.PomodoroState.LONG_PAUSE) {
-            builder.setNeutralButton("End Entire Cycle", (dialog, which) -> {
+            builder.setNeutralButton(R.string.dialog_action_end_cycle, (dialog, which) -> {
                 homeViewModel.stopTimerAndReset();
-                Toast.makeText(getContext(), "Pomodoro cycle stopped.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.toast_cycle_stopped, Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -405,7 +405,7 @@ public class HomeFragment extends HomeFragmentHelper {
 
     private void earnCoin(int amount) {
         if (profileViewModel != null) profileViewModel.addCoins(amount);
-        String message = (amount == 1) ? "+1 Coin!" : String.format(Locale.getDefault(), "+%d Coins!", amount);
+        String message = (amount == 1) ? getString(R.string.toast_coins_earned_single) : getString(R.string.toast_coins_earned_multiple, amount);
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 }

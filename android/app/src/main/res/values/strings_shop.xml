@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Categories -->
+    <string name="shop_category_terrain_ground">Terrain - Ground</string>
+    <string name="shop_category_terrain_water">Terrain - Water</string>
+    <string name="shop_category_infrastructure_roads">Infrastructure - Roads</string>
+    <string name="shop_category_infrastructure_terrain">Infrastructure - Terrain</string>
+    <string name="shop_category_nature_trees">Nature - Trees</string>
+    <string name="shop_category_nature_bushes">Nature - Bushes</string>
+    <string name="shop_category_nature_rocks">Nature - Rocks</string>
+    <string name="shop_category_resources_gold">Resources - Gold</string>
+    <string name="shop_category_resources_wood">Resources - Wood</string>
+    <string name="shop_category_resources_tools">Resources - Tools</string>
+    <string name="shop_category_buildings">Buildings</string>
+    <string name="shop_category_decorations">Decorations</string>
+    <string name="shop_category_props">Props</string>
+    <string name="shop_category_miscellaneous">Miscellaneous</string>
+
+    <!-- Dialogs -->
+    <string name="shop_dialog_remove_title">Remove %s?</string>
+    <string name="shop_dialog_remove_message">Are you sure you want to remove this building? You won\'t get a refund.</string>
+    <string name="shop_action_remove">Remove</string>
+    
+    <string name="shop_dialog_replace_title">Replace Buildings?</string>
+    <string name="shop_dialog_replace_single">This will destroy 1 existing building. Continue?</string>
+    <string name="shop_dialog_replace_multiple">This will destroy %d existing buildings. Continue?</string>
+    <string name="shop_action_replace">Replace</string>
+    
+    <string name="shop_dialog_purchase_title">Confirm Purchase</string>
+    <string name="shop_dialog_purchase_message">Buy \"%1$s\" for %2$d coins?</string>
+    <string name="shop_action_buy">Buy</string>
+    
+    <string name="shop_action_cancel">Cancel</string>
+
+    <!-- Toasts / Feedback -->
+    <string name="shop_feedback_selected">Selected %s for placement.</string>
+    <string name="shop_feedback_removed">%s removed.</string>
+    <string name="shop_error_no_inventory">You don\'t have that tile in your inventory.</string>
+    <string name="shop_error_unknown_tile">Unknown tile type.</string>
+    <string name="shop_error_out_of_bounds">Can\'t place tile there - outside grid bounds.</string>
+    <string name="shop_error_placement_failed">Couldn\'t place tile there.</string>
+    <string name="shop_feedback_placed_replaced">Tile placed! Buildings destroyed.</string>
+    <string name="shop_error_insufficient_funds">Not enough coins to buy %s</string>
+    <string name="shop_feedback_purchased">You purchased %1$d x %2$s!</string>
+    <string name="shop_error_generic">Something went wrong. Please try again.</string>
+    <string name="shop_default_building_name">Building</string>
+</resources>

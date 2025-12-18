@@ -204,7 +204,7 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
             public void onTileSelected(TileAsset asset) {
                 selectedTileId = asset.id();
                 inventoryAdapter.setSelectedTileId(selectedTileId);
-                showToast("Selected " + asset.displayName() + " for placement.");
+                showToast(getString(R.string.shop_feedback_selected, asset.displayName()));
             }
 
             @Override
@@ -263,19 +263,19 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
 
         // Pre-defined shop sections: Terrain, Infrastructure, Nature, Resources, Buildings, Decorations
         String[] order = new String[]{
-                "Terrain - Ground",
-                "Terrain - Water",
-                "Infrastructure - Roads",
-                "Infrastructure - Terrain",
-                "Nature - Trees",
-                "Nature - Bushes",
-                "Nature - Rocks",
-                "Resources - Gold",
-                "Resources - Wood",
-                "Resources - Tools",
-                "Buildings",
-                "Decorations",
-                "Props"
+                getString(R.string.shop_category_terrain_ground),
+                getString(R.string.shop_category_terrain_water),
+                getString(R.string.shop_category_infrastructure_roads),
+                getString(R.string.shop_category_infrastructure_terrain),
+                getString(R.string.shop_category_nature_trees),
+                getString(R.string.shop_category_nature_bushes),
+                getString(R.string.shop_category_nature_rocks),
+                getString(R.string.shop_category_resources_gold),
+                getString(R.string.shop_category_resources_wood),
+                getString(R.string.shop_category_resources_tools),
+                getString(R.string.shop_category_buildings),
+                getString(R.string.shop_category_decorations),
+                getString(R.string.shop_category_props)
         };
 
         // initialize empty lists for each category in order
@@ -314,21 +314,21 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         String path = asset.assetPath().toLowerCase(Locale.US);
 
         // simple heuristic based on type or path keywords as fallback
-        if (asset.type() == TileType.ROAD) return "Infrastructure - Roads";
-        if (asset.type() == TileType.WATER || path.contains("water")) return "Terrain - Water";
-        if (path.contains("tree")) return "Nature - Trees";
-        if (path.contains("bush")) return "Nature - Bushes";
-        if (path.contains("rock")) return "Nature - Rocks";
-        if (asset.type() == TileType.BUILDING) return "Buildings";
-        if (path.contains("gold")) return "Resources - Gold";
-        if (path.contains("wood")) return "Resources - Wood";
-        if (path.contains("tool")) return "Resources - Tools";
-        if (path.contains("prop")) return "Props";
-        if (asset.type() == TileType.TERRAIN) return "Terrain - Ground";
-        if (asset.type() == TileType.DECORATION) return "Decorations";
+        if (asset.type() == TileType.ROAD) return getString(R.string.shop_category_infrastructure_roads);
+        if (asset.type() == TileType.WATER || path.contains("water")) return getString(R.string.shop_category_terrain_water);
+        if (path.contains("tree")) return getString(R.string.shop_category_nature_trees);
+        if (path.contains("bush")) return getString(R.string.shop_category_nature_bushes);
+        if (path.contains("rock")) return getString(R.string.shop_category_nature_rocks);
+        if (asset.type() == TileType.BUILDING) return getString(R.string.shop_category_buildings);
+        if (path.contains("gold")) return getString(R.string.shop_category_resources_gold);
+        if (path.contains("wood")) return getString(R.string.shop_category_resources_wood);
+        if (path.contains("tool")) return getString(R.string.shop_category_resources_tools);
+        if (path.contains("prop")) return getString(R.string.shop_category_props);
+        if (asset.type() == TileType.TERRAIN) return getString(R.string.shop_category_terrain_ground);
+        if (asset.type() == TileType.DECORATION) return getString(R.string.shop_category_decorations);
 
         // general fallback
-        return "Miscellaneous";
+        return getString(R.string.shop_category_miscellaneous);
     }
 
     /**
@@ -348,18 +348,18 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
     @Override
     public void onBuildingClick(TilePlacement placement) {
         TileAsset asset = assetIndex.get(placement.getTileId());
-        String name = asset != null ? asset.displayName() : "Building";
+        String name = asset != null ? asset.displayName() : getString(R.string.shop_default_building_name);
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("Remove " + name + "?")
-                .setMessage("Are you sure you want to remove this building? You won't get a refund.")
-                .setPositiveButton("Remove", (dialog, which) -> {
+                .setTitle(getString(R.string.shop_dialog_remove_title, name))
+                .setMessage(R.string.shop_dialog_remove_message)
+                .setPositiveButton(R.string.shop_action_remove, (dialog, which) -> {
                     tileGameViewModel.removePlacement(placement);
                     VibrationHelper.vibrate(requireContext(), VibrationHelper.VibrationType.DESTROY_TILE);
                     SoundPlayer.playSound(requireContext(), R.raw.purchase);
-                    showToast(name + " removed.");
+                    showToast(getString(R.string.shop_feedback_removed, name));
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.shop_action_cancel, null)
                 .show();
     }
 
@@ -375,14 +375,14 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         Map<String, Integer> inventory = tileGameViewModel.getInventory().getValue();
         int quantity = inventory != null ? inventory.getOrDefault(tileId, 0) : 0;
         if (quantity <= 0) {
-            showToast("You don't have that tile in your inventory.");
+            showToast(getString(R.string.shop_error_no_inventory));
             return;
         }
 
         // get the tile asset
         TileAsset asset = assetIndex.get(tileId);
         if (asset == null) {
-            showToast("Unknown tile type.");
+            showToast(getString(R.string.shop_error_unknown_tile));
             return;
         }
 
@@ -393,7 +393,7 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
 
         // check if placement is within bounds
         if (!tileGameViewModel.isWithinBounds(row, col, height, width)) {
-            showToast("Can't place tile there - outside grid bounds.");
+            showToast(getString(R.string.shop_error_out_of_bounds));
             return;
         }
 
@@ -422,17 +422,17 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
      */
     private void showReplacementDialog(int row, int col, String tileId, int height, int width, int destructionCount) {
         String message = destructionCount == 1
-                ? "This will destroy 1 existing building. Continue?"
-                : "This will destroy " + destructionCount + " existing buildings. Continue?";
+                ? getString(R.string.shop_dialog_replace_single)
+                : getString(R.string.shop_dialog_replace_multiple, destructionCount);
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("Replace Buildings?")
+                .setTitle(R.string.shop_dialog_replace_title)
                 .setMessage(message)
-                .setPositiveButton("Replace", (dialog, which) -> {
+                .setPositiveButton(R.string.shop_action_replace, (dialog, which) -> {
                     // remove items from map
                     attemptPlacementWithReplacement(row, col, tileId, height, width);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.shop_action_cancel, null)
                 .show();
     }
 
@@ -448,7 +448,7 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
     private void attemptPlacement(int row, int col, String tileId, int height, int width) {
         boolean placed = tileGameViewModel.placeTile(row, col, tileId, height, width);
         if (!placed) {
-            showToast("Couldn't place tile there.");
+            showToast(getString(R.string.shop_error_placement_failed));
             return;
         }
 
@@ -472,7 +472,7 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
     private void attemptPlacementWithReplacement(int row, int col, String tileId, int height, int width) {
         boolean placed = tileGameViewModel.placeTileWithReplacement(row, col, tileId, height, width);
         if (!placed) {
-            showToast("Couldn't place tile there.");
+            showToast(getString(R.string.shop_error_placement_failed));
             return;
         }
 
@@ -480,7 +480,7 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         tileGameViewModel.consumeFromInventory(tileId);
 
         // notify user with feedback
-        showToast("Tile placed! Buildings destroyed.");
+        showToast(getString(R.string.shop_feedback_placed_replaced));
         SoundPlayer.playSound(getContext(), R.raw.purchase);
 
         // vibrate to indicate destruction
@@ -499,20 +499,20 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
 
         // check if enough coins
         if (currentCoins == null || currentCoins < item.price()) {
-            showToast("Not enough coins to buy " + item.displayName());
+            showToast(getString(R.string.shop_error_insufficient_funds, item.displayName()));
             return;
         }
 
         // show confirmation dialog
         new AlertDialog.Builder(requireContext())
-                .setTitle("Confirm Purchase")
-                .setMessage("Buy \"" + item.displayName() + "\" for " + item.price() + " coins?")
-                .setPositiveButton("Buy", (dialog, which) -> {
+                .setTitle(R.string.shop_dialog_purchase_title)
+                .setMessage(getString(R.string.shop_dialog_purchase_message, item.displayName(), item.price()))
+                .setPositiveButton(R.string.shop_action_buy, (dialog, which) -> {
                     // complete the purchase
                     completePurchase(item);
                     SoundPlayer.playSound(getContext(), R.raw.purchase);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.shop_action_cancel, null)
                 .show();
     }
 
@@ -529,9 +529,9 @@ public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyC
         if (purchaseSuccessful) {
             int quantity = purchaseQuantity(item);
             tileGameViewModel.addToInventory(item.id(), quantity);
-            showToast("You purchased " + quantity + " x " + item.displayName() + "!");
+            showToast(getString(R.string.shop_feedback_purchased, quantity, item.displayName()));
         } else {
-            showToast("Something went wrong. Please try again.");
+            showToast(getString(R.string.shop_error_generic));
         }
     }
 

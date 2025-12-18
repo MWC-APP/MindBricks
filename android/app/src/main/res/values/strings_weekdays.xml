@@ -7,4 +7,15 @@
     <string name="weekday_friday">Friday</string>
     <string name="weekday_saturday">Saturday</string>
     <string name="weekday_sunday">Sunday</string>
+
+    <!-- Used in "weekly chart" in the analytics fragment -->
+    <string-array name="weekdays_short">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
 </resources>

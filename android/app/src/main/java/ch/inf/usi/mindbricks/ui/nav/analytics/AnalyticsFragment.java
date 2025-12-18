@@ -181,7 +181,7 @@ public class AnalyticsFragment extends Fragment {
 
         // Handle item clicks
         dailyRingsAdapter.setOnDayClickListener((position, data) -> {
-            Toast.makeText(getContext(), "Clicked: " + data.getDisplayDate(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.analytics_toast_clicked, data.getDisplayDate()), Toast.LENGTH_SHORT).show();
         });
         expandRingsButton.setOnClickListener(v -> {
             isHistoryExpanded = !isHistoryExpanded;
@@ -214,11 +214,11 @@ public class AnalyticsFragment extends Fragment {
     private void updateHistoryVisibility() {
         if (isHistoryExpanded) {
             dailyRingsRecyclerView.setVisibility(View.VISIBLE);
-            expandRingsButton.setText("Hide");
+            expandRingsButton.setText(R.string.analytics_history_hide);
             expandRingsButton.setIconResource(R.drawable.ic_expand_less);
         } else {
             dailyRingsRecyclerView.setVisibility(View.GONE);
-            expandRingsButton.setText("Show");
+            expandRingsButton.setText(R.string.analytics_history_show);
             expandRingsButton.setIconResource(R.drawable.ic_expand_more);
         }
     }
@@ -492,14 +492,15 @@ public class AnalyticsFragment extends Fragment {
                 sessionHistoryAdapter.setData(sessions);
 
                 if (sessionCountText != null) {
-                    String countText = sessions.size() + " session" + (sessions.size() == 1 ? "" : "s");
+                    String countText = getString(R.string.analytics_session_count_format,
+                            sessions.size(), sessions.size() == 1 ? "" : "s");
 
                     // Show if data is truncated
                     DateRange currentRange = viewModel.getCurrentDateRange();
                     if (currentRange != null &&
                             currentRange.getRangeType() == DateRange.RangeType.ALL_TIME &&
                             sessions.size() >= 200) {
-                        countText += " (showing most recent)";
+                        countText += getString(R.string.analytics_session_count_truncated);
                     }
 
                     sessionCountText.setText(countText);
@@ -565,10 +566,10 @@ public class AnalyticsFragment extends Fragment {
         if (expandRingsButton == null) return;
 
         if (isExpanded) {
-            expandRingsButton.setText("Hide history");
+            expandRingsButton.setText(R.string.analytics_history_hide_full);
             expandRingsButton.setIconResource(R.drawable.ic_expand_less);
         } else {
-            expandRingsButton.setText("Show history");
+            expandRingsButton.setText(R.string.analytics_history_show_full);
             expandRingsButton.setIconResource(R.drawable.ic_expand_more);
         }
     }
@@ -595,7 +596,7 @@ public class AnalyticsFragment extends Fragment {
 
         // Add legend title with themed color
         TextView legendTitle = new TextView(requireContext());
-        legendTitle.setText("Activity Types");
+        legendTitle.setText(R.string.analytics_legend_activity_types);
         legendTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         legendTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.analytics_text_primary));
         legendTitle.setTypeface(null, android.graphics.Typeface.BOLD);
@@ -689,7 +690,7 @@ public class AnalyticsFragment extends Fragment {
 
         // Build a nicely formatted message
         StringBuilder message = new StringBuilder();
-        message.append("Date: ").append(dateStr).append("\n\n");
+        message.append(getString(R.string.analytics_summary_date_prefix, dateStr)).append("\n\n");
 
         // Show study status with icon
         // FIXME: I don't like emojis as they seem a bit cheap, but we need to see if we have enough time
@@ -697,23 +698,23 @@ public class AnalyticsFragment extends Fragment {
         String statusText = switch (day.getStatus()) {
             case HIT_TARGET -> {
                 statusIcon = "✅";
-                yield "Goal Completed";
+                yield getString(R.string.analytics_status_goal_completed);
             }
             case PARTIAL -> {
                 statusIcon = "⏳";
-                yield "Partially Completed";
+                yield getString(R.string.analytics_status_partially_completed);
             }
             case EXCEPTIONAL -> {
                 statusIcon = "⭐";
-                yield "Exceptional!";
+                yield getString(R.string.analytics_status_exceptional);
             }
             case NONE -> {
                 statusIcon = "❌";
-                yield "No Study";
+                yield getString(R.string.analytics_status_no_study);
             }
             default -> {
                 statusIcon = "❓";
-                yield "Unknown";
+                yield getString(R.string.analytics_status_unknown);
             }
         };
         message.append(statusIcon).append(" ").append(statusText).append("\n\n");
@@ -723,28 +724,29 @@ public class AnalyticsFragment extends Fragment {
         int hours = totalMinutes / 60;
         int minutes = totalMinutes % 60;
 
+        message.append(getString(R.string.analytics_time_total_prefix));
         if (hours > 0) {
-            message.append("Total Study Time: ").append(hours).append("h ").append(minutes).append("m\n");
+            message.append(getString(R.string.analytics_time_format_hours_mins, hours, minutes)).append("\n");
         } else {
-            message.append("Total Study Time: ").append(minutes).append(" minutes\n");
+            message.append(getString(R.string.analytics_time_format_mins, minutes)).append("\n");
         }
 
         // Add motivational message based on status
         message.append("\n");
         if (day.getStatus() == StreakDay.StreakStatus.HIT_TARGET) {
-            message.append("Great job on reaching your goal!");
+            message.append(getString(R.string.analytics_motivation_goal_met));
         } else if (day.getStatus() == StreakDay.StreakStatus.EXCEPTIONAL) {
-            message.append("Outstanding effort! You exceeded your goal!");
+            message.append(getString(R.string.analytics_motivation_exceptional));
         } else if (day.getStatus() == StreakDay.StreakStatus.PARTIAL) {
-            message.append("Good effort! Keep building your streak.");
+            message.append(getString(R.string.analytics_motivation_partial));
         } else if (day.getStatus() == StreakDay.StreakStatus.NONE) {
-            message.append("Every day is a new opportunity to focus!");
+            message.append(getString(R.string.analytics_motivation_none));
         }
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("Study Summary")
+                .setTitle(R.string.analytics_dialog_summary_title)
                 .setMessage(message.toString())
-                .setPositiveButton("Close", null)
+                .setPositiveButton(R.string.analytics_close, null)
                 .show();
     }
 
@@ -786,11 +788,10 @@ public class AnalyticsFragment extends Fragment {
                 // Show message based on current range
                 DateRange currentRange = viewModel.getCurrentDateRange();
                 if (currentRange != null) {
-                    String message = "No sessions found for " + currentRange.getDisplayName() +
-                            ".\n\nTry a different time range or start studying!";
+                    String message = getString(R.string.analytics_empty_range, currentRange.getDisplayName());
                     emptyStateText.setText(message);
                 } else {
-                    emptyStateText.setText("No study sessions yet.\nStart studying to see your analytics!");
+                    emptyStateText.setText(R.string.analytics_empty_all);
                 }
                 break;
 
@@ -800,8 +801,8 @@ public class AnalyticsFragment extends Fragment {
                 chartsContainer.setVisibility(View.GONE);
                 emptyStateText.setVisibility(View.VISIBLE);
                 emptyStateText.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_theme_error));
-                emptyStateText.setText("Error loading analytics");
-                Toast.makeText(getContext(), "Error loading analytics data", Toast.LENGTH_SHORT).show();
+                emptyStateText.setText(R.string.analytics_error_loading);
+                Toast.makeText(getContext(), R.string.analytics_error_loading_toast, Toast.LENGTH_SHORT).show();
                 break;
         }
 
@@ -810,15 +811,15 @@ public class AnalyticsFragment extends Fragment {
 
     private void showFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Select Time Range");
+        builder.setTitle(R.string.analytics_filter_title);
 
         String[] options = {
-                "Last 7 Days",
-                "Last 30 Days",
-                "Last 90 Days",
-                "This Month",
-                "Last Month",
-                "All Time"
+                getString(R.string.analytics_range_7_days),
+                getString(R.string.analytics_range_30_days),
+                getString(R.string.analytics_range_90_days),
+                getString(R.string.analytics_range_this_month),
+                getString(R.string.analytics_range_last_month),
+                getString(R.string.analytics_range_all_time)
         };
 
         builder.setItems(options, (dialog, which) -> {
@@ -853,7 +854,7 @@ public class AnalyticsFragment extends Fragment {
             }
         });
 
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(R.string.analytics_cancel, null);
         builder.show();
     }
 
@@ -885,13 +886,13 @@ public class AnalyticsFragment extends Fragment {
         durationText.setText(formatDuration(session.getDurationMinutes()));
         tagText.setText(session.getTagTitle());
         focusScoreText.setText(String.format(Locale.getDefault(),
-                "Focus Score: %.1f%%", session.getFocusScore()));
+                getString(R.string.analytics_detail_focus_score), session.getFocusScore()));
         noiseText.setText(String.format(Locale.getDefault(),
-                "Noise (RMS): %.1f", session.getAvgNoiseLevel()));
+                getString(R.string.analytics_detail_noise), session.getAvgNoiseLevel()));
         lightText.setText(String.format(Locale.getDefault(),
-                "Light Level: %.1f%%", session.getAvgLightLevel()));
+                getString(R.string.analytics_detail_light), session.getAvgLightLevel()));
         pickupsText.setText(String.format(Locale.getDefault(),
-                "Phone Pickups: %d", session.getPhonePickupCount()));
+                getString(R.string.analytics_detail_pickups), session.getPhonePickupCount()));
 
         // Show notes if available
         if (session.getNotes() != null && !session.getNotes().isEmpty()) {
@@ -903,9 +904,9 @@ public class AnalyticsFragment extends Fragment {
 
         // Show dialog
         new AlertDialog.Builder(requireContext())
-                .setTitle("Session Details")
+                .setTitle(R.string.analytics_detail_title)
                 .setView(dialogView)
-                .setPositiveButton("Close", null)
+                .setPositiveButton(R.string.analytics_close, null)
                 .show();
     }
 
@@ -916,15 +917,18 @@ public class AnalyticsFragment extends Fragment {
      */
     private void showSessionOptionsDialog(StudySessionWithStats session) {
         new AlertDialog.Builder(requireContext())
-                .setTitle("Session Options")
-                .setItems(new String[]{"View Details", "Delete Session"}, (dialog, which) -> {
+                .setTitle(R.string.analytics_options_title)
+                .setItems(new String[]{
+                        getString(R.string.analytics_action_view_details),
+                        getString(R.string.analytics_action_delete_session)},
+                        (dialog, which) -> {
                     if (which == 0) {
                         showSessionDetails(session);
                     } else if (which == 1) {
                         confirmDeleteSession(session);
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.analytics_cancel, null)
                 .show();
     }
 
@@ -935,13 +939,13 @@ public class AnalyticsFragment extends Fragment {
      */
     private void confirmDeleteSession(StudySessionWithStats session) {
         new AlertDialog.Builder(requireContext())
-                .setTitle("Delete Session")
-                .setMessage("Are you sure you want to delete this study session? This cannot be undone.")
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.analytics_delete_confirm_title)
+                .setMessage(R.string.analytics_delete_confirm_message)
+                .setPositiveButton(R.string.analytics_action_delete, (dialog, which) -> {
                     viewModel.deleteSession(session);
-                    Toast.makeText(getContext(), "Session deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.analytics_toast_deleted, Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.analytics_cancel, null)
                 .show();
     }
 
@@ -956,10 +960,10 @@ public class AnalyticsFragment extends Fragment {
         int minutes = totalMinutes % 60;
 
         if (hours > 0) {
-            return String.format(Locale.getDefault(), "%d hour%s %d min",
+            return getString(R.string.analytics_format_hours_mins_long,
                     hours, hours == 1 ? "" : "s", minutes);
         } else {
-            return String.format(Locale.getDefault(), "%d minutes", minutes);
+            return getString(R.string.analytics_format_mins_long, minutes);
         }
     }
 
