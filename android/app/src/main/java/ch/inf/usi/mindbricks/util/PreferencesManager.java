@@ -106,16 +106,16 @@ public class PreferencesManager {
         return preferences.getString(PreferencesKey.STUDY_OBJECTIVE.getName(), "");
     }
 
-    public void setStudyPlan(List<DayHours> plan) {
-        preferences.edit().putString(PreferencesKey.STUDY_PLAN_JSON.getName(), gson.toJson(plan)).apply();
-    }
-
     public boolean isStudyGoalSet() {
         return preferences.getBoolean(PreferencesKey.STUDY_GOAL_SET.getName(), false);
     }
 
     public void setStudyGoalSet(boolean isSet) {
         preferences.edit().putBoolean(PreferencesKey.STUDY_GOAL_SET.getName(), isSet).apply();
+    }
+
+    public void setStudyPlan(List<DayHours> plan) {
+        preferences.edit().putString(PreferencesKey.STUDY_PLAN_JSON.getName(), gson.toJson(plan)).apply();
     }
 
     public List<DayHours> getStudyPlan() {
