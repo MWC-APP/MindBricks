@@ -71,6 +71,7 @@ public class HomeViewModel extends AndroidViewModel {
     public final MutableLiveData<Long> showQuestionnaireEvent = new MutableLiveData<>();
 
     private final NotificationHelper notificationHelper;
+    private final PreferencesManager preferencesManager;
     private CountDownTimer timer;
     private int currentPomodoroStep = 0; // 1-4 for sessions in current cycle
     private long currentSessionId = -1;
@@ -79,6 +80,7 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(Application application) {
         super(application);
         this.notificationHelper = new NotificationHelper(application);
+        this.preferencesManager = new PreferencesManager(application);
     }
 
     /**
@@ -146,10 +148,9 @@ public class HomeViewModel extends AndroidViewModel {
             return;
         }
 
-        PreferencesManager prefs = new PreferencesManager(getApplication());
-        int studyDuration = prefs.getTimerStudyDuration();
-        int shortBreakDuration = prefs.getTimerShortPauseDuration();
-        int longBreakDuration = prefs.getTimerLongPauseDuration();
+        int studyDuration = preferencesManager.getTimerStudyDuration();
+        int shortBreakDuration = preferencesManager.getTimerShortPauseDuration();
+        int longBreakDuration = preferencesManager.getTimerLongPauseDuration();
 
         switch (phase) {
             case FOCUS:
@@ -385,9 +386,7 @@ public class HomeViewModel extends AndroidViewModel {
             // Set up for next study session but don't start it
             currentPhase.setValue(Phase.IDLE);
             nextPhase.setValue(Phase.FOCUS);
-
-            PreferencesManager prefs = new PreferencesManager(getApplication());
-            currentTime.setValue(TimeUnit.MINUTES.toMillis(prefs.getTimerStudyDuration()));
+            currentTime.setValue(TimeUnit.MINUTES.toMillis(preferencesManager.getTimerStudyDuration()));
         }
     }
 
