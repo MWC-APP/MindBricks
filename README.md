@@ -22,8 +22,14 @@ Here is the full list of the refactors I (@lucadibello) managed to do during in 
 - [x] Refactored `UserPreferences` into `UserPreferencesLoader`: now we return JSON objects instead of using multiple inner classes to represent the preferences (not flexible, if the JSON changes we need to change the entire class).
 - [x] Refactored `RecommendationEngine`: now using new `UserPreferencesLoader` to load user preferences, removed duplicated code, improved readability.
 - [x] Refactored `CalendarIntegrationEngine`: we removed this class, and integrated its functionality directly into the `RecommendationEngine` (it was only used there, no need for an extra layer of abstraction).
+- [x] Fixed ring chart in `AnalyticsFragment`: now highlighting today's sessions rather than yesterday's.
+- [x] `TagManager` class had two methods doing the same thing in different ways. I merged them into a single method.
+- [x] Solved bug in tags management: when adding a tag, we were not setting the correct ID to the POJO object, causing foreign key constraint exceptions when trying to save sessions with newly created tags.
+- [x] Solved bug where we the app was still referencing the previous tag ID after the user has selected a different tag for a session.
 
 - [] Adding `@author` tags to all classes to make it clear who did what
 - [] Added Javadocs to all classes, methods, fields, etc.
 
 > During this time span, I did not add any new feature to the app, just refactored existing code to improve its quality and maintainability, as well as removing some bugs/inconsistencies/messy code.
+
+> I used CoPilot to help me write javadoc comments (I always review them to ensure they are correct and make sense).
