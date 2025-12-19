@@ -543,6 +543,9 @@ public class CityView extends View {
         }
 
         // Calculate the center point of all fingers
+        // NOTE: I asked chatgpt what would be the best way to implement zoom+panning with multiple fingers
+        // and it suggested to compute the centroid of all fingers excluding the one that is lifting
+        // and I implemented it as suggested
         float sumX = 0, sumY = 0;
         int count = 0;
         for (int i = 0; i < event.getPointerCount(); i++) {
