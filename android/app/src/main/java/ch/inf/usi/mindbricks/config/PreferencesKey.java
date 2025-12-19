@@ -1,5 +1,10 @@
 package ch.inf.usi.mindbricks.config;
-
+/**
+ * Enumeration of keys used for storing and retrieving preferences in SharedPreferences.
+ *
+ * @author Luca Di Bello
+ * @author Loca0307
+ */
 public enum PreferencesKey {
     ONBOARDING_COMPLETE("onboarding_complete"),
     DARK_MODE_ENABLED("dark_mode_enabled"),

@@ -35,6 +35,9 @@ import ch.inf.usi.mindbricks.ui.settings.dialog.CalendarPermissionDialog;
 /**
  * Settings fragment for managing calendar integrations.
  *
+ 
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class SettingsCalendarFragment extends Fragment {
 

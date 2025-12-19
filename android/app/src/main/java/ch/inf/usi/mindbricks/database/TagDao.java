@@ -11,6 +11,11 @@ import java.util.List;
 
 import ch.inf.usi.mindbricks.model.Tag;
 
+/**
+ * interface class.
+ *
+ * @author Luca Di Bello
+ */
 @Dao
 public interface TagDao {
 

@@ -18,9 +18,9 @@ import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.visual.HeatmapCell;
 
 /**
- * Quality Heatmap:
- * Hour × Day grid showing study quality
- * -> Similar to GitHub contribution graph
+ * Custom view to display a quality heatmap chart.
+ *
+ * @author Marta Šafářová
  */
 public class QualityHeatmapChartView extends View {
 

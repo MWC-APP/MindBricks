@@ -14,7 +14,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import ch.inf.usi.mindbricks.R;
-
+/**
+ * Dialog fragment that allows the user to select an emotion from a grid of options.
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
+ * @author Luca Beltrami
+ */
 public class EmotionSelectDialogFragment extends DialogFragment {
 
     private OnEmotionSelectedListener listener;

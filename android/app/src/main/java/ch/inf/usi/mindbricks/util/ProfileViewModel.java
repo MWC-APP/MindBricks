@@ -9,6 +9,12 @@ import androidx.lifecycle.MutableLiveData;
 
 import ch.inf.usi.mindbricks.BuildConfig;
 import ch.inf.usi.mindbricks.config.PreferencesKey;
+/**
+ * ViewModel for managing user profile data, specifically coin balance.
+ *
+ * @author Luca Di Bello
+ * @author Luca Beltrami
+ */
 
 public class ProfileViewModel extends AndroidViewModel {
 

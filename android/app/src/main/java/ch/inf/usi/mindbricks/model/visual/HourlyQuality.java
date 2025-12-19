@@ -1,7 +1,9 @@
 package ch.inf.usi.mindbricks.model.visual;
 
-/*
+/**
  * Represents average study quality for a specific hour of the day
+ *
+ * @author Marta Šafářová
  */
 public class HourlyQuality {
     private int hour;           // 0-23

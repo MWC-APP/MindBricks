@@ -5,6 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Class representing the state of a tile-based world (grid of tiles).
+ * @author Luca Di Bello
+ */
 public class TileWorldState {
 
     /**

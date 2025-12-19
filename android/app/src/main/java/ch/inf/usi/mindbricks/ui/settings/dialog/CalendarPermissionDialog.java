@@ -23,6 +23,8 @@ import ch.inf.usi.mindbricks.R;
 
 /**
  * Dialog that explains why calendar permission is needed before requesting it.
+ *
+ * @author Marta Šafářová
  */
 public class CalendarPermissionDialog extends DialogFragment {
 

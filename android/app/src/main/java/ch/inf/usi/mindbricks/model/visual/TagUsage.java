@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 /**
  * Represents tag usage statistics for pie chart visualization
+ *
+ * @author Marta Šafářová
  */
 public class TagUsage implements Comparable<TagUsage> {
 

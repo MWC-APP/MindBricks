@@ -16,8 +16,6 @@ import ch.inf.usi.mindbricks.util.questionnaire.ProductivityQuestionnaireResult;
  * Entity representing a post-session questionnaire filled by the user (emotion and perceived productivity)
  *
  * @author Marta Šafářová
- * <p>
- * Refactored by:
  * @author Luca Di Bello
  */
 @Entity(tableName = "session_questionnaires",

@@ -29,6 +29,8 @@ import ch.inf.usi.mindbricks.model.visual.TimeSlotStats;
 /**
  * Custom view that displays hourly study distribution.
  *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class HourlyDistributionChartView extends LinearLayout {
 

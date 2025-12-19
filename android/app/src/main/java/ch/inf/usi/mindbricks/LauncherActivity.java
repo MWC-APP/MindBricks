@@ -9,6 +9,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import ch.inf.usi.mindbricks.ui.onboarding.OnboardingActivity;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
 
+/**
+ * Launcher activity that decides which activity to load at app start:
+ * - OnboardingActivity if onboarding is not complete
+ * - MainActivity if onboarding is complete
+ *
+ * @author Luca Di Bello
+ */
 public class LauncherActivity extends AppCompatActivity {
 
     @Override

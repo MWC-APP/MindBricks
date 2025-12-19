@@ -10,6 +10,11 @@ import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingNotificationsFragment;
 import ch.inf.usi.mindbricks.ui.onboarding.page.sensors.OnboardingSensorsFragment;
 import ch.inf.usi.mindbricks.ui.onboarding.page.OnboardingUserFragment;
 
+/**
+ * Pager adapter for the onboarding, managing the different onboarding fragments.
+ *
+ * @author Luca Di Bello
+ */
 public class OnboardingPagerAdapter extends FragmentStateAdapter {
 
     public OnboardingPagerAdapter(@NonNull FragmentActivity fa) {

@@ -14,11 +14,13 @@ import ch.inf.usi.mindbricks.model.visual.StudySession;
 
 /**
  * PAM (Pleasure-Arousal-Motivation) Score Model
- *
+ * <p>
  * Based on research showing that affect has three independent dimensions:
  * - Pleasure: Satisfaction and enjoyment (hedonic state)
  * - Arousal: Energy and alertness (activation state)
  * - Motivation: Willingness to continue (persistence state)
+ *
+ * @author Marta Šafářová
  */
 @Entity(tableName = "pam_scores",
         foreignKeys = {

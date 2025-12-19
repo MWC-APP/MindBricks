@@ -1,5 +1,10 @@
 package ch.inf.usi.mindbricks.model.visual;
 
+/**
+ * Data model for a single cell in the heatmap visualization.
+ *
+ * @author Marta
+ */
 public class HeatmapCell {
     private int year;
     private int month;          // 0-11 (Calendar.MONTH)

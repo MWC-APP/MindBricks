@@ -9,13 +9,15 @@ import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
 
 /**
  * Interface for calendar data providers
- *
+ * <p>
  * Each calendar source (Google Calendar, device calendar, iCal, etc.)
  * implements this interface. This allows:
- *
+ * <p>
  * - Adding new calendar sources without modifying existing code
  * - Consistent API for the CalendarSyncService to work with
  * - Each driver encapsulates its own authentication and API logic
+ *
+ * @author Marta Šafářová
  */
 public interface CalendarDriver {
 

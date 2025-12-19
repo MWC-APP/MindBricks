@@ -22,6 +22,9 @@ import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 
 /**
  * Adapter for displaying study session history in a RecyclerView.
+ 
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class SessionHistoryAdapter extends RecyclerView.Adapter<SessionHistoryAdapter.SessionViewHolder> {
 

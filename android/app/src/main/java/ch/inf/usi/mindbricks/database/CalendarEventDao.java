@@ -13,6 +13,11 @@ import java.util.List;
 import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
 
 
+/**
+ * Data Access Object (DAO) for calendar events in the local database.
+ *
+ * @author Marta Šafářová
+ */
 @Dao
 public interface CalendarEventDao {
     @Insert

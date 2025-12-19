@@ -9,6 +9,13 @@ import java.util.List;
 
 import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
 
+
+/**
+ * Data Access Object for SessionSensorLog entities
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
+ */
 @Dao
 public interface SessionSensorLogDao {
 

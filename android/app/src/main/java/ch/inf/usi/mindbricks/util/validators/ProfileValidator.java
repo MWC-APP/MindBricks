@@ -11,6 +11,9 @@ import ch.inf.usi.mindbricks.util.ValidationResult;
 /**
  * Utility class that provides validation rules for user profile
  * data (name, tags) for reusability across the application
+ *
+ * @author Luca Di Bello
+ * @author Luca Beltrami
  */
 public final class ProfileValidator {
 

@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey;
 
 /**
  * Room entity representing a calendar event fetched from an external calendar provider.
+ *
+ * @author Marta Šafářová
  */
 @Entity(
         tableName = "calendar_events",

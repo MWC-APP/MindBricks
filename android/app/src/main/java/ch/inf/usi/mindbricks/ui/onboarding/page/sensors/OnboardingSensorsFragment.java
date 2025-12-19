@@ -18,6 +18,11 @@ import ch.inf.usi.mindbricks.drivers.LightSensor;
 import ch.inf.usi.mindbricks.drivers.SignificantMotionSensor;
 import ch.inf.usi.mindbricks.ui.onboarding.OnboardingStepValidator;
 
+/**
+ * Fragment for the onboarding step that informs the user about the sensors used by the app.
+ *
+ * @author Luca Di Bello
+ */
 public class OnboardingSensorsFragment extends Fragment implements OnboardingStepValidator {
 
     @Nullable

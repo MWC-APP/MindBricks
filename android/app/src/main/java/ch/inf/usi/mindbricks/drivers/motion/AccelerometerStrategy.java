@@ -9,6 +9,12 @@ import android.hardware.SensorManager;
 import ch.inf.usi.mindbricks.drivers.base.BaseSensor;
 import ch.inf.usi.mindbricks.drivers.base.MotionListener;
 
+/**
+ * Sensor strategy using the accelerometer to detect significant motion events.
+ * (strategy pattern)
+ *
+ * @author Luca Di Bello
+ */
 public class AccelerometerStrategy extends BaseSensor implements MotionSensorStrategy, SensorEventListener {
     private final static double SIGNIFICANT_MOTION_THRESHOLD_MS = 2.0;
     private final SensorManager sensorManager;

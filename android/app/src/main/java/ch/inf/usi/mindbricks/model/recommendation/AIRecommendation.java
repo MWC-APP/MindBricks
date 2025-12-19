@@ -11,6 +11,7 @@ import ch.inf.usi.mindbricks.R;
  * Model class that represents an AI-generated daily schedule.
  *
  * @author Marta Šafářová
+ * @author Luca Di Bello (refactor)
  */
 public class AIRecommendation extends DailyRecommendation{
     private final List<ActivityBlock> activityBlocks;

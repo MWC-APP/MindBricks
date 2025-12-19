@@ -2,6 +2,12 @@ package ch.inf.usi.mindbricks.drivers.motion;
 
 import ch.inf.usi.mindbricks.drivers.base.MotionListener;
 
+/**
+ * Strategy interface for motion sensor handling.
+ * (strategy pattern)
+ *
+ * @author Luca Di Bello
+ */
 public interface MotionSensorStrategy {
     /**
      * Check if the sensor is available on the device.

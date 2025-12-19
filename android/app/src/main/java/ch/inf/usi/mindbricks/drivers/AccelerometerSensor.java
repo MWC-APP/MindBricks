@@ -10,6 +10,11 @@ import android.util.Log;
 import ch.inf.usi.mindbricks.drivers.base.BaseSensor;
 import ch.inf.usi.mindbricks.drivers.base.OrientationListener;
 
+/**
+ * Accelerometer sensor handler with orientation awareness (face up / face down).
+ *
+ * @author Luca Di Bello
+ */
 public class AccelerometerSensor extends BaseSensor implements SensorEventListener {
 
     private static final String TAG = "AccelerometerSensor";
@@ -55,9 +60,11 @@ public class AccelerometerSensor extends BaseSensor implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
         float z = event.values[2];
+
         // trivial check:
         // - when phone facing up: z ~= gravity (9.81)
         // - if z is in range: [gravity - THRESHOLD; gravity + THRESHOLD] then we know it's facing upward!
+        // NOTE: the threshold was selected via experimental trials
         boolean isFaceUp = z > SensorManager.GRAVITY_EARTH - FACE_UP_THRESHOLD
                 && z < SensorManager.GRAVITY_EARTH + FACE_UP_THRESHOLD;
 

@@ -23,7 +23,12 @@ import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.model.visual.TagUsage;
-
+/**
+ * Custom view to display a pie chart of tag usage statistics.
+ *
+ * @author Luca Di Bello
+ * @author Marta
+ */
 public class TagUsageChartView extends LinearLayout {
 
     private TextView summaryText;

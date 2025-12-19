@@ -11,6 +11,12 @@ import java.util.List;
 
 import ch.inf.usi.mindbricks.model.questionnare.SessionQuestionnaire;
 
+/**
+ * Data Access Object for SessionQuestionnaire entities in the database.
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
+ */
 @Dao
 public interface SessionQuestionnaireDao {
 

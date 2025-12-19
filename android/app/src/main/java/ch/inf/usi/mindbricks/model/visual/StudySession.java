@@ -10,6 +10,9 @@ import ch.inf.usi.mindbricks.model.Tag;
 
 /**
  * Model representing a completed study session with metrics
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 @Entity(tableName = "study_sessions",
         foreignKeys = @ForeignKey(

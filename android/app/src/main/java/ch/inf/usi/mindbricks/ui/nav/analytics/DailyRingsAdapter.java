@@ -17,6 +17,8 @@ import ch.inf.usi.mindbricks.ui.charts.GoalRingsView;
 
 /**
  * Adapter for horizontal scrolling list of previous days (excludes today)
+ *
+ * @author Marta Šafářová
  */
 public class DailyRingsAdapter extends ListAdapter<DailyRings, DailyRingsAdapter.CompactViewHolder> {
 

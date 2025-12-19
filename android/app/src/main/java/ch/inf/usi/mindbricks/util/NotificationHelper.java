@@ -16,6 +16,7 @@ import ch.inf.usi.mindbricks.R;
  * Helper class for managing notifications.
  *
  * @author Luca Beltrami
+ * @author Luca Di Bello
  */
 public class NotificationHelper {
 

@@ -36,6 +36,9 @@ import ch.inf.usi.mindbricks.util.evaluation.RecommendationEngine;
 
 /**
  * ViewModel for Analytics screen.
+ *
+ * @author Marta Šafářová
+ * @author Luca Di Bello (refactor)
  */
 public class AnalyticsViewModel extends AndroidViewModel {
     private static final String TAG = "AnalyticsViewModel";

@@ -4,6 +4,8 @@ import java.util.Locale;
 
 /**
  * Utility class for formatting hours.
+ *
+ * @author Luca Di Bello
  */
 public final class Hours {
 

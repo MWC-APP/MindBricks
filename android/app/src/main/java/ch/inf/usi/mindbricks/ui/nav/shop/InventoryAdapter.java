@@ -19,6 +19,8 @@ import ch.inf.usi.mindbricks.game.TileBitmapLoader;
 
 /**
  * Adapter for displaying inventory items in a RecyclerView.
+ *
+ * @author Luca Di Bello
  */
 public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder> {
 

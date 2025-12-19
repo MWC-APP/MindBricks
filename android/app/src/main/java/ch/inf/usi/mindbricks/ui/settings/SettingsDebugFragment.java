@@ -27,8 +27,6 @@ import ch.inf.usi.mindbricks.util.questionnaire.ProductivityQuestionnaireResult;
  * Debug settings fragment for development and testing purposes.
  *
  * @author Marta Šafářová
- * <p>
- * Refactored by:
  * @author Luca Di Bello
  */
 public class SettingsDebugFragment extends Fragment {

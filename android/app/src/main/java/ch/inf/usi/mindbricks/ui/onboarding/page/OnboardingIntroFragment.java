@@ -11,6 +11,11 @@ import androidx.fragment.app.Fragment;
 
 import ch.inf.usi.mindbricks.R;
 
+/**
+ * Fragment for the onboarding introduction screen.
+ *
+ * @author Luca Di Bello
+ */
 public class OnboardingIntroFragment extends Fragment {
 
     @Nullable

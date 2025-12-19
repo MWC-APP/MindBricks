@@ -30,6 +30,9 @@ import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
 
 /**
  * Custom view that displays weekly study statistics as a bar chart.
+ 
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class WeeklyFocusChartView extends LinearLayout {
 

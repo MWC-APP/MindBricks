@@ -2,6 +2,8 @@ package ch.inf.usi.mindbricks.ui.onboarding;
 
 /**
  * Interface implemented by onboarding fragments to ensure each step is valid.
+ *
+ * @author Luca Di Bello
  */
 public interface OnboardingStepValidator {
 

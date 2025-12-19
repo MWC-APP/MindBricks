@@ -9,6 +9,11 @@ import android.util.Log;
 
 import ch.inf.usi.mindbricks.drivers.base.BaseSensor;
 
+/**
+ * Light sensor handler with orientation awareness (face up / face down).
+ *
+ * @author Luca Di Bello
+ */
 public class LightSensor extends BaseSensor implements SensorEventListener {
 
     private static final String TAG = "LightSensor";

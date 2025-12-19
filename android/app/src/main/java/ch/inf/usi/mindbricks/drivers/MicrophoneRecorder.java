@@ -8,6 +8,11 @@ import android.util.Log;
 
 import androidx.annotation.RequiresPermission;
 
+/**
+ * Class to record audio from the microphone and compute the current amplitude (RMS).
+ *
+ * @author Luca Di Bello
+ */
 public class MicrophoneRecorder {
     private static final String LOG_TAG = "Recorder";
     private static final int SAMPLE_RATE = 44100;

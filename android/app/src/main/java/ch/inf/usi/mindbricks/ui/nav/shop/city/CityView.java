@@ -25,7 +25,13 @@ import ch.inf.usi.mindbricks.game.TileBitmapLoader;
 import ch.inf.usi.mindbricks.game.TilePlacement;
 import ch.inf.usi.mindbricks.game.TileWorldState;
 
-public class IsometricCityView extends View {
+/**
+ * Custom view to display and interact with the tile-based city grid.
+ *
+ * @author Luca Di Bello
+ * @author Luca Beltrami
+ */
+public class CityView extends View {
 
     /**
      * Paint object for drawing grid outlines.
@@ -170,7 +176,7 @@ public class IsometricCityView extends View {
      * @param context Context of the view
      * @param attrs Attribute set from XML
      */
-    public IsometricCityView(Context context, AttributeSet attrs) {
+    public CityView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         // set up paint for grid outline
@@ -351,7 +357,7 @@ public class IsometricCityView extends View {
         // get base tile bitmap
         Bitmap baseTile = resolveBaseBitmap();
         if (baseTile == null) {
-            Log.e("IsometricCityView", "Base tile ID '" + worldState.getBaseTileId() + "' could not be resolved. Impossible to draw base tile.");
+            Log.e("CityView", "Base tile ID '" + worldState.getBaseTileId() + "' could not be resolved. Impossible to draw base tile.");
         }
 
         // Determine drop zone bounds if dragging

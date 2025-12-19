@@ -13,6 +13,8 @@ import ch.inf.usi.mindbricks.drivers.motion.SignificantMotionStrategy;
  * If the current device does not support Significant Motion, it will fall back to
  * Accelerometer (simpler logic: if the recorded acceleration magnitude is greater than a given
  * threshold, it is considered as a significant motion).
+ *
+ * @author Luca Di Bello
  */
 public class SignificantMotionSensor {
 

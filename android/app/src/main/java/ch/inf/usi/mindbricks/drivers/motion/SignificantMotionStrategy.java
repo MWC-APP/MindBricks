@@ -9,6 +9,12 @@ import android.util.Log;
 
 import ch.inf.usi.mindbricks.drivers.base.BaseSensor;
 import ch.inf.usi.mindbricks.drivers.base.MotionListener;
+/**
+ * Strategy for detecting significant motion using the device's significant motion sensor.
+ * (strategy pattern)
+ *
+ * @author Luca Di Bello
+ */
 
 public class SignificantMotionStrategy extends BaseSensor implements MotionSensorStrategy {
     private static final String TAG = "SignificantMotionStrategy";

@@ -21,6 +21,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import ch.inf.usi.mindbricks.R;
 
+/**
+ * Fragment for the onboarding step that requests notification permissions.
+ *
+ * @author Luca Di Bello
+ */
 public class OnboardingNotificationsFragment extends Fragment {
 
     private MaterialButton button;

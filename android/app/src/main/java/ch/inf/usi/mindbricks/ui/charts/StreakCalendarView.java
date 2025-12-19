@@ -21,6 +21,8 @@ import ch.inf.usi.mindbricks.model.visual.StreakDay;
 
 /**
  * Monthly calendar showing study streaks
+ *
+ * @author Marta Šafářová
  */
 public class StreakCalendarView extends View {
     private OnMonthChangeListener monthChangeListener;

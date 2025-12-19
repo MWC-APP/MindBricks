@@ -2,7 +2,11 @@ package ch.inf.usi.mindbricks.util;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-
+/**
+ * Sound player utility class.
+ *
+ * @author Luca Beltrami
+ */
 public final class SoundPlayer {
 
     private static MediaPlayer mediaPlayer;

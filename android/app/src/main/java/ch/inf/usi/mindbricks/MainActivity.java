@@ -11,6 +11,13 @@ import androidx.navigation.ui.NavigationUI;
 import ch.inf.usi.mindbricks.databinding.ActivityMainBinding;
 import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
 
+/**
+ * Main activity that hosts the navigation component.
+ *
+ * @author Luca Di Bello
+ * @author Luca Beltrami
+ * @author Marta Šafářová
+ */
 public class MainActivity extends AppCompatActivity implements NavigationLocker {
 
     private ActivityMainBinding binding;

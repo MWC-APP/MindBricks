@@ -7,6 +7,9 @@ import java.util.Locale;
 /**
  * Model representing statistics for a specific time slot (hour of day).
  * Used for hourly distribution analysis.
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 @SuppressWarnings("unused")
 public class TimeSlotStats {

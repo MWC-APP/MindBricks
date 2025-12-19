@@ -34,6 +34,13 @@ import ch.inf.usi.mindbricks.ui.nav.NavigationLocker;
 import ch.inf.usi.mindbricks.ui.nav.home.helper.HomeFragmentHelper;
 import ch.inf.usi.mindbricks.ui.settings.SettingsActivity;
 
+/**
+ * Home fragment that displays the study timer and controls.
+ *
+ * @author Luca Di Bello
+ * @author Marta
+ * @author Luca Beltrami
+ */
 public class HomeFragment extends HomeFragmentHelper {
 
     private TextView timerTextView;

@@ -16,6 +16,9 @@ import ch.inf.usi.mindbricks.model.recommendation.DailyRecommendation;
 
 /**
  * Custom view that displays recommended study times for the day
+ 
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class DailyTimelineChartView extends LinearLayout {
 

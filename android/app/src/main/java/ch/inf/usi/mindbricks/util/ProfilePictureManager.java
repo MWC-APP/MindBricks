@@ -29,6 +29,8 @@ import ch.inf.usi.mindbricks.R;
 /**
  * Utility class to manage profile picture (selection, camera, and display).
  * NOTE: Handles both custom photos and DiceBear avatars.
+ *
+ * @author Luca Di Bello
  */
 public class ProfilePictureManager {
 

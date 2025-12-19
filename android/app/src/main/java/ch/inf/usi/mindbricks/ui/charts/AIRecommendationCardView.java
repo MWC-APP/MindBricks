@@ -32,7 +32,10 @@ import ch.inf.usi.mindbricks.model.recommendation.ActivityType;
 
 
 /**
- * Card de
+ * Custom View to display the generated schedule recommendations as a stacked bar chart.
+ *
+ * @author Marta Šafářová
+ * @author Luca Di Bello (refactor)
  */
 public class AIRecommendationCardView extends View {
     public static final float COLOR_DARKEN_FACTOR = 0.3f;

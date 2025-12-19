@@ -34,6 +34,8 @@ import ch.inf.usi.mindbricks.model.visual.SessionSensorLog;
  * Foreground service for monitoring focus session.
  *
  * @author Luca Di Bello
+ * @author Marta Šafářová
+ * @author Luca Beltrami
  */
 public class SensorService extends Service {
 

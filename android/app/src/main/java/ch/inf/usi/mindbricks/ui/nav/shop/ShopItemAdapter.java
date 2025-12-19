@@ -15,7 +15,12 @@ import java.util.List;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.game.TileAsset;
 import ch.inf.usi.mindbricks.game.TileBitmapLoader;
-
+/**
+ * Adapter for displaying shop items in a RecyclerView.
+ *
+ * @author Luca Di Bello
+ * @author Luca Beltrami
+ */
 public class ShopItemAdapter extends RecyclerView.Adapter<ShopItemAdapter.ShopItemViewHolder> {
 
     private final List<TileAsset> items;

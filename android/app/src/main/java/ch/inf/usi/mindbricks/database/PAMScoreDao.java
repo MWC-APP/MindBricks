@@ -9,6 +9,11 @@ import java.util.List;
 
 import ch.inf.usi.mindbricks.model.evaluation.PAMScore;
 
+/**
+ * Data Access Object for PAMScore entities in the database.
+ *
+ * @author Marta Šafářová
+ */
 @Dao
 public interface PAMScoreDao {
 

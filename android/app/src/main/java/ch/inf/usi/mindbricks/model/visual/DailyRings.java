@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * Represents goal rings data for a single day
+ *
+ * @author Marta
  */
 public class DailyRings {
     private LocalDate date;

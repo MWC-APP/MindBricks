@@ -10,6 +10,10 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * View model for the city building tile game.
+ * @author Luca Di Bello
+ */
 public class TileGameViewModel extends AndroidViewModel {
 
     /**

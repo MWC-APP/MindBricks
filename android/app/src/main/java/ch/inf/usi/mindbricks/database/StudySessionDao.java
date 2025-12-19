@@ -14,6 +14,9 @@ import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 
 /**
  * Data Access Object for StudySession entities
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 @Dao
 public interface StudySessionDao {

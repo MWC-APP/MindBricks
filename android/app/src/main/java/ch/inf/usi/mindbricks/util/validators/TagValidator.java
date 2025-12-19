@@ -10,6 +10,8 @@ import ch.inf.usi.mindbricks.util.ValidationResult;
 
 /**
  * Validation rules for user-defined tags (titles).
+ *
+ * @author Luca Di Bello
  */
 public final class TagValidator {
 

@@ -23,7 +23,12 @@ import ch.inf.usi.mindbricks.game.TileWorldState;
 import ch.inf.usi.mindbricks.model.Tag;
 import ch.inf.usi.mindbricks.model.plan.DayHours;
 import ch.inf.usi.mindbricks.model.plan.DayKey;
-
+/**
+ * Manager class for handling application preferences using SharedPreferences.
+ *
+ * @author Luca Di Bello
+ * @author Luca Beltrami
+ */
 public class PreferencesManager {
 
     private static final String PREFS_NAME = "MindBricks-Preferences";

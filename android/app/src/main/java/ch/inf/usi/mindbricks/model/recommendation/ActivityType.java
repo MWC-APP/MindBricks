@@ -3,7 +3,11 @@ package ch.inf.usi.mindbricks.model.recommendation;
 import android.content.Context;
 
 import ch.inf.usi.mindbricks.R;
-
+/**
+ * Enum representing different types of activities in a daily schedule.
+ *
+ * @author Marta Šafářová
+ */
 public enum ActivityType {
     DEEP_STUDY("Deep Study", R.color.activity_deep_study),
     LIGHT_STUDY("Light Study", R.color.activity_light_study),

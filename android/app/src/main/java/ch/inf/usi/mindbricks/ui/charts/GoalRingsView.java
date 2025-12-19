@@ -20,6 +20,8 @@ import ch.inf.usi.mindbricks.model.visual.GoalRing;
 /**
  * Apple Activity Rings style visualization for daily goals
  * Updated to clearly display daily targets in legend
+ *
+ * @author Marta Šafářová
  */
 public class GoalRingsView extends View {
 

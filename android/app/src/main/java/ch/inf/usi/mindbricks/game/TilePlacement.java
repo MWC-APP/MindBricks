@@ -2,6 +2,8 @@ package ch.inf.usi.mindbricks.game;
 
 /**
  * Represents the placement of a tile in the tile world.
+ 
+ * @author Luca Di Bello
  */
 public class TilePlacement {
     /**

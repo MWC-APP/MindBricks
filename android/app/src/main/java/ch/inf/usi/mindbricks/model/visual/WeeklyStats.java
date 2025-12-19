@@ -3,6 +3,9 @@ package ch.inf.usi.mindbricks.model.visual;
 /**
  * Model representing weekly study statistics.
  * Contains aggregated data for 7 days (Monday-Sunday).
+ 
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class WeeklyStats {
 

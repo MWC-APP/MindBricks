@@ -17,6 +17,8 @@ import java.util.Set;
 
 /**
  * Tile asset loader to load available tile assets from the assets folder.
+ 
+ * @author Luca Di Bello
  */
 public class TileAssetLoader {
 

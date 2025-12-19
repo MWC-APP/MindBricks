@@ -3,6 +3,11 @@ package ch.inf.usi.mindbricks.model;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+/**
+ * Model class representing a Tag entity in the database.
+ *
+ * @author Luca Di Bello
+ */
 @Entity(tableName = "tags")
 public class Tag {
 

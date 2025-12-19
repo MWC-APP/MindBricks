@@ -20,7 +20,8 @@ import ch.inf.usi.mindbricks.util.questionnaire.ProductivityQuestionnaireResult;
  * Utility to generate test data for the database.
  * Creates realistic study sessions with sensor logs and questionnaires for testing.
  * <p>
- * DISCLAIMER: Originally created by Marta, but way too complex. Most of the stuff was not needed.
+ * @author Luca Di Bello
+ * @author Marta
  */
 public class TestDataGenerator {
 

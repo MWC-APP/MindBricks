@@ -9,7 +9,12 @@ import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
 
-// Minimal Glide module (Glide was throwing errors in the log!)
+/**
+ * Minimal Glide module to configure Glide settings.
+ * (Glide was throwing errors in the log!)
+ *
+ * @author Luca Di Bello
+ */
 @GlideModule
 public class MindBricksGlideModule extends AppGlideModule {
 

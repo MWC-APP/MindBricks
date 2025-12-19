@@ -23,6 +23,11 @@ import ch.inf.usi.mindbricks.util.ProfilePictureManager;
 import ch.inf.usi.mindbricks.util.TagManager;
 import ch.inf.usi.mindbricks.util.ValidationResult;
 import ch.inf.usi.mindbricks.util.validators.ProfileValidator;
+/**
+ * Fragment for user profile settings.
+ *
+ * @author Luca Di Bello
+ */
 
 public class SettingsProfileFragment extends Fragment {
 

@@ -31,8 +31,7 @@ import ch.inf.usi.mindbricks.util.database.DataProcessor;
  * number of study hours based on the user's study plan.
  *
  * @author Marta Šafářová
- * Refactored by
- * @author Luca Di Bello
+ * @author Luca Di Bello (refactor)
  */
 public class RecommendationEngine {
 

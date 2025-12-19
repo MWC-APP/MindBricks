@@ -59,6 +59,9 @@ import ch.inf.usi.mindbricks.util.database.DataProcessor;
 /**
  * Fragment that displays analytics and visualizations of study sessions.
  *
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class AnalyticsFragment extends Fragment {
     private static final String TAG = "AnalyticsFragment";

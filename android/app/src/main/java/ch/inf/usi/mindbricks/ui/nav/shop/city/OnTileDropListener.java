@@ -2,6 +2,8 @@ package ch.inf.usi.mindbricks.ui.nav.shop.city;
 
 /**
  * Listener interface for handling tile drop events on the city grid.
+ *
+ * @author Luca Di Bello
  */
 public interface OnTileDropListener {
     /**

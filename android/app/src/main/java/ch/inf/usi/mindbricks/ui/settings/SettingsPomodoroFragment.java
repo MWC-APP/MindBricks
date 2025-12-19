@@ -17,6 +17,12 @@ import java.util.Locale;
 
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.PreferencesManager;
+/**
+ * Fragment for the Pomodoro timer settings.
+ *
+ * @author Luca Di Bello
+ * @author Luca Beltrami
+ */
 
 public class SettingsPomodoroFragment extends Fragment {
 

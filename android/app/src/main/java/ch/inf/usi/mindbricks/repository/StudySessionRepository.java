@@ -21,8 +21,10 @@ import ch.inf.usi.mindbricks.model.visual.StudySession;
 import ch.inf.usi.mindbricks.model.visual.StudySessionWithStats;
 
 /**
- * Repository class that provides a clean API for data access.
- * This abstracts the database from the rest of the app.
+ * Repository class for managing study sessions and their associated data.
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class StudySessionRepository {
     private final StudySessionDao studySessionDao;

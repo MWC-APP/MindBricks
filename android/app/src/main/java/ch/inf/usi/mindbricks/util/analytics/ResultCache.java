@@ -17,6 +17,7 @@ import ch.inf.usi.mindbricks.model.visual.WeeklyStats;
  * Analytics result cache to avoid recomputing the same data multiple times.
  *
  * @author Marta Šafářová
+ * @author Luca Di Bello
  */
 public class ResultCache {
     final int sessionsHash;

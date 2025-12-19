@@ -17,18 +17,18 @@ import java.util.concurrent.Executors;
 import ch.inf.usi.mindbricks.drivers.calendar.CalendarDriver;
 import ch.inf.usi.mindbricks.drivers.calendar.DeviceCalendarDriver;
 import ch.inf.usi.mindbricks.repository.CalendarRepository;
-import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
 
 
 /**
  * Service that orchestrates calendar synchronization.
- *
+ * <p>
  * - Manages registered CalendarDriver instances
  * - Coordinates sync operations between drivers and repository
  * - Tracks sync status and last sync times
  * - Provides a clean API for the rest of the app
+ *
+ * @author Marta Šafářová
  */
-
 public class CalendarSyncService {
 
     private static final String TAG = "CalendarSyncService";

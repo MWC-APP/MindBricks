@@ -2,6 +2,8 @@ package ch.inf.usi.mindbricks.model.visual;
 
 /**
  * Represents a single day in the streak calendar
+
+ * @author Marta Šafářová
  */
 public class StreakDay {
     private int dayOfMonth;         // 1-31

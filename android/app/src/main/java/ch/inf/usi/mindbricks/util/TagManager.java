@@ -27,6 +27,8 @@ import ch.inf.usi.mindbricks.util.validators.TagValidator;
 
 /**
  * Utility class to manage tag creation, display, and deletion.
+ *
+ * @author Luca Di Bello
  */
 public class TagManager {
 

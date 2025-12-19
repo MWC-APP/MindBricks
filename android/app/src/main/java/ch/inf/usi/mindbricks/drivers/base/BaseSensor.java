@@ -4,6 +4,11 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
+/**
+ * Base class for sensor handlers.
+ *
+ * @author Luca Di Bello
+ */
 public class BaseSensor {
 
     protected final SensorManager sensorManager;

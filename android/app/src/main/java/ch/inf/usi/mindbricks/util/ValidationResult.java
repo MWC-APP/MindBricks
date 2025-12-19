@@ -4,6 +4,9 @@ import androidx.annotation.Nullable;
 
 /**
  * Record class that wraps validation results for easier management.
+ 
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public record ValidationResult(boolean isValid, @Nullable String msg) {
     public static ValidationResult ok() {

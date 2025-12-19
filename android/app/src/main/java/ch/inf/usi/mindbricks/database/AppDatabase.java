@@ -18,8 +18,7 @@ import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
  * Room database for MindBricks app
  *
  * @author Marta Šafářová
- * Refactored by
- * @author Luca Di Bello
+ * @author Luca Di Bello (refactor)
  */
 @Database(entities = {
         StudySession.class,

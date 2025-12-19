@@ -4,6 +4,12 @@ import androidx.room.Embedded;
 
 import java.util.Calendar;
 
+/**
+ * Model class representing a study session along with its associated statistics.
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
+ */
 public class StudySessionWithStats {
     @Embedded
     public StudySession session;

@@ -10,6 +10,7 @@ import java.util.List;
  * Contains suggested time slots and reasoning based on historical performance.
  *
  * @author Marta Šafářová
+ * @author Luca Di Bello
  */
 public class DailyRecommendation {
 

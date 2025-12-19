@@ -6,6 +6,8 @@ import java.util.concurrent.Executors;
 /**
  * Singleton class for managing background tasks. Using a singleton allows to ensure only one
  * Executor is used throughout the application.
+ *
+ * @author Luca Di Bello
  */
 public class AppExecutor {
 

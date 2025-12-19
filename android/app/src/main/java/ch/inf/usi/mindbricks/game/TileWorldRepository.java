@@ -8,6 +8,8 @@ import ch.inf.usi.mindbricks.util.PreferencesManager;
 
 /**
  * Repository class for managing the tile world state persistence.
+ 
+ * @author Luca Di Bello
  */
 public class TileWorldRepository {
 

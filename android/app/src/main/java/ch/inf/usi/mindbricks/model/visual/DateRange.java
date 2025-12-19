@@ -6,7 +6,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
-
+/**
+ * Class representing a date range with various predefined types and utility methods.
+ *
+ * @author Marta Šafářová
+ */
 public class DateRange {
     public enum RangeType {
         LAST_N_DAYS,

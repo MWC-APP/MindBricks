@@ -26,6 +26,8 @@ import ch.inf.usi.mindbricks.util.PreferencesManager;
 
 /**
  * Fragment for the study plan settings.
+ *
+ * @author Luca Di Bello
  */
 public class SettingsStudyPlanFragment extends Fragment {
 

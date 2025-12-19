@@ -36,12 +36,18 @@ import ch.inf.usi.mindbricks.game.TileBitmapLoader;
 import ch.inf.usi.mindbricks.game.TileGameViewModel;
 import ch.inf.usi.mindbricks.game.TilePlacement;
 import ch.inf.usi.mindbricks.game.TileType;
-import ch.inf.usi.mindbricks.ui.nav.shop.city.IsometricCityView;
+import ch.inf.usi.mindbricks.ui.nav.shop.city.CityView;
 import ch.inf.usi.mindbricks.util.ProfileViewModel;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
 import ch.inf.usi.mindbricks.util.VibrationHelper;
 
-public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyClickListener, IsometricCityView.OnBuildingClickListener {
+/**
+ * Fragment representing the shop interface for purchasing and placing tiles.
+ *
+ * @author Luca Di Bello
+ * @author Luca Beltrami
+ */
+public class ShopFragment extends Fragment implements ShopItemAdapter.OnItemBuyClickListener, CityView.OnBuildingClickListener {
 
     /**
      * View binding for the fragment layout.

@@ -21,6 +21,8 @@ import ch.inf.usi.mindbricks.model.visual.calendar.CalendarEvent;
 /**
  * CalendarDriver implementation that reads from the Android device's
  * built-in Calendar Provider (CalendarContract).
+ *
+ * @author Marta Šafářová
  */
 public class DeviceCalendarDriver implements CalendarDriver {
 

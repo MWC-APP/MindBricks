@@ -34,7 +34,7 @@ import ch.inf.usi.mindbricks.util.VibrationHelper;
  *
  * @author Luca Di Bello
  * @author Marta Šafářová
- * @author Luca Berami
+ * @author Luca Beltrami
  */
 public class HomeViewModel extends AndroidViewModel {
 

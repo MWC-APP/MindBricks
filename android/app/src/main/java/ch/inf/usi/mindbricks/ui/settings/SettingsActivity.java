@@ -25,7 +25,13 @@ import ch.inf.usi.mindbricks.drivers.calendar.CalendarDriver;
 import ch.inf.usi.mindbricks.model.visual.calendar.CalendarSyncService;
 import ch.inf.usi.mindbricks.util.SoundPlayer;
 
-
+/**
+ * Settings activity that displays various settings fragments in a tabbed layout.
+ *
+ * @author Luca Di Bello
+ * @author Marta
+ * @author Loca0307
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     private CalendarSyncService syncService;

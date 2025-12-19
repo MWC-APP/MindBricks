@@ -16,7 +16,11 @@ import androidx.fragment.app.DialogFragment;
 import ch.inf.usi.mindbricks.R;
 import ch.inf.usi.mindbricks.util.questionnaire.ProductivityQuestionnaireConfig;
 import ch.inf.usi.mindbricks.util.questionnaire.ProductivityQuestionnaireResult;
-
+/**
+ * Fragment that displays a detailed productivity questionnaire dialog.
+ *
+ * @author Luca Di Bello
+ */
 public class ProductivityQuestionsDialogFragment extends DialogFragment {
 
     /**
@@ -199,12 +203,18 @@ public class ProductivityQuestionsDialogFragment extends DialogFragment {
     }
 
 
+    /**
+     * Listener interface for questionnaire actions.
+     */
     public interface OnQuestionnaireActionListener {
         void onQuestionnaireComplete(ProductivityQuestionnaireResult result);
 
         void onQuestionnaireSkipped();
     }
 
+    /**
+     * Callback interface for rating changes.
+     */
     private interface RatingCallback {
         void onRatingChanged(int rating);
     }

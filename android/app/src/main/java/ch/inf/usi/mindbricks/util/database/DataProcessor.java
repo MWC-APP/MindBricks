@@ -30,6 +30,9 @@ import ch.inf.usi.mindbricks.util.PreferencesManager;
 /**
  * Utility class for processing and analyzing study session data.
  * Contains methods to transform raw session data into chart-ready statistics.
+ *
+ * @author Luca Di Bello
+ * @author Marta
  */
 public class DataProcessor {
 

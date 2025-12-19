@@ -15,6 +15,9 @@ import ch.inf.usi.mindbricks.util.AppExecutor;
 
 /**
  * Repository class for CalendarEvent data access.
+ *
+ * @author Luca Di Bello
+ * @author Marta Šafářová
  */
 public class CalendarRepository {
 

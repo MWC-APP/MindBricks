@@ -1,5 +1,10 @@
 package ch.inf.usi.mindbricks.model.recommendation;
 
+/**
+ * class class.
+ *
+ * @author Marta Šafářová
+ */
 public class ActivityBlock {
     private final ActivityType activityType;
     private final int startHour;

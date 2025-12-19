@@ -3,7 +3,11 @@ package ch.inf.usi.mindbricks.util;
 import android.content.Context;
 
 import ch.inf.usi.mindbricks.R;
-
+/**
+ * Tag utility class.
+ *
+ * @author Luca Di Bello
+ */
 public final class Tags {
     public static int[] getTagColorPalette(Context ctx) {
         return new int[]{

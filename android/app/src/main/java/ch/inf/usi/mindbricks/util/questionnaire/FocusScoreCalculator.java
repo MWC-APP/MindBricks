@@ -2,6 +2,8 @@ package ch.inf.usi.mindbricks.util.questionnaire;
 
 /**
  * Utility class for calculating focus score based on questionnaire answers.
+ *
+ * @author Luca Di Bello
  */
 final class FocusScoreCalculator {
 

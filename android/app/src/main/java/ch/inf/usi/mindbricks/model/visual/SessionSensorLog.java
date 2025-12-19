@@ -5,6 +5,12 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+/**
+ * Model class representing a sensor log entry for a study session in the database.
+ *
+ * @author Luca Di Bello
+ * @author Marta
+ */
 @Entity(
         tableName = "session_sensor_logs",
         foreignKeys = @ForeignKey(

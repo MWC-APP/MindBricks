@@ -16,6 +16,8 @@ import java.util.Map;
 
 /**
  * Helper class to load tile bitmaps from png assets and tileset sheets (for ground/water tiles).
+ *
+ * @author Luca Di Bello
  */
 public class TileBitmapLoader {
 
