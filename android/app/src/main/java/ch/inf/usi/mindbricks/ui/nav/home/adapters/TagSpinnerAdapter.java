@@ -60,6 +60,11 @@ public class TagSpinnerAdapter extends ArrayAdapter<Tag> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.component_spinner_tag_item, parent, false);
         }
 
+        // Validate position to prevent IndexOutOfBoundsException
+        if (position < 0 || position >= getCount()) {
+            return convertView;
+        }
+
         // load data from the tag into the view
         Tag tag = getItem(position);
         if (tag != null) {

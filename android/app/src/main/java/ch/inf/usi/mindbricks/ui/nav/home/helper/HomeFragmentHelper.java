@@ -123,26 +123,29 @@ public class HomeFragmentHelper extends Fragment {
                     Tag createNewTag = new Tag("+ Create New Tag", getResources().getColor(R.color.analytics_accent_green, null));
                     tags.add(createNewTag);
 
-                    // setup spinner items - one component for each tag
-                    TagSpinnerAdapter adapter = new TagSpinnerAdapter(requireContext(), tags);
-                    tagSpinner.setAdapter(adapter);
-                    tagSpinner.setSelection(0, false); // select "No tag" by default
+                    // Update UI on main thread
+                    tagSpinner.post(() -> {
+                        // setup spinner items - one component for each tag
+                        TagSpinnerAdapter adapter = new TagSpinnerAdapter(requireContext(), tags);
+                        tagSpinner.setAdapter(adapter);
+                        tagSpinner.setSelection(0, false); // select "No tag" by default
 
-                    // Handle tag selection
-                    tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            // check if the selected item is the "Create New Tag" option
-                            Tag selectedTag = (Tag) parent.getItemAtPosition(position);
-                            if (selectedTag.getTitle().equals("+ Create New Tag")) {
-                                showAddTagDialog(tagSpinner);
+                        // Handle tag selection
+                        tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                // check if the selected item is the "Create New Tag" option
+                                Tag selectedTag = (Tag) parent.getItemAtPosition(position);
+                                if (selectedTag.getTitle().equals("+ Create New Tag")) {
+                                    showAddTagDialog(tagSpinner);
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onNothingSelected(android.widget.AdapterView<?> parent) {
-                            // Do nothing
-                        }
+                            @Override
+                            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                                // Do nothing
+                            }
+                        });
                     });
                 });
 
