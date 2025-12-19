@@ -24,13 +24,11 @@ Here is the full list of the refactors I (@lucadibello) managed to do during in 
 - [x] Fixed ring chart in `AnalyticsFragment`: now highlighting today's sessions rather than yesterday's.
 - [x] `TagManager` class had two methods doing the same thing in different ways. I merged them into a single method.
 - [x] Solved bug in tags management: when adding a tag, we were not setting the correct ID to the POJO object, causing foreign key constraint exceptions when trying to save sessions with newly created tags.
+- [x] Adding `@author` tags to all classes to make it clear who did what
 - [x] Solved bug where we the app was still referencing the previous tag ID after the user has selected a different tag for a session.
 - [x] Before we locked only the navbar and the settings menu when studying. Now we lock also the tag spinner.
-- [x] Added `@author` tags to all classes to make it clear who did what
-- [x] The heatmap should always render all hours of the day, not only the ones that has already seen
-- [x] More granular settings for timer (short/long/focus)
-
-- [] Added Javadocs to all classes, methods, fields, etc.
+- [x] Sensor sampling broke after some ~30s when phone is in standby. Using WakeLock as suggested by the Android SDK doc
+- [x] More granular settings for timer (short/long/focus) as suggested during the presentation
 
 > During this time span, I did not add any new feature to the app, just refactored existing code to improve its quality and maintainability, as well as removing some bugs/inconsistencies/messy code.
 

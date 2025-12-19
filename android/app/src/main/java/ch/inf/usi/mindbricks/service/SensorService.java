@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -100,6 +101,7 @@ public class SensorService extends Service {
     private HandlerThread sensorHandlerThread;
     private Handler sensorHandler;
     private final ExecutorService dbExecutor = Executors.newSingleThreadExecutor();
+    private PowerManager.WakeLock wakeLock;
 
     @Override
     public void onCreate() {
@@ -158,6 +160,20 @@ public class SensorService extends Service {
 
         Log.d(TAG, "Starting session: " + sessionId);
         currentSessionId = sessionId;
+
+        // hold power lock to keep CPU running during standby
+        // SOURCES:
+        // - https://developer.android.com/training/scheduling/wakelock
+        // - https://developer.android.com/develop/background-work/background-tasks/awake/wakelock/set
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        if (powerManager != null) {
+            wakeLock = powerManager.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK,
+                "MindBricks::SensorServiceWakeLock"
+            );
+            wakeLock.acquire();
+            Log.d(TAG, "WakeLock acquired");
+        }
 
         // Start Foreground Service
         createNotificationChannel();
@@ -229,6 +245,13 @@ public class SensorService extends Service {
 
         // Stop Loop
         sensorHandler.removeCallbacks(logRunnable);
+
+        // Release WakeLock
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+            Log.d(TAG, "WakeLock released");
+            wakeLock = null;
+        }
 
         stopForeground(true);
         stopSelf();
@@ -353,6 +376,13 @@ public class SensorService extends Service {
         Log.d(TAG, "Service onDestroy called");
 
         stopSession(); // Ensure everything is stopped
+
+        // Ensure WakeLock is released if not already
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+            Log.w(TAG, "WakeLock released in onDestroy (safety fallback)");
+            wakeLock = null;
+        }
 
         // Gracefully shutdown executor with timeout
         dbExecutor.shutdown();
