@@ -2,13 +2,13 @@
 
 ### Refactor (from 16.12.25 to 19.12.25)
 
-As cited during the last lesson, it's possible to make some changes in the code before the submission of the project (scheduled for the 17th of December, 2025).
+As cited during the last lesson, it's possible to make some changes in the code before the submission of the project (scheduled for the 19th of December, 2025).
 The codebase of the app is quite big, and some features were poorly implemented (not optimized, not flexible, etc). The goal of this refactor is to improve the code quality and the user experience, while also solving some bugs along the way.
 
-Here is the full list of the refactors I (@lucadibello) managed to do during in this span of time:
+Here is the list of changes made after the presentation:
 
 - [x] Split the `HomeFragment` class (HUGE, contains both UI-related code / data-related code and some helper methods) into multiple smaller classes, each with a single responsibility (`HomeViewModel` for data-related code and `HomeFragmentHelper` for helper methods).
-- [x] The questionnaires are handled poorly (not using constants, emotion questionnaire answer passed to the perceived productivity questionnaire without any reason, constructors with too many parameters, etc). I refactored the questionnaire-related code to make it more modular and easier to maintain.
+- [x] The questionnaires are handled poorly (not using constants, emotion questionnaire answer passed to the perceived productivity questionnaire without any reason, constructors with too many parameters, etc). Refactored the questionnaire-related code to make it more modular and easier to maintain.
 - [x] The code still used a database seeder, while we have a `debug` settings menu available on debug builds. I removed the class entirely.
 - [x] Removed unused string resources.
 - [x] Deleted old `ProfileFragment` (removed, wasn't needed anymore).
