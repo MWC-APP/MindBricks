@@ -1,7 +1,9 @@
 package ch.inf.usi.mindbricks.ui.nav.home.helper;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +69,9 @@ public class HomeFragmentHelper extends Fragment {
      */
     protected ProfileViewModel profileViewModel;
 
+    @Nullable
+    private Tag defaultTag = null;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,16 +106,18 @@ public class HomeFragmentHelper extends Fragment {
      *
      * @param tagSpinner spinner to set up
      */
-    protected void setupTagSpinner(Spinner tagSpinner) {
+    protected void setupTagSpinner(Spinner tagSpinner, @Nullable Runnable onTagsLoaded) {
         // Load tags on background thread
         AppExecutor.getInstance().execute(
                 () -> {
                     // Ensure default "No tag" exists
-                    Tag defaultTag = db.tagDao().getTagByTitle("No tag");
                     if (defaultTag == null) {
-                        defaultTag = new Tag("No tag", android.graphics.Color.GRAY);
-                        long defaultTagId = db.tagDao().insert(defaultTag);
-                        defaultTag.setId(defaultTagId);
+                        defaultTag = db.tagDao().getTagByTitle("No tag");
+                        if (defaultTag == null) {
+                            defaultTag = new Tag("No tag", Color.GRAY);
+                            long defaultTagId = db.tagDao().insert(defaultTag);
+                            defaultTag.setId(defaultTagId);
+                        }
                     }
 
                     // Load user tags from preferences (will eventually migrate to database)
@@ -129,6 +136,11 @@ public class HomeFragmentHelper extends Fragment {
                         TagSpinnerAdapter adapter = new TagSpinnerAdapter(requireContext(), tags);
                         tagSpinner.setAdapter(adapter);
                         tagSpinner.setSelection(0, false); // select "No tag" by default
+
+                        // run callback if provided
+                        if (onTagsLoaded != null) {
+                            onTagsLoaded.run();
+                        }
 
                         // Handle tag selection
                         tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -165,16 +177,17 @@ public class HomeFragmentHelper extends Fragment {
                 // on create callback
                 newTag -> {
                     // reload tag spinner
-                    setupTagSpinner(tagSpinner);
-
-                    // find + set new tag
-                    for (int i = 0; i < tagSpinner.getCount(); i++) {
-                        Tag tag = (Tag) tagSpinner.getItemAtPosition(i);
-                        if (tag.getTitle().equals(newTag.getTitle()) && tag.getColor() == newTag.getColor()) {
-                            tagSpinner.setSelection(i);
-                            break;
+                    setupTagSpinner(tagSpinner, () -> {
+                        // find + set new tag
+                        for (int i = 0; i < tagSpinner.getCount(); i++) {
+                            Tag tag = (Tag) tagSpinner.getItemAtPosition(i);
+                            Log.d("HomeFragmentHelper", "Comparing tags: " + newTag.getTitle() + " vs " + tag.getTitle());
+                            if (newTag.equals(tag)) {
+                                tagSpinner.setSelection(i);
+                                break;
+                            }
                         }
-                    }
+                    });
                 },
                 // on cancel callback
                 () -> tagSpinner.setSelection(0) // reset to "no tag" on cancel

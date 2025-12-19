@@ -97,7 +97,7 @@ public class HomeFragment extends HomeFragmentHelper {
         sessionDotsLayout = view.findViewById(R.id.session_dots_layout);
 
         // setup tag selector
-        setupTagSpinner(tagSpinner);
+        setupTagSpinner(tagSpinner, null);
 
         // Initialize the list of session dot ImageViews
         sessionDots = new ArrayList<>();
