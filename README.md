@@ -31,7 +31,6 @@
 - [Key Components](#-key-components)
 - [Database Schema](#-database-schema)
 - [Building the Project](#-building-the-project)
-- [Contributors](#-contributors)
 - [License](#-license)
 
 ---
@@ -828,42 +827,15 @@ Then build:
 ./gradlew assembleRelease
 ```
 
-## 👥 Contributors
-
-| Member | Role | Key Contributions |
-|--------|------|-------------------|
-| **Luca Di Bello** | Data Processing & DB | • Sensor drivers (Microphone, Light, Motion)<br>• Database logic & Focus score estimation<br>• User onboarding, Settings & Data validation<br>• City personalization & Gamification logic |
-| **Marta Šafářová** | UI & Data Visualization | • Perceived productivity questionnaire (research-based)<br>• Analytics visualizations & Charts<br>• Interactive study timeline recommendation system |
-| **Luca Beltrami** | UI & Gamification | • Core app experience & Pomodoro timer logic<br>• Notifications & Sound effects<br>• Gamification animations & City structure |
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
-## 🐛 Known Issues & Future Improvements
-
-### Known Issues
-- Sensor sampling may occasionally lag on older devices
-- Calendar sync requires manual refresh in some cases
-- City grid scrolling can be jittery on low-end devices
-
-### Planned Features
-- **Cloud Sync**: Backup and sync across devices
-- **Study Groups**: Collaborative study sessions
-- **Advanced Analytics**: Machine learning-based insights
-- **Widget Support**: Home screen timer widget
-- **Wear OS App**: Companion app for smartwatches
-- **Export Data**: CSV/JSON export for external analysis
-- **Study Playlists**: Integrated music player with focus playlists
-- **Achievements System**: Badges and milestones
-
----
-
 ## 🙏 Final Notes
 
-MindBricks represents months of dedicated development, combining theoretical knowledge with practical Android development skills. The project demonstrates:
+MindBricks represents two months of dedicated development, combining theoretical knowledge with practical Android development skills. The project demonstrates:
 
 - ✅ Clean architecture with separation of concerns
 - ✅ Modern Android development best practices
