@@ -1,0 +1,79 @@
+MIT License
+
+Copyright (c) 2024-2026 MindBricks Team
+- Luca Di Bello
+- Marta Šafářová
+- Luca Beltrami
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Third-Party Libraries
+
+This project uses the following third-party libraries:
+
+### AndroidX Libraries
+- AndroidX Core, AppCompat, Material Components
+- Room Database, ViewModel, LiveData, Navigation
+- License: Apache License 2.0
+- https://developer.android.com/jetpack
+
+### MPAndroidChart
+- Copyright 2018 Philipp Jahoda
+- License: Apache License 2.0
+- https://github.com/PhilJay/MPAndroidChart
+
+### Glide
+- Copyright 2014 Google, Inc.
+- License: Apache License 2.0, BSD, MIT
+- https://github.com/bumptech/glide
+
+### Gson
+- Copyright 2008 Google Inc.
+- License: Apache License 2.0
+- https://github.com/google/gson
+
+---
+
+## Academic Use Notice
+
+This project was developed as part of a university course at:
+- **Institution**: Università della Svizzera italiana (USI)
+- **Course**: Mobile Application Development
+- **Academic Year**: 2024-2025
+
+The project is released under MIT License to promote open-source learning
+and allow others to benefit from the code and architecture patterns used.
+
+---
+
+## Attribution
+
+If you use this project or its code in your own work, we'd appreciate:
+1. Keeping this license file with attribution
+2. A link back to the original repository
+3. A mention in your project's acknowledgments
+
+While not required by the MIT License, attribution helps support open-source
+development and gives credit to the original authors.
+
+---
+
+For questions about licensing, please open an issue on GitHub.
